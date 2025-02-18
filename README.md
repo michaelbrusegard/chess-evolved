@@ -57,7 +57,7 @@ Create APK:
 ./gradlew android:assembleRelease
 ```
 
-#### Debug and Testing
+### Debug and Testing
 
 This is not setup yet! Remove this when setup is complete and add GitHub action.
 
