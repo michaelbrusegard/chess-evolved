@@ -1,5 +1,5 @@
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-eclipse.project.name = appName + '-core'
+eclipse.project.name = appName + '-chesstwo_presenter'
 
 dependencies {
   api "com.badlogicgames.ashley:ashley:$ashleyVersion"
@@ -36,6 +36,8 @@ dependencies {
   api "net.onedaybeard.artemis:artemis-odb:$artemisOdbVersion"
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+
+  implementation project (":chesstwo_model")
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
