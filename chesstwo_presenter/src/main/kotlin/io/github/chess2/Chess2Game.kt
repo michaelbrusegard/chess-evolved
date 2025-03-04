@@ -10,9 +10,8 @@ import ktx.assets.disposeSafely
 import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
 import ktx.graphics.use
-import io.github.chess2.ExampleFile
 
-class Chess2Game : KtxGame<KtxScreen>() {
+class Chess2Game : KtxGame<KtxScreen>(){
     override fun create() {
         KtxAsync.initiate()
 
