@@ -4,7 +4,8 @@ gradle-app.setting
 /gradle/gradle-daemon-jvm.properties
 /build/
 /android/build/
-/core/build/
+/chesstwo_presenter/build/
+/chesstwo_model/build/
 /lwjgl2/build/
 /lwjgl3/build/
 /html/build/
