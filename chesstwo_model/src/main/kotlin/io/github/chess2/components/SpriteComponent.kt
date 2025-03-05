@@ -9,6 +9,10 @@ import ktx.assets.toInternalFile
 /**
  * @param spriteName - Should just be relative location in assets folder.
  */
-class SpriteComponent(spriteName: String) : Component{
-    var batch: Sprite =  Sprite(Texture(spriteName.toInternalFile()))
+class SpriteComponent(spriteName: String, renderPosX: Float, renderPosY: Float) : Component{
+    val sprite: Sprite =  Sprite(Texture(spriteName.toInternalFile()))
+
+    init {
+        sprite.setPosition(renderPosX, renderPosY)
+    }
 }
