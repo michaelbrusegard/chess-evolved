@@ -8,11 +8,13 @@ import io.github.chessevolved.components.SpriteComponent
 import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
 import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.supabase.SupabaseClient
 
 class GamePresenter : IPresenter {
     // Have a list of pieces for now, this should be established in the playersingleton later.
     val pieces: MutableList<ChessPiece> = mutableListOf()
     val board: ChessBoard = ChessBoard()
+    val supabaseClient: SupabaseClient = SupabaseClient
 
     val boardSize: Int = 8
 
