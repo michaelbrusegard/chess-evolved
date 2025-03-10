@@ -5,6 +5,7 @@ import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.result.PostgrestResult
+import kotlinx.serialization.Serializable
 
 object SupabaseLobbyHandler {
     /**
@@ -54,5 +55,46 @@ object SupabaseLobbyHandler {
             }
         }
         return ""; // Code should never reach this, but interpreter doesn't understand that.
+    }
+
+    @Serializable
+    data class Lobbies(
+        val id: Int,
+        val created_at: String,
+        val lobby_code: String,
+        val second_player: Boolean
+    )
+
+    /**
+     * Joins a lobby corresponding to the lobbyCode provided.
+     * @param lobbyCode corresponding to the lobby the player wants to join
+     * @throws Error if a lobby does not exist or a lobby is full
+     */
+    suspend fun joinLobby(lobbyCode : String) {
+        // TODO: Change up what type of error is thrown upon full and non-existent lobbies.
+        val response = supabase.from("lobbies").select() {
+            filter {
+                eq("lobby_code", lobbyCode)
+            }
+        }.decodeList<Lobbies>()
+
+        if (response.isEmpty()) {
+            throw Exception("Lobby does not exist.")
+        }
+        if (response[0].second_player) {
+            throw Exception("Lobby is full!")
+        }
+
+        supabase.from("lobbies")
+                .update(
+                    {
+                        set("second_player", value = true)
+                    }
+                )
+                {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
+                }
     }
 }
