@@ -5,7 +5,7 @@ import io.github.chessevolved.singletons.GameSettings
 class SettingsPresenter : IPresenter {
 
     //TODO: wait for implementation of ScenePresenterStateManager
-    val gameSettings = GameSettings
+    private val gameSettings = GameSettings
     //val presenterManager = ScenePresenterStateManager
 
     /**
@@ -37,7 +37,12 @@ class SettingsPresenter : IPresenter {
     /**
      *  Switch to LobbyPresenter
      */
-    fun onBack() {
+    fun returnToLobby() {
         //TODO: wait for implementation of ScenePresenterStateManager
+    }
+
+    override
+    fun render() {
+        // Required by IPresenter
     }
 }
