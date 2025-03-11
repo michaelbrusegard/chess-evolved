@@ -5,7 +5,7 @@ import io.github.chessevolved.entities.ChessPiece
 import ktx.ashley.get
 
 class MovementSystem {
-    fun changeChessPiecePosition(chesspiece: ChessPiece, x: Int, y: Int): Unit {
+    fun moveChessPiece(chesspiece: ChessPiece, x: Int, y: Int): Unit {
 
     }
 }
