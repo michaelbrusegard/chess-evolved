@@ -1,5 +1,6 @@
 package io.github.chessevolved.presenters
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Sprite
 import io.github.chessevolved.components.BoardSizeComponent
 import io.github.chessevolved.components.ChessBoardSpriteComponent
@@ -7,36 +8,53 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SpriteComponent
 import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
-import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.views.IView
 
-class GamePresenter : IPresenter {
-    // Have a list of pieces for now, this should be established in the playersingleton later.
+class GamePresenter(givenView: IView) : IPresenter {
     val pieces: MutableList<ChessPiece> = mutableListOf()
     val board: ChessBoard = ChessBoard()
 
+    val boardViewportSize: Float = Gdx.graphics.width - 10f
+    var boardScreenPosX: Int = 0
+    var boardScreenPosY: Int = 0
+    val pixelSize: Int = 32
+    val view: IView = givenView
+
+    // Temporary value, should be defined elsewhere
     val boardSize: Int = 8
 
     init {
-        // Test values for now
-        for (i in 0..4) {
-            val piece: ChessPiece = ChessPiece()
-            piece.add(PositionComponent(i, i))
-            piece.add(SpriteComponent("pieces/rookBlackExample.png", i * 32.0f, i * 32.0f))
-            pieces.add(piece)
-            ECSEngine.addEntity(piece)
-        }
-
         board.add(BoardSizeComponent(boardSize))
         board.add(ChessBoardSpriteComponent())
-        ECSEngine.addEntity(board)
+
+        val piece: ChessPiece = ChessPiece()
+        piece.add(PositionComponent(4, 4))
+        piece.add(SpriteComponent("pieces/rookBlackExample.png"))
+
+        pieces.add(piece)
+
+        boardScreenPosX = (Gdx.graphics.width - (boardSize * pixelSize)) / 2
+        boardScreenPosY = (Gdx.graphics.height - (boardSize * pixelSize)) / 2
     }
 
-    fun getPieceSprites() : List<Sprite> {
-        return pieces.map { it.getComponent(SpriteComponent::class.java).sprite }
-    }
+    override fun render() {
+        view.beginBatch()
+        for (y in 0..boardSize-1) {
+            for (x in 0..boardSize-1) {
+                var sprite = board.getComponent(ChessBoardSpriteComponent::class.java).whiteTileSprite
+                if ((y + x) % 2 == 0) {
+                    sprite = board.getComponent(ChessBoardSpriteComponent::class.java).blackTileSprite
+                }
+                sprite.setPosition(boardScreenPosX.toFloat() + pixelSize * x, boardScreenPosY.toFloat() + pixelSize * y)
+                view.render(sprite)
+            }
+        }
 
-    fun getBoardSprites() : List<Sprite> {
-        return listOf(board.getComponent(ChessBoardSpriteComponent::class.java).blackTileSprite,
-                      board.getComponent(ChessBoardSpriteComponent::class.java).whiteTileSprite)
+        val sprite: Sprite = pieces[0].getComponent(SpriteComponent::class.java).sprite
+        val posComp: PositionComponent = pieces[0].getComponent(PositionComponent::class.java)
+        sprite.setPosition((boardScreenPosX + (posComp.xPos-1) * pixelSize).toFloat(), (boardScreenPosY + (posComp.yPos-1) * pixelSize).toFloat())
+        view.render(sprite)
+
+        view.endBatch()
     }
 }
