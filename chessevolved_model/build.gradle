@@ -51,6 +51,8 @@ dependencies {
   implementation("io.ktor:ktor-client-cio:$ktor_version")
   //END SUPABASE DEPENDENCIES
 
+  // We need this to be able to retrieve .env variables. See https://github.com/cdimascio/dotenv-kotlin?tab=readme-ov-file#faq
+  implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
 
 }

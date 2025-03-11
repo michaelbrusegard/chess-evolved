@@ -1,5 +1,6 @@
 package io.github.chessevolved.supabase
 
+import io.github.cdimascio.dotenv.dotenv
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.logging.LogLevel
@@ -10,11 +11,12 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
 object SupabaseClient {
+    private val dotenv = dotenv()
     private val supabase : SupabaseClient = createSupabaseClient(
-        supabaseUrl = "https://tsmubattgglbqaarktnw.supabase.co",
+        supabaseUrl = dotenv["SUPABASE_URL"] ?: "no_url_found",
 
         // This key is an admin (service role) key.
-        supabaseKey = ""
+        supabaseKey = dotenv["SUPABASE_ADMIN_KEY"] ?: "no_key_found"
     ) {
         install(Postgrest)
         install(Realtime) {
