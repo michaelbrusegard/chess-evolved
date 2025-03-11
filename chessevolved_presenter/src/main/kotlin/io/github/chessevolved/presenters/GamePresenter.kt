@@ -21,11 +21,17 @@ class GamePresenter : IPresenter {
 
     val boardSize: Int = 8
 
+    private fun onLobbyEvent(newLobbyRow : SupabaseLobbyHandler.Lobby) {
+        println("Registered lobby event in lobby event handler! LobbyID: " + newLobbyRow.id)
+    }
+
     init {
+
         suspend fun test() {
-            var lobbyCode = supabaseLobbyHandler.createLobby()
-            supabaseLobbyHandler.joinLobby(lobbyCode)
+            var lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
+
         }
+
         GlobalScope.launch { test() }
         // Test values for now
         for (i in 0..4) {

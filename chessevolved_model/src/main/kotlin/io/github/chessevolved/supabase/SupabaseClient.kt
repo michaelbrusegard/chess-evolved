@@ -28,7 +28,7 @@ object SupabaseClient {
         })
     }
 
-    public fun getSupabaseClient(): SupabaseClient {
+    fun getSupabaseClient(): SupabaseClient {
         return supabase
     }
 }

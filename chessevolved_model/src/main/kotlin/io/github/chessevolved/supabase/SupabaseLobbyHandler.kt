@@ -3,9 +3,18 @@ package io.github.chessevolved.supabase
 import io.github.chessevolved.supabase.SupabaseClient.getSupabaseClient
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.Columns
-import io.github.jan.supabase.postgrest.result.PostgrestResult
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
+import io.github.jan.supabase.realtime.PostgresAction
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresChangeFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 
 object SupabaseLobbyHandler {
     /**
@@ -17,6 +26,18 @@ object SupabaseLobbyHandler {
      * Supabase client used to query supabase
      */
     private val supabase = getSupabaseClient()
+
+    /**
+     * Type used for lobbies saved in database.
+     */
+    @Serializable
+    data class Lobby(
+        val id: Int,
+        val created_at: String,
+        val lobby_code: String,
+        val second_player: Boolean,
+        val game_started: Boolean
+    )
 
     // Taken from https://stackoverflow.com/questions/46943860/idiomatic-way-to-generate-a-random-alphanumeric-string-in-kotlin
     /**
@@ -38,7 +59,7 @@ object SupabaseLobbyHandler {
      * @return string containing the lobby-code of the lobby created.
      * @throws PostgrestRestException if creating a lobby fails three times.
      */
-    suspend fun createLobby(): String {
+    suspend fun createLobby(onEventListener: (newLobbyRow : Lobby) -> Unit): String {
         // TODO: Add subscribe to row to see if other players join the lobby.
         println("LAUNCHING LOBBY")
         var lobbyCode = getRandomString(LOBBY_CODE_LENGTH);
@@ -46,6 +67,9 @@ object SupabaseLobbyHandler {
         for (attempts in 1..3) {
             try {
                 supabase.from("lobbies").insert(mapOf("lobby_code" to lobbyCode))
+                addLobbyListener(lobbyCode, onEventListener)
+                Thread.sleep(3000L)
+                joinLobby(lobbyCode, onEventListener)
                 return lobbyCode
             } catch (e : PostgrestRestException) {
                 if (attempts == 3) {
@@ -57,26 +81,18 @@ object SupabaseLobbyHandler {
         return ""; // Code should never reach this, but interpreter doesn't understand that.
     }
 
-    @Serializable
-    data class Lobbies(
-        val id: Int,
-        val created_at: String,
-        val lobby_code: String,
-        val second_player: Boolean
-    )
-
     /**
      * Joins a lobby corresponding to the lobbyCode provided.
      * @param lobbyCode corresponding to the lobby the player wants to join
      * @throws Error if a lobby does not exist or a lobby is full
      */
-    suspend fun joinLobby(lobbyCode : String) {
+    suspend fun joinLobby(lobbyCode : String, onEventListener: (newLobbyRow : Lobby) -> Unit) {
         // TODO: Change up what type of error is thrown upon full and non-existent lobbies.
         val response = supabase.from("lobbies").select() {
             filter {
                 eq("lobby_code", lobbyCode)
             }
-        }.decodeList<Lobbies>()
+        }.decodeList<Lobby>()
 
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
@@ -84,8 +100,9 @@ object SupabaseLobbyHandler {
         if (response[0].second_player) {
             throw Exception("Lobby is full!")
         }
-
-        supabase.from("lobbies")
+        //addLobbyListener(lobbyCode, onEventListener)
+        try {
+            supabase.from("lobbies")
                 .update(
                     {
                         set("second_player", value = true)
@@ -96,5 +113,30 @@ object SupabaseLobbyHandler {
                         eq("lobby_code", lobbyCode)
                     }
                 }
+        } catch (e : PostgrestRestException) {
+            // TODO: If lobby row is deleted right after checking if the lobby exists, we might get an exception here.
+        }
+    }
+
+    private suspend fun addLobbyListener(lobbyCode : String, onEventListener: (newLobbyRow : Lobby) -> Unit) {
+        val channel = supabase.channel(lobbyCode) {
+            //optional config
+        }
+
+        val changeFlow = channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+            table = "lobbies"
+            filter("lobby_code", FilterOperator.EQ, lobbyCode)
+        }
+
+        val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+        changeFlow.onEach {
+            val updatedRecord = it.record
+            val lobby = Json.decodeFromString<Lobby>(updatedRecord.toString())
+
+            onEventListener(lobby)
+        }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
+
+        channel.subscribe()
     }
 }
