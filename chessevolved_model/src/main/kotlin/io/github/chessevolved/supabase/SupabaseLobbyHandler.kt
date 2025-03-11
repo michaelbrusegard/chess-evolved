@@ -60,7 +60,6 @@ object SupabaseLobbyHandler {
      * @throws PostgrestRestException if creating a lobby fails three times.
      */
     suspend fun createLobby(onEventListener: (newLobbyRow : Lobby) -> Unit): String {
-        // TODO: Add subscribe to row to see if other players join the lobby.
         println("LAUNCHING LOBBY")
         var lobbyCode = getRandomString(LOBBY_CODE_LENGTH);
 
@@ -68,8 +67,6 @@ object SupabaseLobbyHandler {
             try {
                 supabase.from("lobbies").insert(mapOf("lobby_code" to lobbyCode))
                 addLobbyListener(lobbyCode, onEventListener)
-                Thread.sleep(3000L)
-                joinLobby(lobbyCode, onEventListener)
                 return lobbyCode
             } catch (e : PostgrestRestException) {
                 if (attempts == 3) {
@@ -138,5 +135,27 @@ object SupabaseLobbyHandler {
         }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
         channel.subscribe()
+    }
+
+    suspend fun startGame(lobbyCode : String) {
+        try {
+            supabase.from("games")
+                .insert(mapOf("lobby_code" to lobbyCode))
+
+            supabase.from("lobbies")
+                .update(
+                    {
+                        set("game_started", value = true)
+                    }
+                )
+                {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
+                }
+
+        } catch (e : PostgrestRestException) {
+            // TODO: Handle error when trying to start a game for a lobby that does not exist.
+        }
     }
 }

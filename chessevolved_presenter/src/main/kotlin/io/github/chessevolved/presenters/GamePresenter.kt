@@ -10,6 +10,8 @@ import io.github.chessevolved.entities.ChessPiece
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.supabase.SupabaseClient
 import io.github.chessevolved.supabase.SupabaseLobbyHandler
+import io.github.chessevolved.supabase.SupabaseLobbyHandler.joinLobby
+import io.github.chessevolved.supabase.SupabaseLobbyHandler.startGame
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -28,8 +30,10 @@ class GamePresenter : IPresenter {
     init {
 
         suspend fun test() {
-            var lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
-
+            val lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
+            Thread.sleep(3000L)
+            joinLobby(lobbyCode, ::onLobbyEvent) // Think of this as player2
+            startGame(lobbyCode)
         }
 
         GlobalScope.launch { test() }
