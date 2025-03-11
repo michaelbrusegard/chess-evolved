@@ -26,4 +26,9 @@ class LobbyPresenter : IPresenter {
     fun returnToMenu() {
         //TODO: Wait for ScenePresenterStateManager
     }
+
+    override
+    fun render() {
+        // Required by IPresenter
+    }
 }

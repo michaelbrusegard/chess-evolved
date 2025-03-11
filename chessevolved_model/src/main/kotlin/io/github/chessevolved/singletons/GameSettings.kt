@@ -1,8 +1,8 @@
 package io.github.chessevolved.singletons
 
 object GameSettings {
-    var fogOfWar: Boolean = false
-    var boardSize: Int = 8
+    private var fogOfWar: Boolean = false
+    private var boardSize: Int = 8
 
     /**
      * Toggles Fog of War for the game
