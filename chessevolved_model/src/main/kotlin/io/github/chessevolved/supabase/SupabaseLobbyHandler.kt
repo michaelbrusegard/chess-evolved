@@ -59,7 +59,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun createLobby(onEventListener: KSuspendFunction1<Lobby, Unit>): String {
         println("LAUNCHING LOBBY")
-        var lobbyCode = getRandomString(LOBBY_CODE_LENGTH);
+        var lobbyCode = getRandomString(LOBBY_CODE_LENGTH)
 
         for (attempts in 1..3) {
             try {
@@ -73,7 +73,7 @@ object SupabaseLobbyHandler {
                 lobbyCode = getRandomString(LOBBY_CODE_LENGTH)
             }
         }
-        return ""; // Code should never reach this, but interpreter doesn't understand that.
+        return "" // Code should never reach this, but interpreter doesn't understand that.
     }
 
     /**
@@ -95,7 +95,7 @@ object SupabaseLobbyHandler {
         if (response[0].second_player) {
             throw Exception("Lobby is full!")
         }
-        //addLobbyListener(lobbyCode, onEventListener)
+        addLobbyListener(lobbyCode, onEventListener)
         try {
             supabase.from("lobbies")
                 .update(
