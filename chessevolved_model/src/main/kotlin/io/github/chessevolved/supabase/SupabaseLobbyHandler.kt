@@ -5,16 +5,14 @@ import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.PostgresAction
-import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
+import kotlin.reflect.KSuspendFunction1
 
 object SupabaseLobbyHandler {
     /**
@@ -59,7 +57,7 @@ object SupabaseLobbyHandler {
      * @return string containing the lobby-code of the lobby created.
      * @throws PostgrestRestException if creating a lobby fails three times.
      */
-    suspend fun createLobby(onEventListener: (newLobbyRow : Lobby) -> Unit): String {
+    suspend fun createLobby(onEventListener: KSuspendFunction1<Lobby, Unit>): String {
         println("LAUNCHING LOBBY")
         var lobbyCode = getRandomString(LOBBY_CODE_LENGTH);
 
@@ -83,7 +81,7 @@ object SupabaseLobbyHandler {
      * @param lobbyCode corresponding to the lobby the player wants to join
      * @throws Error if a lobby does not exist or a lobby is full
      */
-    suspend fun joinLobby(lobbyCode : String, onEventListener: (newLobbyRow : Lobby) -> Unit) {
+    suspend fun joinLobby(lobbyCode: String, onEventListener: KSuspendFunction1<Lobby, Unit>) {
         // TODO: Change up what type of error is thrown upon full and non-existent lobbies.
         val response = supabase.from("lobbies").select() {
             filter {
@@ -115,10 +113,8 @@ object SupabaseLobbyHandler {
         }
     }
 
-    private suspend fun addLobbyListener(lobbyCode : String, onEventListener: (newLobbyRow : Lobby) -> Unit) {
-        val channel = supabase.channel(lobbyCode) {
-            //optional config
-        }
+    private suspend fun addLobbyListener(lobbyCode: String, onEventListener: KSuspendFunction1<Lobby, Unit>) {
+        val channel = SupabaseChannelSubscriber.getOrSubscribeToChannel(lobbyCode)
 
         val changeFlow = channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
             table = "lobbies"
