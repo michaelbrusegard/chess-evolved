@@ -9,16 +9,24 @@ import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.supabase.SupabaseClient
+import io.github.chessevolved.supabase.SupabaseLobbyHandler
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class GamePresenter : IPresenter {
     // Have a list of pieces for now, this should be established in the playersingleton later.
     val pieces: MutableList<ChessPiece> = mutableListOf()
     val board: ChessBoard = ChessBoard()
-    val supabaseClient: SupabaseClient = SupabaseClient
+    val supabaseLobbyHandler = SupabaseLobbyHandler
 
     val boardSize: Int = 8
 
     init {
+        suspend fun test() {
+            var lobbyCode = supabaseLobbyHandler.createLobby()
+            supabaseLobbyHandler.joinLobby(lobbyCode)
+        }
+        GlobalScope.launch { test() }
         // Test values for now
         for (i in 0..4) {
             val piece: ChessPiece = ChessPiece()
