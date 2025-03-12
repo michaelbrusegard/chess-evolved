@@ -1,4 +1,4 @@
-package io.github.chess2
+package io.github.chessevolved
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
@@ -11,7 +11,7 @@ import ktx.assets.toInternalFile
 import ktx.async.KtxAsync
 import ktx.graphics.use
 
-class Chess2Game : KtxGame<KtxScreen>(){
+class ChessEvolvedGame : KtxGame<KtxScreen>() {
     override fun create() {
         KtxAsync.initiate()
 
@@ -23,7 +23,7 @@ class Chess2Game : KtxGame<KtxScreen>(){
 class FirstScreen : KtxScreen {
     private val image = Texture("logo.png".toInternalFile(), true).apply { setFilter(Linear, Linear) }
     private val batch = SpriteBatch()
-    private var rText: ExampleFile = ExampleFile();
+    private var rText: ExampleFile = ExampleFile()
 
     override fun render(delta: Float) {
         clearScreen(red = 0.7f, green = 0.7f, blue = 0.7f)

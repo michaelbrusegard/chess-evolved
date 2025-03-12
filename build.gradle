@@ -63,7 +63,7 @@ configure(subprojects - project(':android')) {
 
 subprojects {
   version = "$projectVersion"
-  ext.appName = 'Chess2'
+  ext.appName = 'Chess Evolved'
   repositories {
     mavenCentral()
     maven { url 'https://s01.oss.sonatype.org' }
@@ -75,4 +75,4 @@ subprojects {
   }
 }
 
-eclipse.project.name = 'Chess2' + '-parent'
+eclipse.project.name = 'Chess Evolved' + '-parent'
