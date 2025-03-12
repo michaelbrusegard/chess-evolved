@@ -1,11 +1,13 @@
 package io.github.chessevolved.presenters
 
+import io.github.chessevolved.systems.LobbySystem
 import io.github.chessevolved.views.IView
 
 class JoinGamePresenter(
-    givenView: IView? = null,
+    joinGameView: IView? = null,
+    private val lobbySystem: LobbySystem = LobbySystem(),
 ) : IPresenter {
-    val view: IView? = givenView
+    val view: IView? = joinGameView
 
     /**
      * Attempts to join a game lobby by ID
@@ -13,17 +15,13 @@ class JoinGamePresenter(
      * @param lobbyID String representing the lobby to join
      * @return Boolean indicating success or failure
      */
-    fun joinGame(lobbyID: String): Boolean {
-        // TODO: Implement actual lobby joining logic when networking is ready
-        // For now, just validate the lobby ID format (placeholder logic)
-        return lobbyID.isNotEmpty()
-    }
+    fun joinGame(lobbyID: String): Boolean = lobbySystem.joinLobby(lobbyID)
 
     /**
      * Return to the menu scene using the presenter stack
      */
     fun returnToMenu() {
-        // TODO: Use ScenePresenterStateManager once implemented in issue #7
+        // TODO: idk but this should return here to let another presenter handle it
         // presenterManager.popToPresenter(MenuPresenter::class)
     }
 
