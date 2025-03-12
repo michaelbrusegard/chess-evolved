@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 //Note, the above license and copyright applies to this file only.
-package io.github.chess2.lwjgl3
+package io.github.chessevolved.lwjgl3
 
 import org.lwjgl.system.macosx.LibC
 import java.io.BufferedReader
