@@ -7,7 +7,7 @@ import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ktx.async.KtxAsync
 
-class ChessEvolvedGame : KtxGame<KtxScreen>(){
+class ChessEvolvedGame : KtxGame<KtxScreen>() {
     override fun create() {
         KtxAsync.initiate()
 

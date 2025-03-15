@@ -8,6 +8,8 @@ import ktx.assets.toInternalFile
 /**
  * @param spriteName - Should just be relative location in assets folder.
  */
-class SpriteComponent(spriteName: String) : Component{
-    val sprite: Sprite =  Sprite(Texture(spriteName.toInternalFile()))
+class SpriteComponent(
+    spriteName: String,
+) : Component {
+    val sprite: Sprite = Sprite(Texture(spriteName.toInternalFile()))
 }
