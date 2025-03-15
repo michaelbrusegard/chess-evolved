@@ -1,49 +1,101 @@
 package io.github.chessevolved
 
-import io.github.chessevolved.presenters.JoinGamePresenter
-import io.github.chessevolved.views.JoinGameView
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.utils.viewport.ScreenViewport
+import io.github.chessevolved.ui.ButtonT
+import io.github.chessevolved.ui.TextFieldT
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
-import ktx.async.KtxAsync
+import ktx.scene2d.Scene2DSkin
+import ktx.scene2d.scene2d
+import ktx.scene2d.table
 
 class ChessEvolvedGame : KtxGame<KtxScreen>() {
     override fun create() {
-        KtxAsync.initiate()
-
         addScreen(FirstScreen())
         setScreen<FirstScreen>()
     }
 }
 
 class FirstScreen : KtxScreen {
-    private val joinGameView = JoinGameView()
-    private val joinGamePresenter = JoinGamePresenter(joinGameView)
+    private val stage = Stage(ScreenViewport())
+    private val skin = Skin(Gdx.files.internal("comic/skin/comic-ui.json")) // Load the skin
 
     init {
-        // Set up callbacks from view to presenter
-        joinGameView.setJoinButtonCallback { joinGamePresenter.onJoinButtonPressed() }
-        joinGameView.setBackButtonCallback { joinGamePresenter.returnToMenu() }
-    }
+        Scene2DSkin.defaultSkin = skin
+        // Set up the UI using your custom components
+        val textField =
+            TextFieldT(
+                text = "",
+                skin = skin,
+                focusedColor = skin.getColor("white"),
+                unfocusedColor = skin.getColor("gray"),
+            )
 
-    // Commented out original game presenter
-    // val presenter: GamePresenter = GamePresenter(AndroidView())
+        val joinButton =
+            ButtonT(
+                text = "Join Game",
+                skin = skin,
+                defaultColor = skin.getColor("white"),
+                hoverColor = skin.getColor("gray"),
+                clickColor = skin.getColor("black"),
+            )
+
+        val backButton =
+            ButtonT(
+                text = "Back",
+                skin = skin,
+                defaultColor = skin.getColor("white"),
+                hoverColor = skin.getColor("gray"),
+                clickColor = skin.getColor("black"),
+            )
+
+        // Set up button callbacks
+        joinButton.setClickListener {
+            println("Join button clicked! Text: ${textField.text}")
+        }
+
+        backButton.setClickListener {
+            println("Back button clicked!")
+        }
+
+        // Add components to the stage using a table layout
+        stage.addActor(
+            scene2d.table {
+                setFillParent(true)
+                pad(20f)
+
+                add("Enter Game Code:").row()
+                add(textField).width(300f).pad(10f).row()
+                add(joinButton).width(200f).pad(10f).row()
+                add(backButton).width(200f).pad(10f).row()
+
+                center()
+            },
+        )
+
+        // Set the input processor to the stage
+        Gdx.input.inputProcessor = stage
+    }
 
     override fun render(delta: Float) {
         clearScreen(red = 0.1f, green = 0.1f, blue = 0.23f)
-        // presenter.render() - commented out
-        joinGamePresenter.render()
-        joinGameView.render(delta)
+        stage.act(delta)
+        stage.draw()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        joinGameView.resize(width, height)
+        stage.viewport.update(width, height, true)
     }
 
     override fun dispose() {
-        joinGameView.dispose()
+        stage.dispose()
+        skin.dispose()
     }
 }
