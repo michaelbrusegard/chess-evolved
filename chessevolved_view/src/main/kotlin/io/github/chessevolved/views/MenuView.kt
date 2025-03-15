@@ -14,5 +14,4 @@ class MenuView : IView {
     override fun render(sprite: Sprite) {
         TODO("Not yet implemented")
     }
-
 }
