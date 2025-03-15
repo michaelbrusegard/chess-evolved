@@ -16,7 +16,7 @@ class JoinGamePresenter(
      * @param lobbyID String representing the lobby to join
      * @return Boolean indicating success or failure
      */
-    fun joinGame(lobbyId: String): Boolean {
+    fun joinGame(lobbyId: String) {
         val success = Lobby.joinLobby(lobbyId)
 
         if (success) {
@@ -24,8 +24,6 @@ class JoinGamePresenter(
         } else {
             view.showJoinError("Error message should be put here")
         }
-
-        return success
     }
 
     fun onJoinButtonPressed(lobbyId: String) {
