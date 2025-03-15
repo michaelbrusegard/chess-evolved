@@ -2,11 +2,16 @@ package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
-import ktx.scene2d.*
+import ktx.scene2d.button
+import ktx.scene2d.dialog
+import ktx.scene2d.label
+import ktx.scene2d.scene2d
+import ktx.scene2d.table
+import ktx.scene2d.textButton
+import ktx.scene2d.textField
 
 class JoinGameView {
     private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
@@ -21,63 +26,69 @@ class JoinGameView {
     }
 
     fun setupUI() {
-        val root = scene2d.table {
-            setFillParent(true)
-            defaults().pad(20f).space(10f)
+        val root =
+            scene2d.table {
+                setFillParent(true)
+                defaults().pad(20f).space(10f)
 
-            label("Join Game", "title") {
-                it.padBottom(40f)
-            }
-            row()
+                label("Join Game", "title") {
+                    it.padBottom(40f)
+                }
+                row()
 
-            label("Enter Lobby Code:")
-            row()
+                label("Enter Lobby Code:")
+                row()
 
-            inputField = textField("") {
-                it.width(300f)
-            }
-            row()
+                inputField =
+                    textField("") {
+                        it.width(300f)
+                    }
+                row()
 
-            table {
-                defaults().pad(10f).width(200f)
+                table {
+                    defaults().pad(10f).width(200f)
 
-                textButton("Join Game") {
-                    onClick {
-                        onJoinButtonClicked(inputField.text)
+                    textButton("Join Game") {
+                        onClick {
+                            onJoinButtonClicked(inputField.text)
+                        }
+                    }
+
+                    textButton("Return to Menu") {
+                        onClick {
+                            onReturnButtonClicked()
+                        }
                     }
                 }
-
-                textButton("Return to Menu") {
-                    onClick {
-                        onReturnButtonClicked()
-                    }
-                }
             }
-        }
 
         stage.addActor(root)
     }
 
     fun showJoinSuccess() {
-        scene2d.dialog("Success", "dialog") {
-            contentTable.apply {
-                label("Successfully joined the lobby!")
-            }
-            button("OK") {
-                onClick { hide() }
-            }
-        }.show(stage)
+        scene2d
+            .dialog("Success", "dialog")
+            .apply {
+                contentTable.apply {
+                    label("Successfully joined the lobby!")
+                }
+                button("OK") {
+                    onClick { hide() }
+                }
+            }.show(stage)
     }
 
     fun showJoinError(message: String) {
-        scene2d.dialog("Error", "dialog") {
-            contentTable.apply {
-                label(message)
-            }
-            button("OK") {
-                onClick { hide() }
-            }
-        }.show(stage)
+        scene2d
+            .dialog("Error", "dialog")
+            .apply {
+                contentTable.apply {
+                    label(message)
+                }
+                button("OK") {
+                    onClick { hide() }
+                }
+            }.show(stage)
     }
 
     fun getLobbyId(): String = inputField.text
