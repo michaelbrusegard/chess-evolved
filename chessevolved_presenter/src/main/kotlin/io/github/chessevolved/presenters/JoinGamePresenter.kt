@@ -6,6 +6,10 @@ import io.github.chessevolved.views.JoinGameView
 class JoinGamePresenter(
     private val view: JoinGameView,
 ) : IPresenter {
+    init {
+        view.init()
+    }
+
     /**
      * Attempts to join a game lobby by ID
      *

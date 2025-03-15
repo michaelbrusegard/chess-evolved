@@ -14,7 +14,7 @@ import ktx.scene2d.table
 import ktx.scene2d.textButton
 import ktx.scene2d.textField
 
-class JoinGameView {
+class JoinGameView : IView {
     private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
     private lateinit var inputField: TextField
     private lateinit var toastContainer: Table
@@ -22,12 +22,7 @@ class JoinGameView {
     var onJoinButtonClicked: (String) -> Unit = {}
     var onReturnButtonClicked: () -> Unit = {}
 
-    init {
-        setupUI()
-        Gdx.input.inputProcessor = stage
-    }
-
-    fun setupUI() {
+    override fun init() {
         val root =
             scene2d.table {
                 setFillParent(true)
@@ -72,6 +67,24 @@ class JoinGameView {
 
         stage.addActor(root)
         stage.addActor(toastContainer)
+
+        Gdx.input.inputProcessor = stage
+    }
+
+    override fun render() {
+        stage.act(Gdx.graphics.deltaTime)
+        stage.draw()
+    }
+
+    override fun resize(
+        width: Int,
+        height: Int,
+    ) {
+        stage.viewport.update(width, height, true)
+    }
+
+    override fun dispose() {
+        stage.dispose()
     }
 
     fun showJoinSuccess() {
@@ -109,23 +122,5 @@ class JoinGameView {
                 Actions.run { toastContainer.clear() },
             ),
         )
-    }
-
-    fun getLobbyId(): String = inputField.text
-
-    fun render() {
-        stage.act(Gdx.graphics.deltaTime)
-        stage.draw()
-    }
-
-    fun resize(
-        width: Int,
-        height: Int,
-    ) {
-        stage.viewport.update(width, height, true)
-    }
-
-    fun dispose() {
-        stage.dispose()
     }
 }

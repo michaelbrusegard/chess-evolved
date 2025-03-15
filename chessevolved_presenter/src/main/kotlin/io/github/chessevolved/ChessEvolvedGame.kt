@@ -22,6 +22,7 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
 }
 
 class FirstScreen : KtxScreen {
+    // We create the view outside of the presenter so that it is easier to test the presenter with a mock view
     private val joinGameView: JoinGameView =
         JoinGameView().apply {
             onJoinButtonClicked = { lobbyId: String ->

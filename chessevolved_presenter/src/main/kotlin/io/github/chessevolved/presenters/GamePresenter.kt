@@ -8,10 +8,10 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SpriteComponent
 import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
-import io.github.chessevolved.views.IView
+import io.github.chessevolved.views.AndroidView
 
 class GamePresenter(
-    givenView: IView,
+    givenView: AndroidView,
 ) : IPresenter {
     val pieces: MutableList<ChessPiece> = mutableListOf()
     val board: ChessBoard = ChessBoard()
@@ -20,7 +20,7 @@ class GamePresenter(
     var boardScreenPosX: Int = 0
     var boardScreenPosY: Int = 0
     val pixelSize: Int = 32
-    val view: IView = givenView
+    val view: AndroidView = givenView
 
     // Temporary value, should be defined elsewhere
     val boardSize: Int = 8
