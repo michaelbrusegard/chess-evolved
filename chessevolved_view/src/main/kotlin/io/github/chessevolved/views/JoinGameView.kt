@@ -1,196 +1,92 @@
 package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.badlogic.gdx.utils.viewport.FitViewport
+import ktx.actors.onClick
+import ktx.scene2d.*
 
 class JoinGameView {
-    private var lobbyIdInput: String = ""
-    private val stage = Stage(ScreenViewport())
+    private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
+    private lateinit var inputField: TextField
 
-    // UI components
-    private val skin =
-        Skin()
-            .apply {
-                // Create default font
-                add("default-font", BitmapFont(), BitmapFont::class.java)
-
-                // Create simple label style
-                val labelStyle = Label.LabelStyle()
-                labelStyle.font = getFont("default-font")
-                add("default", labelStyle)
-
-                // Create simple text field style
-                val textFieldStyle = TextField.TextFieldStyle()
-                textFieldStyle.font = getFont("default-font")
-                textFieldStyle.fontColor = Color.WHITE
-
-                // Create a pixel texture for basic UI elements
-                val pixelTexture = Texture(Pixmap(1, 1, Pixmap.Format.RGBA8888))
-                pixelTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat)
-
-                val whiteRegion = TextureRegion(pixelTexture)
-                whiteRegion.setRegion(0, 0, 1, 1)
-                val whiteDrawable = TextureRegionDrawable(whiteRegion)
-
-                textFieldStyle.cursor = whiteDrawable
-                textFieldStyle.background = whiteDrawable
-                add("default", textFieldStyle)
-
-                // Create simple text button style
-                val textButtonStyle = TextButton.TextButtonStyle()
-                textButtonStyle.font = getFont("default-font")
-                textButtonStyle.up = whiteDrawable
-                textButtonStyle.down = whiteDrawable
-                add("default", textButtonStyle)
-            }
-
-    private val mainTable = Table()
-    private val titleLabel = Label("Join Game", skin)
-    private val lobbyIdTextField = TextField("", skin)
-    private val joinButton = TextButton("Join", skin)
-    private val backButton = TextButton("Back to Menu", skin)
-    private val statusLabel = Label("", skin)
-
-    // Callback references for the presenter
-    private var onJoinButtonPressed: (() -> Unit)? = null
-    private var onBackButtonPressed: (() -> Unit)? = null
+    var onJoinButtonClicked: (String) -> Unit = {}
+    var onReturnButtonClicked: () -> Unit = {}
 
     init {
         setupUI()
         Gdx.input.inputProcessor = stage
     }
 
-    private fun setupUI() {
-        // Configure main table
-        mainTable.setFillParent(true)
+    fun setupUI() {
+        val root = scene2d.table {
+            setFillParent(true)
+            defaults().pad(20f).space(10f)
 
-        // Add elements to table
-        mainTable
-            .add(titleLabel)
-            .padBottom(50f)
-            .row()
-        mainTable
-            .add(Label("Enter Lobby ID:", skin))
-            .padBottom(10f)
-            .row()
-        mainTable
-            .add(lobbyIdTextField)
-            .width(300f)
-            .padBottom(30f)
-            .row()
+            label("Join Game", "title") {
+                it.padBottom(40f)
+            }
+            row()
 
-        val buttonTable = Table()
-        buttonTable.add(joinButton).width(120f).padRight(20f)
-        buttonTable.add(backButton).width(120f)
-        mainTable
-            .add(buttonTable)
-            .padBottom(30f)
-            .row()
+            label("Enter Lobby Code:")
+            row()
 
-        mainTable
-            .add(statusLabel)
-            .width(300f)
-            .row()
+            inputField = textField("") {
+                it.width(300f)
+            }
+            row()
 
-        // Add listeners
-        joinButton.addListener(
-            object : ChangeListener() {
-                override fun changed(
-                    event: ChangeEvent,
-                    actor: Actor,
-                ) {
-                    onJoinButtonPressed?.invoke()
+            table {
+                defaults().pad(10f).width(200f)
+
+                textButton("Join Game") {
+                    onClick {
+                        onJoinButtonClicked(inputField.text)
+                    }
                 }
-            },
-        )
 
-        backButton.addListener(
-            object : ChangeListener() {
-                override fun changed(
-                    event: ChangeEvent,
-                    actor: Actor,
-                ) {
-                    onBackButtonPressed?.invoke()
+                textButton("Return to Menu") {
+                    onClick {
+                        onReturnButtonClicked()
+                    }
                 }
-            },
-        )
+            }
+        }
 
-        lobbyIdTextField.addListener(
-            object : ChangeListener() {
-                override fun changed(
-                    event: ChangeEvent,
-                    actor: Actor,
-                ) {
-                    setLobbyId(lobbyIdTextField.text)
-                }
-            },
-        )
-
-        // Add table to stage
-        stage.addActor(mainTable)
-    }
-
-    fun setJoinButtonCallback(callback: () -> Unit) {
-        onJoinButtonPressed = callback
-    }
-
-    fun setBackButtonCallback(callback: () -> Unit) {
-        onBackButtonPressed = callback
-    }
-
-    fun displayLobbyInput() {
-        statusLabel.setText("")
-        statusLabel.color = Color.WHITE
+        stage.addActor(root)
     }
 
     fun showJoinSuccess() {
-        statusLabel.setText("Successfully joined lobby!")
-        statusLabel.color = Color.GREEN
+        scene2d.dialog("Success", "dialog") {
+            text("Successfully joined the lobby!")
+            button("OK") {
+                onClick { hide() }
+            }
+        }.show(stage)
     }
 
     fun showJoinError(message: String) {
-        statusLabel.setText(message)
-        statusLabel.color = Color.RED
+        scene2d.dialog("Error", "dialog") {
+            text(message)
+            button("OK") {
+                onClick { hide() }
+            }
+        }.show(stage)
     }
 
-    fun getLobbyId(): String = lobbyIdInput
+    fun getLobbyId(): String = inputField.text
 
-    fun setLobbyId(id: String) {
-        lobbyIdInput = id
-    }
-
-    fun closeView() {
-        // Cleanup resources if needed
-    }
-
-    fun render(delta: Float) {
-        stage.act(delta)
+    fun render() {
+        stage.act(Gdx.graphics.deltaTime)
         stage.draw()
     }
 
-    fun resize(
-        width: Int,
-        height: Int,
-    ) {
+    fun resize(width: Int, height: Int) {
         stage.viewport.update(width, height, true)
     }
 
     fun dispose() {
         stage.dispose()
-        skin.dispose()
     }
 }

@@ -18,15 +18,13 @@ class JoinGamePresenter(
         if (success) {
             view.showJoinSuccess()
         } else {
-            view.showJoinError("Unable to join lobby")
+            view.showJoinError("Error message should be put here")
         }
 
         return success
     }
 
-    fun onJoinButtonPressed() {
-        println("JoinGamePresenter: Join button pressed")
-        val lobbyId = view.getLobbyId()
+    fun onJoinButtonPressed(lobbyId: String) {
         joinGame(lobbyId)
     }
 
@@ -40,6 +38,17 @@ class JoinGamePresenter(
     }
 
     override fun render() {
-        view.displayLobbyInput()
+        view.render()
+    }
+
+    override fun resize(
+        width: Int,
+        height: Int,
+    ) {
+        view.resize(width, height)
+    }
+
+    override fun dispose() {
+        view.dispose()
     }
 }
