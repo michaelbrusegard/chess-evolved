@@ -10,7 +10,9 @@ import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
 import io.github.chessevolved.views.IView
 
-class GamePresenter(givenView: IView) : IPresenter {
+class GamePresenter(
+    givenView: IView,
+) : IPresenter {
     val pieces: MutableList<ChessPiece> = mutableListOf()
     val board: ChessBoard = ChessBoard()
 
@@ -39,8 +41,8 @@ class GamePresenter(givenView: IView) : IPresenter {
 
     override fun render() {
         view.beginBatch()
-        for (y in 0..boardSize-1) {
-            for (x in 0..boardSize-1) {
+        for (y in 0..boardSize - 1) {
+            for (x in 0..boardSize - 1) {
                 var sprite = board.getComponent(ChessBoardSpriteComponent::class.java).whiteTileSprite
                 if ((y + x) % 2 == 0) {
                     sprite = board.getComponent(ChessBoardSpriteComponent::class.java).blackTileSprite
@@ -52,7 +54,10 @@ class GamePresenter(givenView: IView) : IPresenter {
 
         val sprite: Sprite = pieces[0].getComponent(SpriteComponent::class.java).sprite
         val posComp: PositionComponent = pieces[0].getComponent(PositionComponent::class.java)
-        sprite.setPosition((boardScreenPosX + (posComp.xPos-1) * pixelSize).toFloat(), (boardScreenPosY + (posComp.yPos-1) * pixelSize).toFloat())
+        sprite.setPosition(
+            (boardScreenPosX + (posComp.xPos - 1) * pixelSize).toFloat(),
+            (boardScreenPosY + (posComp.yPos - 1) * pixelSize).toFloat(),
+        )
         view.render(sprite)
 
         view.endBatch()

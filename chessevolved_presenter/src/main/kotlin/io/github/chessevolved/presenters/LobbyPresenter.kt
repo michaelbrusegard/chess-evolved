@@ -1,7 +1,6 @@
 import io.github.chessevolved.presenters.IPresenter
 
 class LobbyPresenter : IPresenter {
-
     /**
      * Save lobby in backend
      *
@@ -9,26 +8,29 @@ class LobbyPresenter : IPresenter {
      * @param player2
      * @param lobbyID
      */
-    fun saveLobby(player1: String, player2: String, lobbyID: String) {
-        //Todo: Finish implementation. temporary using string for player
+    fun saveLobby(
+        // player1: String,
+        // player2: String,
+        // lobbyID: String,
+    ) {
+        // Todo: Finish implementation. temporary using string for player
     }
 
     /**
      * Change to SettingsPresenter
      */
     fun enterSettings() {
-        //TODO: Wait for ScenePresenterStateManager
+        // TODO: Wait for ScenePresenterStateManager
     }
 
     /**
      * Change to MenuPresenter
      */
     fun returnToMenu() {
-        //TODO: Wait for ScenePresenterStateManager
+        // TODO: Wait for ScenePresenterStateManager
     }
 
-    override
-    fun render() {
+    override fun render() {
         // Required by IPresenter
     }
 }
