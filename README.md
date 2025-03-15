@@ -57,6 +57,22 @@ Create APK:
 ./gradlew android:assembleRelease
 ```
 
+### Format and linting
+
+The tool we use for formatting and linting is [ktlint](https://ktlint.github.io/). It does both. To run it, use the following command:
+
+```bash
+./gradlew ktlintCheck
+```
+
+This will check the code for formatting and lint issues. To automatically fix them, run:
+
+```bash
+./gradlew ktlintFormat
+```
+
+This will only fix some of the issues because ktlint is not perfect. The rest of the issues will need to be fixed manually.
+
 ### Debug and Testing
 
 This is not setup yet! Remove this when setup is complete and add GitHub action.
