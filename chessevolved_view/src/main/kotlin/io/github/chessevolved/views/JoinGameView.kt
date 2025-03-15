@@ -2,10 +2,7 @@ package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
-import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
 import ktx.scene2d.label
@@ -17,7 +14,7 @@ import ktx.scene2d.textField
 class JoinGameView : IView {
     private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
     private lateinit var inputField: TextField
-    private lateinit var toastContainer: Table
+    private lateinit var toastManager: ToastManager
 
     var onJoinButtonClicked: (String) -> Unit = {}
     var onReturnButtonClicked: () -> Unit = {}
@@ -38,14 +35,32 @@ class JoinGameView : IView {
 
                 inputField =
                     textField("") {
-                        it.width(200f)
+                        it.width(125f)
+                        maxLength = 6
+                        messageText = "XXXXXX"
+
+                        textFieldFilter =
+                            TextField.TextFieldFilter { _, c ->
+                                c.isLetterOrDigit()
+                            }
+
+                        setTextFieldListener { field, _ ->
+                            val cursorPosition = field.cursorPosition
+                            field.text = field.text.uppercase()
+                            field.setCursorPosition(cursorPosition)
+                        }
                     }
                 row()
 
                 textButton("Join Game") {
                     it.width(150f).padTop(20f)
                     onClick {
-                        onJoinButtonClicked(inputField.text)
+                        val code = inputField.text
+                        if (code.length == 6) {
+                            onJoinButtonClicked(code)
+                        } else {
+                            toastManager.showError("Lobby code must be 6 characters")
+                        }
                     }
                 }
                 row()
@@ -58,15 +73,8 @@ class JoinGameView : IView {
                 }
             }
 
-        toastContainer =
-            scene2d.table {
-                setFillParent(true)
-                top()
-                padTop(20f)
-            }
-
         stage.addActor(root)
-        stage.addActor(toastContainer)
+        toastManager = ToastManager(stage)
 
         Gdx.input.inputProcessor = stage
     }
@@ -88,39 +96,10 @@ class JoinGameView : IView {
     }
 
     fun showJoinSuccess() {
-        showToast("Successfully joined the lobby!")
+        toastManager.showSuccess("Successfully joined the lobby!")
     }
 
     fun showJoinError(message: String) {
-        showToast("Error: $message")
-    }
-
-    private fun showToast(message: String) {
-        toastContainer.clear()
-
-        val toast =
-            scene2d.table {
-                // Set table color directly
-                setColor(0.2f, 0.2f, 0.2f, 0.8f)
-                pad(10f)
-
-                label(message) {
-                    it.width(300f)
-                    it.align(Align.center)
-                }
-            }
-
-        toastContainer.add(toast).width(300f)
-
-        // Fade in, stay visible for 3 seconds, then fade out
-        toast.color.a = 0f
-        toast.addAction(
-            Actions.sequence(
-                Actions.fadeIn(0.5f),
-                Actions.delay(3f),
-                Actions.fadeOut(0.5f),
-                Actions.run { toastContainer.clear() },
-            ),
-        )
+        toastManager.showError("Error: $message")
     }
 }

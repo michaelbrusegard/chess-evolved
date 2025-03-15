@@ -39,7 +39,7 @@ class FirstScreen : KtxScreen {
     // val presenter: GamePresenter = GamePresenter(AndroidView())
 
     override fun render(delta: Float) {
-        clearScreen(red = 0.1f, green = 0.1f, blue = 0.23f)
+        clearScreen(red = 0.5f, green = 0.5f, blue = 0.75f)
         joinGamePresenter.render()
         // presenter.render()
     }
