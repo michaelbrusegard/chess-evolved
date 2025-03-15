@@ -6,7 +6,6 @@ import io.github.chessevolved.presenters.JoinGamePresenter
 import io.github.chessevolved.views.JoinGameView
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
-import ktx.app.clearScreen
 import ktx.async.KtxAsync
 import ktx.scene2d.Scene2DSkin
 
@@ -22,9 +21,9 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
 }
 
 class FirstScreen : KtxScreen {
-    private val joinGameView =
+    private val joinGameView: JoinGameView =
         JoinGameView().apply {
-            onJoinButtonClicked = { lobbyId ->
+            onJoinButtonClicked = { lobbyId: String ->
                 joinGamePresenter.joinGame(lobbyId)
             }
             onReturnButtonClicked = {
@@ -38,8 +37,8 @@ class FirstScreen : KtxScreen {
     // val presenter: GamePresenter = GamePresenter(AndroidView())
 
     override fun render(delta: Float) {
-        clearScreen(red = 0.1f, green = 0.1f, blue = 0.23f)
         joinGamePresenter.render()
+        // clearScreen(red = 0.1f, green = 0.1f, blue = 0.23f)
         // presenter.render()
     }
 
