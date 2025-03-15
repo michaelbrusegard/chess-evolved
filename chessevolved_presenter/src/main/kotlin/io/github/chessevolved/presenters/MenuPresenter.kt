@@ -3,7 +3,7 @@ package io.github.chessevolved.presenters
 import io.github.chessevolved.views.MenuView
 
 class MenuPresenter(
-    menuView: MenuView
+    menuView: MenuView,
 ) : IPresenter {
     override fun render() {
         TODO("Not yet implemented")
