@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.FitViewport
 
-class AndroidView : IView{
+class AndroidView : IView {
     private val camera: OrthographicCamera = OrthographicCamera()
     private var viewport: FitViewport
     private val batch: SpriteBatch = SpriteBatch()
