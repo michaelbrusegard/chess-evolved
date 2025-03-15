@@ -1,6 +1,6 @@
-package io.github.chessevolved.supabase
+package io.github.chessevolved.singletons.supabase
 
-import io.github.chessevolved.supabase.SupabaseClient.getSupabaseClient
+import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.PostgresAction

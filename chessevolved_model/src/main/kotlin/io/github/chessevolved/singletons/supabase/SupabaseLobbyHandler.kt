@@ -1,6 +1,6 @@
-package io.github.chessevolved.supabase
+package io.github.chessevolved.singletons.supabase
 
-import io.github.chessevolved.supabase.SupabaseClient.getSupabaseClient
+import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
@@ -117,6 +117,10 @@ object SupabaseLobbyHandler {
         } catch (e: PostgrestRestException) {
             // TODO: If lobby row is deleted right after checking if the lobby exists, we might get an exception here.
         }
+    }
+
+    private suspend fun leaveLobby(lobbyCode: String) {
+        SupabaseChannelManager.unsubscribeFromChannel(lobbyCode)
     }
 
     private suspend fun addLobbyListener(

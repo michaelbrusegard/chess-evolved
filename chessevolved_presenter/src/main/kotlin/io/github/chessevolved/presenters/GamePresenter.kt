@@ -8,11 +8,11 @@ import io.github.chessevolved.components.SpriteComponent
 import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
 import io.github.chessevolved.singletons.ECSEngine
-import io.github.chessevolved.supabase.SupabaseGameHandler
-import io.github.chessevolved.supabase.SupabaseGameHandler.addGameListener
-import io.github.chessevolved.supabase.SupabaseLobbyHandler
-import io.github.chessevolved.supabase.SupabaseLobbyHandler.joinLobby
-import io.github.chessevolved.supabase.SupabaseLobbyHandler.startGame
+import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
+import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.addGameListener
+import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
+import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.joinLobby
+import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.startGame
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 

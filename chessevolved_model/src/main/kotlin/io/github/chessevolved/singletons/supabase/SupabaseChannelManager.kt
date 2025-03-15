@@ -1,6 +1,6 @@
-package io.github.chessevolved.supabase
+package io.github.chessevolved.singletons.supabase
 
-import io.github.chessevolved.supabase.SupabaseClient.getSupabaseClient
+import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.realtime
@@ -62,9 +62,10 @@ internal object SupabaseChannelManager {
     /**
      * Function for unsubscribing from channels.
      * @param channelName of channel to unsubscribe from
+     * @throws Error if trying to unsubscribing from nonexistent channel.
      */
     suspend fun unsubscribeFromChannel(channelName: String) {
-        val channel = channels[channelName] ?: return
+        val channel = channels[channelName] ?: throw Error("Can't unsubscribe from non-existent channel.")
 
         // TODO: Error handling for when removing a channel fails.
         supabase.realtime.removeChannel(channel)
