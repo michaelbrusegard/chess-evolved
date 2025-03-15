@@ -83,6 +83,9 @@ www-test/
 /headless/bin/
 /server/bin/
 /shared/bin/
+/chessevolved_model/bin/
+/chessevolved_presenter/bin/
+/chessevolved_view/bin/
 *.tmp
 *.bak
 *.swp
