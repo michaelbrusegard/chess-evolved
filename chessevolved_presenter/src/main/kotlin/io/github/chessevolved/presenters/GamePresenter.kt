@@ -23,11 +23,12 @@ class GamePresenter : IPresenter {
     val supabaseLobbyHandler = SupabaseLobbyHandler
 
     val boardSize: Int = 8
-    private fun onGameEvent(newGameRow : SupabaseGameHandler.Game) {
+
+    private fun onGameEvent(newGameRow: SupabaseGameHandler.Game) {
         println("Game was updated!")
     }
 
-    private suspend fun onLobbyEvent(newLobbyRow : SupabaseLobbyHandler.Lobby) {
+    private suspend fun onLobbyEvent(newLobbyRow: SupabaseLobbyHandler.Lobby) {
         println("Registered lobby event in lobby event handler!$newLobbyRow")
         if (newLobbyRow.game_started) {
             addGameListener(newLobbyRow.lobby_code, ::onGameEvent)
@@ -40,6 +41,7 @@ class GamePresenter : IPresenter {
             val lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
             Thread.sleep(3000L)
             joinLobby(lobbyCode, ::onLobbyEvent) // Think of this as player2
+            Thread.sleep(4000L)
             startGame(lobbyCode)
         }
 
@@ -58,12 +60,11 @@ class GamePresenter : IPresenter {
         ECSEngine.addEntity(board)
     }
 
-    fun getPieceSprites() : List<Sprite> {
-        return pieces.map { it.getComponent(SpriteComponent::class.java).sprite }
-    }
+    fun getPieceSprites(): List<Sprite> = pieces.map { it.getComponent(SpriteComponent::class.java).sprite }
 
-    fun getBoardSprites() : List<Sprite> {
-        return listOf(board.getComponent(ChessBoardSpriteComponent::class.java).blackTileSprite,
-                      board.getComponent(ChessBoardSpriteComponent::class.java).whiteTileSprite)
-    }
+    fun getBoardSprites(): List<Sprite> =
+        listOf(
+            board.getComponent(ChessBoardSpriteComponent::class.java).blackTileSprite,
+            board.getComponent(ChessBoardSpriteComponent::class.java).whiteTileSprite,
+        )
 }
