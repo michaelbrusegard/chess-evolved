@@ -62,4 +62,13 @@ class GamePresenter(
 
         view.endBatch()
     }
+
+    override fun resize(
+        width: Int,
+        height: Int,
+    ) {
+    }
+
+    override fun dispose() {
+    }
 }

@@ -5,7 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
-import ktx.scene2d.*
+import ktx.scene2d.button
+import ktx.scene2d.dialog
+import ktx.scene2d.label
+import ktx.scene2d.table
+import ktx.scene2d.text
+import ktx.scene2d.textButton
+import ktx.scene2d.textField
 
 class JoinGameView {
     private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
@@ -20,45 +26,47 @@ class JoinGameView {
     }
 
     fun setupUI() {
-        val root = scene2d.table {
-            setFillParent(true)
-            defaults().pad(20f).space(10f)
-
-            label("Join Game", "title") {
-                it.padBottom(40f)
-            }
-            row()
-
-            label("Enter Lobby Code:")
-            row()
-
-            inputField = textField("") {
-                it.width(300f)
-            }
-            row()
-
+        val root =
             table {
-                defaults().pad(10f).width(200f)
+                setFillParent(true)
+                defaults().pad(20f).space(10f)
 
-                textButton("Join Game") {
-                    onClick {
-                        onJoinButtonClicked(inputField.text)
-                    }
+                label("Join Game", "title") {
+                    it.padBottom(40f)
                 }
+                row()
 
-                textButton("Return to Menu") {
-                    onClick {
-                        onReturnButtonClicked()
+                label("Enter Lobby Code:")
+                row()
+
+                inputField =
+                    textField("") {
+                        it.width(300f)
+                    }
+                row()
+
+                table {
+                    defaults().pad(10f).width(200f)
+
+                    textButton("Join Game") {
+                        onClick {
+                            onJoinButtonClicked(inputField.text)
+                        }
+                    }
+
+                    textButton("Return to Menu") {
+                        onClick {
+                            onReturnButtonClicked()
+                        }
                     }
                 }
             }
-        }
 
         stage.addActor(root)
     }
 
     fun showJoinSuccess() {
-        scene2d.dialog("Success", "dialog") {
+        dialog("Success", "dialog") {
             text("Successfully joined the lobby!")
             button("OK") {
                 onClick { hide() }
@@ -67,7 +75,7 @@ class JoinGameView {
     }
 
     fun showJoinError(message: String) {
-        scene2d.dialog("Error", "dialog") {
+        dialog("Error", "dialog") {
             text(message)
             button("OK") {
                 onClick { hide() }
@@ -82,7 +90,10 @@ class JoinGameView {
         stage.draw()
     }
 
-    fun resize(width: Int, height: Int) {
+    fun resize(
+        width: Int,
+        height: Int,
+    ) {
         stage.viewport.update(width, height, true)
     }
 
