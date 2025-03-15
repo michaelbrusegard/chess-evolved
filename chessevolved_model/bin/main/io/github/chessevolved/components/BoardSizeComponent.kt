@@ -1,4 +1,4 @@
-package io.github.chess2.components
+package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
 
