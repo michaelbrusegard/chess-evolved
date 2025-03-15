@@ -7,7 +7,7 @@ import io.github.chessevolved.components.ChessBoardSpriteComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SpriteComponent
 
-class Mappers {
+object Mappers {
     private val boardSize:ComponentMapper<BoardSizeComponent> = ComponentMapper.getFor(BoardSizeComponent::class.java)
     private val position:ComponentMapper<PositionComponent> = ComponentMapper.getFor(PositionComponent::class.java)
     private val chessboardSprite:ComponentMapper<ChessBoardSpriteComponent> = ComponentMapper.getFor(ChessBoardSpriteComponent::class.java)
