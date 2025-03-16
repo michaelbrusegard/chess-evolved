@@ -19,6 +19,11 @@ object SupabaseGameHandler {
     private val supabase = getSupabaseClient()
 
     /**
+     * Name of the table containing the game rows
+     */
+    private val SUPABASE_GAME_TABLE_NAME = "games"
+
+    /**
      * Type used for games saved in database.
      */
     @Serializable
@@ -26,61 +31,113 @@ object SupabaseGameHandler {
         val id: Int,
         val updated_at: String,
         val lobby_code: String,
-        val last_move: String,
+        val last_move: String?,
         val turn: String, // TODO: Make this a color enum?
-        val board: String, // TODO: Make a board-class that the board-json can be decoded to.
+        val board: Array<String>, // TODO: Make a board-class that the board-json can be decoded to.
     )
+
+    /**
+     * Method that checks if a game-row corresponding to a lobbyCode exists, and subscribes
+     * to updates on it.
+     * @param lobbyCode identifying the game
+     * @param onEventListener being the method to be called whenever an update happens
+     * @throws Error if the game-row does not exist
+     * @throws IllegalStateException if trying to join a game you have already joined
+     */
+    suspend fun joinGame(
+        lobbyCode: String,
+        onEventListener: (newGameRow: Game) -> Unit,
+    ) {
+        if (!checkIfGameExists(lobbyCode)) {
+            throw Exception("Game does not exist.")
+        }
+        addGameListener(lobbyCode, onEventListener)
+    }
 
     /**
      * Method to subscribe to updates on a specific game-table row.
      * @param lobbyCode of the game to subscribe to
      * @param onEventListener as the method to be called on updates
+     * @throws IllegalStateException if trying to subscribe to a channel that has already been subscribed to
      */
-    suspend fun addGameListener(
+    private suspend fun addGameListener(
         lobbyCode: String,
         onEventListener: (newGameRow: Game) -> Unit,
     ) {
         // TODO: More error handling
         val channel = SupabaseChannelManager.getOrCreateChannel("game_$lobbyCode")
-        val changeFlow =
-            channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
-                table = "games"
-                filter("lobby_code", FilterOperator.EQ, lobbyCode)
-            }
 
-        val coroutineScope = CoroutineScope(Dispatchers.IO)
+        try {
+            val changeFlow =
+                channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+                    table = "games"
+                    filter("lobby_code", FilterOperator.EQ, lobbyCode)
+                }
 
-        changeFlow
-            .onEach {
-                val updatedRecord = it.record
+            val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-                val game = Json.decodeFromString<Game>(updatedRecord.toString())
+            changeFlow
+                .onEach {
+                    val updatedRecord = it.record
 
-                onEventListener(game)
-            }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
+                    val game = Json.decodeFromString<Game>(updatedRecord.toString())
 
-        channel.subscribe()
+                    onEventListener(game)
+                }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
+
+            channel.subscribe()
+        } catch (e: IllegalStateException) {
+            // TODO: Implement some kind of error handling for when a player tries to join a lobby they have already joined
+            throw e
+        }
     }
 
+    // TODO: updateGameBoard does not work yet, as i'm wondering how we want to update the data on supabase.
+
     /**
+     * updateGameBoard does not work yet, as i'm wondering how we want to update the data on supabase. // TODO: Remove this line when method is updated
      * Method to update the board-column in a specific game.
      * @param lobbyCode of the game to update the column for
+     * @throws Error if the game does not exist
      */
     suspend fun updateGameBoard(
         lobbyCode: String,
         board: String,
     ) {
-        // TODO: More error handling
+        if (!checkIfGameExists(lobbyCode)) {
+            throw Error("Game does not exist!")
+        }
+
+        val stringArray = arrayOf<String>()
+
         supabase
             .from("games")
             .update(
                 {
-                    set("board", value = board)
+                    set("board", value = stringArray)
                 },
             ) {
                 filter {
                     eq("lobby_code", lobbyCode)
                 }
             }
+    }
+
+    /**
+     * Method that checks if a game-row with a corresponding lobbyCode exists.
+     * @param lobbyCode of the game to look for
+     * @return Boolean of whether the game exists or not
+     */
+    private suspend fun checkIfGameExists(lobbyCode: String): Boolean {
+        val response =
+            supabase
+                .from(SUPABASE_GAME_TABLE_NAME)
+                .select {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
+                }.decodeList<Game>()
+
+        return response.isNotEmpty()
     }
 }

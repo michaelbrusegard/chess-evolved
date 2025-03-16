@@ -9,9 +9,9 @@ import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
-import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.addGameListener
+import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.joinGame
+import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.updateGameBoard
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
-import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.joinLobby
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.startGame
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -25,13 +25,13 @@ class GamePresenter : IPresenter {
     val boardSize: Int = 8
 
     private fun onGameEvent(newGameRow: SupabaseGameHandler.Game) {
-        println("Game was updated!")
+        println("Game was updated! $newGameRow")
     }
 
     private suspend fun onLobbyEvent(newLobbyRow: SupabaseLobbyHandler.Lobby) {
-        println("Registered lobby event in lobby event handler!$newLobbyRow")
+        println("Registered lobby event in lobby event handler! $newLobbyRow")
         if (newLobbyRow.game_started) {
-            addGameListener(newLobbyRow.lobby_code, ::onGameEvent)
+            joinGame(newLobbyRow.lobby_code, ::onGameEvent)
         }
     }
 
@@ -39,10 +39,13 @@ class GamePresenter : IPresenter {
 
         suspend fun test() {
             val lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
+
             Thread.sleep(3000L)
-            joinLobby(lobbyCode, ::onLobbyEvent) // Think of this as player2
-            Thread.sleep(4000L)
             startGame(lobbyCode)
+            Thread.sleep(3000L)
+
+            updateGameBoard(lobbyCode, "asd")
+            // leaveLobby(lobbyCode)
         }
 
         GlobalScope.launch { test() }

@@ -131,6 +131,7 @@ object SupabaseLobbyHandler {
      * Also unsubscribes from the channel that listens to row-level-changes.
      * @param lobbyCode of the lobby to leave
      * @throws Exception if the lobby does not exist
+     * @throws PostgrestRestException if trying to leave a lobby that still has an ongoing game
      */
     suspend fun leaveLobby(lobbyCode: String) {
         val response =
@@ -147,10 +148,15 @@ object SupabaseLobbyHandler {
         }
 
         if (!response[0].second_player) {
-            supabase.from(SUPABASE_LOBBY_TABLE_NAME).delete {
-                filter {
-                    eq("lobby_code", lobbyCode)
+            try {
+                supabase.from(SUPABASE_LOBBY_TABLE_NAME).delete {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
                 }
+            } catch (e: PostgrestRestException) {
+                // TODO: Error handling for when trying to delete a lobby
+                throw e
             }
         } else {
             try {
@@ -177,7 +183,7 @@ object SupabaseLobbyHandler {
      * Method that subscribes to row-level-updates on the lobby created/joined
      * @param lobbyCode corresponding to the lobby to subscribe to
      * @param onEventListener corresponding to the method to be called upon row changes
-     * @throws IllegalStateException if trying to subscribe to a channel that has already been subscribed to.
+     * @throws IllegalStateException if trying to subscribe to a channel that has already been subscribed to
      */
     private suspend fun addLobbyListener(
         lobbyCode: String,
