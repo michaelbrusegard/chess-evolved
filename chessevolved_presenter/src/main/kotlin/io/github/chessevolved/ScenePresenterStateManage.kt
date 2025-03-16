@@ -1,10 +1,7 @@
-package io.github.chess2.States
-
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import java.util.ArrayDeque
 
-class ScenePresenterStateManage {
-
+object ScenePresenterStateManage {
     private val states = ArrayDeque<State>()
 
     fun push(state: State) {
@@ -12,20 +9,28 @@ class ScenePresenterStateManage {
     }
 
     fun pop() {
-        states.pop()
+        if (states.isNotEmpty()) {
+            states.pop()
+        }
     }
 
     fun set(state: State) {
-        states.pop()
+        if (states.isNotEmpty()) {
+            states.pop()
+        }
         states.push(state)
     }
 
     fun update(dt: Float) {
-        states.peek().update(dt)
+        if (states.isNotEmpty()) {
+            states.peek().update(dt)
+        }
     }
 
     fun render(sb: SpriteBatch) {
-        states.peek().render(sb)
+        if (states.isNotEmpty()) {
+            states.peek().render(sb)
+        }
     }
 
     fun dispose() {

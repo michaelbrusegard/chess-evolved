@@ -3,9 +3,9 @@ package io.github.chessevolved.presenters
 import io.github.chessevolved.singletons.GameSettings
 
 class SettingsPresenter : IPresenter {
-    // TODO: wait for implementation of ScenePresenterStateManager
+    // TODO: wait for implementation of ScenePresenterStateManager//
     private val gameSettings = GameSettings
-    // val presenterManager = ScenePresenterStateManager
+    // val presenterManager = ScenePresenterStateManager//
 
     /**
      * Applies the chosen game settings
@@ -17,10 +17,10 @@ class SettingsPresenter : IPresenter {
         fowSetting: Boolean,
         sizeSetting: Int,
     ) {
-        // TODO: Consider if game settings should be applied manually or automatically
+        // TODO: Consider if game settings should be applied manually or automatically//
         gameSettings.setFOW(fowSetting)
 
-        // TODO: validate max/min boardsize here?
+        // TODO: validate max/min boardsize here?//
         gameSettings.setBoardSize(sizeSetting)
     }
 
@@ -39,10 +39,10 @@ class SettingsPresenter : IPresenter {
      *  Switch to LobbyPresenter
      */
     fun returnToLobby() {
-        // TODO: wait for implementation of ScenePresenterStateManager
+        // TODO: wait for implementation of ScenePresenterStateManager//
     }
 
     override fun render() {
-        // Required by IPresenter
+        // Required by IPresenter //
     }
 }

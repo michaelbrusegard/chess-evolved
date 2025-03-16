@@ -31,4 +31,14 @@ class AndroidView : IView {
     override fun render(sprite: Sprite) {
         sprite.draw(batch)
     }
+
+    fun dispose() {
+        batch.dispose()
+    }
+
+    fun resize(width: Int, height: Int) {
+        viewport.update(width, height)
+        camera.setToOrtho(false, width.toFloat(), height.toFloat())
+        camera.update()
+    }
 }
