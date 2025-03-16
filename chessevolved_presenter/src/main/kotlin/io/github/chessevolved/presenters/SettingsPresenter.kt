@@ -2,24 +2,25 @@ package io.github.chessevolved.presenters
 
 import SettingsView
 import io.github.chessevolved.singletons.GameSettings
-import io.github.chessevolved.views.IView
 
 class SettingsPresenter(
     private val view: SettingsView,
 ) : IPresenter {
+
     init {
         view.init()
         view.onApply = { fowSetting, sizeSetting ->
-            onApplyPressed(fowSetting, sizeSetting) // Call presenter function
+            onApplyPressed(fowSetting, sizeSetting)
         }
     }
+
     // TODO: wait for implementation of ScenePresenterStateManager
     private val gameSettings = GameSettings
     // val presenterManager = ScenePresenterStateManager
 
 
     /**
-     * Applies the chosen game settings
+     * Applies the chosen game settings and returns to lobby
      *
      * @param fowSetting Boolean for Fog of War
      * @param sizeSetting Int for size of chessboard
@@ -28,12 +29,10 @@ class SettingsPresenter(
         fowSetting: Boolean,
         sizeSetting: Int,
     ) {
-        // TODO: Consider if game settings should be applied manually or automatically
         gameSettings.setFOW(fowSetting)
-
-        // TODO: validate max/min board size here?
         gameSettings.setBoardSize(sizeSetting)
-        println("Settings applied")
+
+        returnToLobby()
     }
 
     /**

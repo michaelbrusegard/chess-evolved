@@ -43,7 +43,7 @@ class SettingsView : IView {
                     }
                 }
             }
-            add(FOWField).pad(10f) // Add to parent table
+            add(FOWField).pad(10f)
             row()
 
             boardField = scene2d.table {
@@ -52,22 +52,20 @@ class SettingsView : IView {
                     it.width(50f)
                     maxLength = 2
                     messageText = "Max 16"
-
                     alignment = Align.center
 
-                    // Filter for numbers
+                    // Check that input is a number
                     textFieldFilter = TextField.TextFieldFilter { _, c -> c.isDigit() }
 
-                    // Ensure cursor remains in place when modifying input
                     setTextFieldListener { field, _ ->
                         val cursorPosition = field.cursorPosition
                         field.text =
-                            field.text.filter { it.isDigit() } // Remove non-numeric characters
+                            field.text.filter { it.isDigit() }
                         field.setCursorPosition(cursorPosition)
                     }
                 }
             }
-            add(boardField).pad(10f) // Add to parent table
+            add(boardField).pad(10f)
             row()
 
             textButton("Apply and return") {
