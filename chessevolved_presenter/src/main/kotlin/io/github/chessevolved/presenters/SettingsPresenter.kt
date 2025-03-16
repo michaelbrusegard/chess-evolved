@@ -3,15 +3,33 @@ package io.github.chessevolved.presenters
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Sprite
 import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.views.IView
+import io.github.chessevolved.views.IView
 
+class SettingsPresenter(
+    givenView: IView,
+) : IPresenter {
 class SettingsPresenter(
     givenView: IView,
 ) : IPresenter {
     // TODO: wait for implementation of ScenePresenterStateManager
     private val gameSettings = GameSettings
     // val presenterManager = ScenePresenterStateManager
+
+    private val view = givenView
+    private val buttonTexture: Texture = Texture("buttons/placeholderButton.png")
+    private val buttonSprite: Sprite = Sprite(buttonTexture)
+
+    init {
+        buttonSprite.setPosition(
+            (Gdx.graphics.width/2 - buttonSprite.width/2),
+            50f
+        )
+    }
 
     private val view = givenView
     private val buttonTexture: Texture = Texture("buttons/placeholderButton.png")
@@ -37,6 +55,7 @@ class SettingsPresenter(
         // TODO: Consider if game settings should be applied manually or automatically
         gameSettings.setFOW(fowSetting)
 
+        // TODO: validate max/min board size here?
         // TODO: validate max/min board size here?
         gameSettings.setBoardSize(sizeSetting)
     }
