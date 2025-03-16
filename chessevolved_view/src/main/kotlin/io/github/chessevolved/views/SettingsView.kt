@@ -17,7 +17,7 @@ import ktx.scene2d.textField
 
 class SettingsView : IView {
     private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
-    private lateinit var FOWField: Table
+    private lateinit var fowField: Table
     private lateinit var fogOfWarCheckBox: CheckBox
     private lateinit var boardField: Table
     private lateinit var boardSizefield: TextField
@@ -26,7 +26,8 @@ class SettingsView : IView {
     var onApply: (Boolean, Int) -> Unit = { _, _ -> }
 
     override fun init() {
-        val root = scene2d.table {
+        val root =
+            scene2d.table {
             setFillParent(true)
             defaults().pad(10f)
 
@@ -35,19 +36,25 @@ class SettingsView : IView {
             }
             row()
 
-            FOWField = scene2d.table {
-                label("Fog of War") {it.padRight(10f)}
+            fowField =
+                scene2d.table {
+                label("Fog of War") {
+                    it.padRight(10f)
+                }
                 fogOfWarCheckBox = checkBox("") {
                     onClick {
                         println("Fog of War enabled: ${fogOfWarCheckBox.isChecked}")
                     }
                 }
             }
-            add(FOWField).pad(10f)
+            add(fowField)
+                .pad(10f)
             row()
 
             boardField = scene2d.table {
-                label("Board size") {it.padRight(10f)}
+                label("Board size") {
+                    it.padRight(10f)
+                }
                 boardSizefield = textField("8") {
                     it.width(50f)
                     maxLength = 2
@@ -75,8 +82,7 @@ class SettingsView : IView {
 
                     if (enteredNumber != null && enteredNumber in 8..16) {
                         onApply(fogOfWarCheckBox.isChecked, enteredNumber)
-                    }
-                    else {
+                    } else {
                         toastManager.showError("Board size must be between 8 and 16")
                     }
                 }

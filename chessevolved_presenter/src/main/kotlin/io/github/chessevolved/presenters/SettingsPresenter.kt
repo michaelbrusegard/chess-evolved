@@ -6,7 +6,6 @@ import io.github.chessevolved.singletons.GameSettings
 class SettingsPresenter(
     private val view: SettingsView,
 ) : IPresenter {
-
     init {
         view.init()
         view.onApply = { fowSetting, sizeSetting ->
@@ -17,8 +16,7 @@ class SettingsPresenter(
     // TODO: wait for implementation of ScenePresenterStateManager
     private val gameSettings = GameSettings
     // val presenterManager = ScenePresenterStateManager
-
-
+    
     /**
      * Applies the chosen game settings and returns to lobby
      *
