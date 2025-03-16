@@ -38,16 +38,16 @@ class SettingsView : IView {
 
                 fowField =
                     scene2d.table {
-                    label("Fog of War") {
-                        it.padRight(10f)
-                    }
-                    fogOfWarCheckBox =
-                        checkBox("") {
-                        onClick {
-                            println("Fog of War enabled: ${fogOfWarCheckBox.isChecked}")
+                        label("Fog of War") {
+                            it.padRight(10f)
+                        }
+                        fogOfWarCheckBox =
+                            checkBox("") {
+                            onClick {
+                                println("Fog of War enabled: ${fogOfWarCheckBox.isChecked}")
+                            }
                         }
                     }
-                }
                 add(fowField)
                     .pad(10f)
                 row()
