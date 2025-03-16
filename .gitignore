@@ -4,8 +4,9 @@ gradle-app.setting
 /gradle/gradle-daemon-jvm.properties
 /build/
 /android/build/
-/chesstwo_presenter/build/
-/chesstwo_model/build/
+/chessevolved_presenter/build/
+/chessevolved_model/build/
+/chessevolved_view/build/
 /lwjgl2/build/
 /lwjgl3/build/
 /html/build/
@@ -82,6 +83,9 @@ www-test/
 /headless/bin/
 /server/bin/
 /shared/bin/
+/chessevolved_model/bin/
+/chessevolved_presenter/bin/
+/chessevolved_view/bin/
 *.tmp
 *.bak
 *.swp
