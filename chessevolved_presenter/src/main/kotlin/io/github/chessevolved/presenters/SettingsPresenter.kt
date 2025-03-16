@@ -16,7 +16,7 @@ class SettingsPresenter(
     // TODO: wait for implementation of ScenePresenterStateManager
     private val gameSettings = GameSettings
     // val presenterManager = ScenePresenterStateManager
-    
+
     /**
      * Applies the chosen game settings and returns to lobby
      *
