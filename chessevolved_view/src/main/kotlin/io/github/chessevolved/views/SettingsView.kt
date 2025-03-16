@@ -28,66 +28,69 @@ class SettingsView : IView {
     override fun init() {
         val root =
             scene2d.table {
-            setFillParent(true)
-            defaults().pad(10f)
+                setFillParent(true)
+                defaults().pad(10f)
 
-            label("Settings", "title") {
-                it.padBottom(100f)
-            }
-            row()
-
-            fowField =
-                scene2d.table {
-                label("Fog of War") {
-                    it.padRight(10f)
+                label("Settings", "title") {
+                    it.padBottom(100f)
                 }
-                fogOfWarCheckBox = checkBox("") {
+                row()
+
+                fowField =
+                    scene2d.table {
+                    label("Fog of War") {
+                        it.padRight(10f)
+                    }
+                    fogOfWarCheckBox =
+                        checkBox("") {
+                        onClick {
+                            println("Fog of War enabled: ${fogOfWarCheckBox.isChecked}")
+                        }
+                    }
+                }
+                add(fowField)
+                    .pad(10f)
+                row()
+
+                boardField =
+                    scene2d.table {
+                    label("Board size") {
+                        it.padRight(10f)
+                    }
+                    boardSizefield =
+                        textField("8") {
+                        it.width(50f)
+                        maxLength = 2
+                        messageText = "Max 16"
+                        alignment = Align.center
+
+                        // Check that input is a number
+                        textFieldFilter = TextField.TextFieldFilter { _, c -> c.isDigit() }
+
+                        setTextFieldListener { field, _ ->
+                            val cursorPosition = field.cursorPosition
+                            field.text =
+                                field.text.filter { it.isDigit() }
+                            field.setCursorPosition(cursorPosition)
+                        }
+                    }
+                }
+                add(boardField).pad(10f)
+                row()
+
+                textButton("Apply and return") {
+                    it.padTop(100f)
                     onClick {
-                        println("Fog of War enabled: ${fogOfWarCheckBox.isChecked}")
+                        val enteredNumber = boardSizefield.text.toIntOrNull()
+
+                        if (enteredNumber != null && enteredNumber in 8..16) {
+                            onApply(fogOfWarCheckBox.isChecked, enteredNumber)
+                        } else {
+                            toastManager.showError("Board size must be between 8 and 16")
+                        }
                     }
                 }
             }
-            add(fowField)
-                .pad(10f)
-            row()
-
-            boardField = scene2d.table {
-                label("Board size") {
-                    it.padRight(10f)
-                }
-                boardSizefield = textField("8") {
-                    it.width(50f)
-                    maxLength = 2
-                    messageText = "Max 16"
-                    alignment = Align.center
-
-                    // Check that input is a number
-                    textFieldFilter = TextField.TextFieldFilter { _, c -> c.isDigit() }
-
-                    setTextFieldListener { field, _ ->
-                        val cursorPosition = field.cursorPosition
-                        field.text =
-                            field.text.filter { it.isDigit() }
-                        field.setCursorPosition(cursorPosition)
-                    }
-                }
-            }
-            add(boardField).pad(10f)
-            row()
-
-            textButton("Apply and return") {
-                it.padTop(100f)
-                onClick {
-                    val enteredNumber = boardSizefield.text.toIntOrNull()
-
-                    if (enteredNumber != null && enteredNumber in 8..16) {
-                        onApply(fogOfWarCheckBox.isChecked, enteredNumber)
-                    } else {
-                        toastManager.showError("Board size must be between 8 and 16")
-                    }
-                }
-            }
-        }
 
         stage.addActor(root)
         toastManager = ToastManager(stage)
