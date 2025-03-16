@@ -37,9 +37,9 @@ internal object SupabaseChannelManager {
     /**
      * Function to retrieve an already subscribed-to channel.
      * @param channelName of channel to return
-     * @return RealtimeChannel of the subscribed to channel
+     * @return RealtimeChannel of the subscribed to channel or null
      */
-    private fun getChannel(channelName: String): RealtimeChannel? = channels[channelName]
+    fun getChannel(channelName: String): RealtimeChannel? = channels[channelName]
 
     /**
      * Check if a channel-name is already subscribed to.
@@ -62,10 +62,10 @@ internal object SupabaseChannelManager {
     /**
      * Function for unsubscribing from channels.
      * @param channelName of channel to unsubscribe from
-     * @throws Error if trying to unsubscribing from nonexistent channel.
+     * @throws Exception if trying to unsubscribe from nonexistent channel.
      */
     suspend fun unsubscribeFromChannel(channelName: String) {
-        val channel = channels[channelName] ?: throw Error("Can't unsubscribe from non-existent channel.")
+        val channel = channels[channelName] ?: throw Exception("Can't unsubscribe from non-existent channel.")
 
         // TODO: Error handling for when removing a channel fails.
         supabase.realtime.removeChannel(channel)

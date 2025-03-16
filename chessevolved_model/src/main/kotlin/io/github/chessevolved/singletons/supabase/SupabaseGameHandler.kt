@@ -41,7 +41,7 @@ object SupabaseGameHandler {
         onEventListener: (newGameRow: Game) -> Unit,
     ) {
         // TODO: More error handling
-        val channel = SupabaseChannelManager.getOrCreateChannel(lobbyCode)
+        val channel = SupabaseChannelManager.getOrCreateChannel("game_$lobbyCode")
         val changeFlow =
             channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
                 table = "games"
@@ -58,7 +58,8 @@ object SupabaseGameHandler {
 
                 onEventListener(game)
             }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
-        supabase
+
+        channel.subscribe()
     }
 
     /**

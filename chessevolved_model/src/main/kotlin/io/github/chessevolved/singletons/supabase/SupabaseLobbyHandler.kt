@@ -26,6 +26,11 @@ object SupabaseLobbyHandler {
     private val supabase = getSupabaseClient()
 
     /**
+     * Supabase lobby-table name
+     */
+    private val SUPABASE_LOBBY_TABLE_NAME = "lobbies"
+
+    /**
      * Type used for lobbies saved in database.
      */
     @Serializable
@@ -63,7 +68,7 @@ object SupabaseLobbyHandler {
 
         for (attempts in 1..3) {
             try {
-                supabase.from("lobbies").insert(mapOf("lobby_code" to lobbyCode))
+                supabase.from(SUPABASE_LOBBY_TABLE_NAME).insert(mapOf("lobby_code" to lobbyCode))
                 addLobbyListener(lobbyCode, onEventListener)
                 return lobbyCode
             } catch (e: PostgrestRestException) {
@@ -80,15 +85,16 @@ object SupabaseLobbyHandler {
      * Joins a lobby corresponding to the lobbyCode provided.
      * @param lobbyCode corresponding to the lobby the player wants to join
      * @throws Error if a lobby does not exist or a lobby is full
+     * @throws IllegalStateException if trying to join a lobby you have already joined.
      */
     suspend fun joinLobby(
         lobbyCode: String,
         onEventListener: KSuspendFunction1<Lobby, Unit>,
     ) {
-        // TODO: Change up what type of error is thrown upon full and non-existent lobbies.
+        // TODO: Change up what type of error is thrown upon full and non-existent lobbies. Make them more specific.
         val response =
             supabase
-                .from("lobbies")
+                .from(SUPABASE_LOBBY_TABLE_NAME)
                 .select {
                     filter {
                         eq("lobby_code", lobbyCode)
@@ -101,10 +107,10 @@ object SupabaseLobbyHandler {
         if (response[0].second_player) {
             throw Exception("Lobby is full!")
         }
-        addLobbyListener(lobbyCode, onEventListener)
+        addLobbyListener(lobbyCode, onEventListener) // Throws illegalStateException upon already joined lobby
         try {
             supabase
-                .from("lobbies")
+                .from(SUPABASE_LOBBY_TABLE_NAME)
                 .update(
                     {
                         set("second_player", value = true)
@@ -119,37 +125,94 @@ object SupabaseLobbyHandler {
         }
     }
 
-    private suspend fun leaveLobby(lobbyCode: String) {
-        SupabaseChannelManager.unsubscribeFromChannel(lobbyCode)
+    /**
+     * Method to leave a lobby, marking the row in supabase as not having a second player anymore,
+     * or straight up deleting the row if the second player column is already false.
+     * Also unsubscribes from the channel that listens to row-level-changes.
+     * @param lobbyCode of the lobby to leave
+     * @throws Exception if the lobby does not exist
+     */
+    suspend fun leaveLobby(lobbyCode: String) {
+        val response =
+            supabase
+                .from(SUPABASE_LOBBY_TABLE_NAME)
+                .select {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
+                }.decodeList<Lobby>()
+
+        if (response.isEmpty()) {
+            throw Exception("Lobby does not exist.")
+        }
+
+        if (!response[0].second_player) {
+            supabase.from(SUPABASE_LOBBY_TABLE_NAME).delete {
+                filter {
+                    eq("lobby_code", lobbyCode)
+                }
+            }
+        } else {
+            try {
+                supabase
+                    .from(SUPABASE_LOBBY_TABLE_NAME)
+                    .update(
+                        {
+                            set("second_player", value = false)
+                        },
+                    ) {
+                        filter {
+                            eq("lobby_code", lobbyCode)
+                        }
+                    }
+            } catch (e: PostgrestRestException) {
+                // TODO: If lobby row is deleted right after checking if the lobby exists, we might get an exception here.
+            }
+        }
+
+        SupabaseChannelManager.unsubscribeFromChannel("lobby_$lobbyCode")
     }
 
+    /**
+     * Method that subscribes to row-level-updates on the lobby created/joined
+     * @param lobbyCode corresponding to the lobby to subscribe to
+     * @param onEventListener corresponding to the method to be called upon row changes
+     * @throws IllegalStateException if trying to subscribe to a channel that has already been subscribed to.
+     */
     private suspend fun addLobbyListener(
         lobbyCode: String,
         onEventListener: KSuspendFunction1<Lobby, Unit>,
     ) {
-        println(SupabaseChannelManager.channelExists(lobbyCode))
-        val channel = SupabaseChannelManager.getOrCreateChannel(lobbyCode)
-        println(SupabaseChannelManager.channelExists(lobbyCode))
+        val channel = SupabaseChannelManager.getOrCreateChannel("lobby_$lobbyCode")
+        try {
+            val changeFlow =
+                channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+                    table = SUPABASE_LOBBY_TABLE_NAME
+                    filter("lobby_code", FilterOperator.EQ, lobbyCode)
+                }
 
-        val changeFlow =
-            channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
-                table = "lobbies"
-                filter("lobby_code", FilterOperator.EQ, lobbyCode)
-            }
+            val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-        val coroutineScope = CoroutineScope(Dispatchers.IO)
+            changeFlow
+                .onEach {
+                    val updatedRecord = it.record
+                    val lobby = Json.decodeFromString<Lobby>(updatedRecord.toString())
 
-        changeFlow
-            .onEach {
-                val updatedRecord = it.record
-                val lobby = Json.decodeFromString<Lobby>(updatedRecord.toString())
+                    onEventListener(lobby)
+                }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
-                onEventListener(lobby)
-            }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
-
-        channel.subscribe()
+            channel.subscribe()
+        } catch (e: IllegalStateException) {
+            // TODO: Implement some kind of error handling for when a player tries to join a lobby they have already joined
+            throw e
+        }
     }
 
+    /**
+     * Method to set the "game_started"-column for the lobby table to true in supabase.
+     * Also creates a row in the game table on supabase.
+     * @param lobbyCode which is the code of the lobby to start the game for.
+     */
     suspend fun startGame(lobbyCode: String) {
         try {
             supabase
@@ -168,7 +231,7 @@ object SupabaseLobbyHandler {
                     }
                 }
         } catch (e: PostgrestRestException) {
-            // TODO: Handle error when trying to start a game for a lobby that does not exist.
+            // TODO: Handle error when trying to start a game for a lobby that does not exist. OR when both players try to start the lobby at the same time.
         }
     }
 }
