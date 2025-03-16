@@ -54,27 +54,27 @@ class SettingsView : IView {
 
                 boardField =
                     scene2d.table {
-                    label("Board size") {
-                        it.padRight(10f)
-                    }
+                        label("Board size") {
+                            it.padRight(10f)
+                        }
                     boardSizefield =
                         textField("8") {
-                        it.width(50f)
-                        maxLength = 2
-                        messageText = "Max 16"
-                        alignment = Align.center
+                            it.width(50f)
+                            maxLength = 2
+                            messageText = "Max 16"
+                            alignment = Align.center
 
-                        // Check that input is a number
-                        textFieldFilter = TextField.TextFieldFilter { _, c -> c.isDigit() }
+                            // Check that input is a number
+                            textFieldFilter = TextField.TextFieldFilter { _, c -> c.isDigit() }
 
-                        setTextFieldListener { field, _ ->
-                            val cursorPosition = field.cursorPosition
-                            field.text =
-                                field.text.filter { it.isDigit() }
-                            field.setCursorPosition(cursorPosition)
+                            setTextFieldListener { field, _ ->
+                                val cursorPosition = field.cursorPosition
+                                field.text =
+                                    field.text.filter { it.isDigit() }
+                                field.setCursorPosition(cursorPosition)
+                            }
                         }
                     }
-                }
                 add(boardField).pad(10f)
                 row()
 
