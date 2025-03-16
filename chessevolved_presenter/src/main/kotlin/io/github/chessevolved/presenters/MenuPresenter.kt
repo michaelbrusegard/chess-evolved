@@ -1,11 +1,9 @@
 package io.github.chessevolved.presenters
 
-import io.github.chessevolved.views.MenuView
-
 class MenuPresenter(
-    menuView: MenuView,
-) : IPresenter {
-    override fun render() {
+    // menuView: MenuView,
+) {
+    fun render() {
         TODO("Not yet implemented")
     }
 

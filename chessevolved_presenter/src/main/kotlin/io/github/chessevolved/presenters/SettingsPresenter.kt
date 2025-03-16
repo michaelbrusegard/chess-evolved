@@ -45,4 +45,13 @@ class SettingsPresenter : IPresenter {
     override fun render() {
         // Required by IPresenter
     }
+
+    override fun resize(
+        width: Int,
+        height: Int,
+    ) {
+    }
+
+    override fun dispose() {
+    }
 }
