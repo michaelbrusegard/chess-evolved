@@ -1,46 +1,22 @@
 package io.github.chessevolved.presenters
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Sprite
+import SettingsView
 import io.github.chessevolved.singletons.GameSettings
-import io.github.chessevolved.views.IView
 import io.github.chessevolved.views.IView
 
 class SettingsPresenter(
-    givenView: IView,
+    private val view: SettingsView,
 ) : IPresenter {
-class SettingsPresenter(
-    givenView: IView,
-) : IPresenter {
+    init {
+        view.init()
+        view.onApply = { fowSetting, sizeSetting ->
+            onApplyPressed(fowSetting, sizeSetting) // Call presenter function
+        }
+    }
     // TODO: wait for implementation of ScenePresenterStateManager
     private val gameSettings = GameSettings
     // val presenterManager = ScenePresenterStateManager
 
-    private val view = givenView
-    private val buttonTexture: Texture = Texture("buttons/placeholderButton.png")
-    private val buttonSprite: Sprite = Sprite(buttonTexture)
-
-    init {
-        buttonSprite.setPosition(
-            (Gdx.graphics.width/2 - buttonSprite.width/2),
-            50f
-        )
-    }
-
-    private val view = givenView
-    private val buttonTexture: Texture = Texture("buttons/placeholderButton.png")
-    private val buttonSprite: Sprite = Sprite(buttonTexture)
-
-    init {
-        buttonSprite.setPosition(
-            (Gdx.graphics.width/2 - buttonSprite.width/2),
-            50f
-        )
-    }
 
     /**
      * Applies the chosen game settings
@@ -48,7 +24,7 @@ class SettingsPresenter(
      * @param fowSetting Boolean for Fog of War
      * @param sizeSetting Int for size of chessboard
      */
-    fun onApply(
+    private fun onApplyPressed(
         fowSetting: Boolean,
         sizeSetting: Int,
     ) {
@@ -56,8 +32,16 @@ class SettingsPresenter(
         gameSettings.setFOW(fowSetting)
 
         // TODO: validate max/min board size here?
-        // TODO: validate max/min board size here?
         gameSettings.setBoardSize(sizeSetting)
+        println("Settings applied")
+    }
+
+    /**
+     *  Switch to LobbyPresenter
+     */
+    private fun returnToLobby() {
+        // TODO: wait for implementation of ScenePresenterStateManager
+        println("SettingsPresenter: Returning to lobby")
     }
 
     /**
@@ -71,26 +55,18 @@ class SettingsPresenter(
             "BoardSize" to gameSettings.getBoardSize(),
         )
 
-    /**
-     *  Switch to LobbyPresenter
-     */
-    fun returnToLobby() {
-        // TODO: wait for implementation of ScenePresenterStateManager
-    }
-
     override fun render() {
-        // Required by IPresenter
-        view.beginBatch()
-        view.render(buttonSprite)
-        view.endBatch()
+        view.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
+        view.resize(width, height)
     }
 
     override fun dispose() {
+        view.dispose()
     }
 }

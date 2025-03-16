@@ -1,33 +1,109 @@
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import io.github.chessevolved.views.IView
+import io.github.chessevolved.views.ToastManager
+import ktx.actors.onClick
+import ktx.scene2d.checkBox
+import ktx.scene2d.label
+import ktx.scene2d.scene2d
+import ktx.scene2d.table
+import ktx.scene2d.textButton
+import ktx.scene2d.textField
 
 class SettingsView : IView {
-    private val camera: OrthographicCamera = OrthographicCamera()
-    private var viewport: FitViewport
-    private val batch: SpriteBatch = SpriteBatch()
+    private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
+    private lateinit var FOWField: Table
+    private lateinit var fogOfWarCheckBox: CheckBox
+    private lateinit var boardField: Table
+    private lateinit var boardSizefield: TextField
+    private lateinit var toastManager: ToastManager
 
-    init {
-        camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-        camera.update()
-        viewport = FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera)
-        viewport.setScreenBounds(0, 0, Gdx.graphics.width, Gdx.graphics.height)
+    var onApply: (Boolean, Int) -> Unit = { _, _ -> }
+
+    override fun init() {
+        val root = scene2d.table {
+            setFillParent(true)
+            defaults().pad(10f)
+
+            label("Settings", "title") {
+                it.padBottom(100f)
+            }
+            row()
+
+            FOWField = scene2d.table {
+                label("Fog of War") {it.padRight(10f)}
+                fogOfWarCheckBox = checkBox("") {
+                    onClick {
+                        println("Fog of War enabled: ${fogOfWarCheckBox.isChecked}")
+                    }
+                }
+            }
+            add(FOWField).pad(10f) // Add to parent table
+            row()
+
+            boardField = scene2d.table {
+                label("Board size") {it.padRight(10f)}
+                boardSizefield = textField("8") {
+                    it.width(50f)
+                    maxLength = 2
+                    messageText = "Max 16"
+
+                    alignment = Align.center
+
+                    // Filter for numbers
+                    textFieldFilter = TextField.TextFieldFilter { _, c -> c.isDigit() }
+
+                    // Ensure cursor remains in place when modifying input
+                    setTextFieldListener { field, _ ->
+                        val cursorPosition = field.cursorPosition
+                        field.text =
+                            field.text.filter { it.isDigit() } // Remove non-numeric characters
+                        field.setCursorPosition(cursorPosition)
+                    }
+                }
+            }
+            add(boardField).pad(10f) // Add to parent table
+            row()
+
+            textButton("Apply and return") {
+                it.padTop(100f)
+                onClick {
+                    val enteredNumber = boardSizefield.text.toIntOrNull()
+
+                    if (enteredNumber != null && enteredNumber in 8..16) {
+                        onApply(fogOfWarCheckBox.isChecked, enteredNumber)
+                    }
+                    else {
+                        toastManager.showError("Board size must be between 8 and 16")
+                    }
+                }
+            }
+        }
+
+        stage.addActor(root)
+        toastManager = ToastManager(stage)
+
+        Gdx.input.inputProcessor = stage
     }
 
-    override fun beginBatch() {
-        viewport.apply()
-        batch.projectionMatrix = viewport.camera.combined
-        batch.begin()
+    override fun render() {
+        stage.act(Gdx.graphics.deltaTime)
+        stage.draw()
     }
 
-    override fun endBatch() {
-        batch.end()
+    override fun resize(
+        width: Int,
+        height: Int,
+    ) {
+        stage.viewport.update(width, height, true)
     }
 
-    override fun render(sprite: Sprite) {
-        sprite.draw(batch)
+    override fun dispose() {
+        stage.dispose()
     }
 }
