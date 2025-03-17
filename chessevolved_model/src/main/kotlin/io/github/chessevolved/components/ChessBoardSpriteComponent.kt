@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import ktx.assets.toInternalFile
 
-class ChessBoardSpriteComponent: Component {
+class ChessBoardSpriteComponent : Component {
     val blackTileSprite: Sprite = Sprite(Texture("board/BlackTile.png".toInternalFile()))
     val whiteTileSprite: Sprite = Sprite(Texture("board/WhiteTile.png".toInternalFile()))
 }

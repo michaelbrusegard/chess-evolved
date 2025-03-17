@@ -1,40 +1,105 @@
 package io.github.chessevolved.views
 
-interface JoinGameView {
-    fun displayLobbyInput()
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.badlogic.gdx.utils.viewport.FitViewport
+import ktx.actors.onClick
+import ktx.scene2d.label
+import ktx.scene2d.scene2d
+import ktx.scene2d.table
+import ktx.scene2d.textButton
+import ktx.scene2d.textField
 
-    fun showJoinSuccess()
+class JoinGameView : IView {
+    private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
+    private lateinit var inputField: TextField
+    private lateinit var toastManager: ToastManager
 
-    fun showJoinError(message: String)
+    var onJoinButtonClicked: (String) -> Unit = {}
+    var onReturnButtonClicked: () -> Unit = {}
 
-    fun getLobbyId(): String
+    override fun init() {
+        val root =
+            scene2d.table {
+                setFillParent(true)
+                defaults().pad(10f)
 
-    fun closeView()
-}
+                label("Join Game", "title") {
+                    it.padBottom(20f)
+                }
+                row()
 
-// This is temporary for now
-class JoinGameViewImpl : JoinGameView {
-    private var lobbyIdInput: String = ""
+                label("Enter Lobby Code:")
+                row()
 
-    override fun displayLobbyInput() {
-        // Setup UI for lobby input
+                inputField =
+                    textField("") {
+                        it.width(125f)
+                        maxLength = 6
+                        messageText = "XXXXXX"
+
+                        textFieldFilter =
+                            TextField.TextFieldFilter { _, c ->
+                                c.isLetterOrDigit()
+                            }
+
+                        setTextFieldListener { field, _ ->
+                            val cursorPosition = field.cursorPosition
+                            field.text = field.text.uppercase()
+                            field.setCursorPosition(cursorPosition)
+                        }
+                    }
+                row()
+
+                textButton("Join Game") {
+                    it.width(150f).padTop(20f)
+                    onClick {
+                        val code = inputField.text
+                        if (code.length == 6) {
+                            onJoinButtonClicked(code)
+                        } else {
+                            toastManager.showError("Lobby code must be 6 characters")
+                        }
+                    }
+                }
+                row()
+
+                textButton("Return to Menu") {
+                    it.width(200f).padTop(10f)
+                    onClick {
+                        onReturnButtonClicked()
+                    }
+                }
+            }
+
+        stage.addActor(root)
+        toastManager = ToastManager(stage)
+
+        Gdx.input.inputProcessor = stage
     }
 
-    override fun showJoinSuccess() {
-        // Show success state
+    override fun render() {
+        stage.act(Gdx.graphics.deltaTime)
+        stage.draw()
     }
 
-    override fun showJoinError(message: String) {
-        // Show error with message
+    override fun resize(
+        width: Int,
+        height: Int,
+    ) {
+        stage.viewport.update(width, height, true)
     }
 
-    override fun getLobbyId(): String = lobbyIdInput
-
-    fun setLobbyId(id: String) {
-        lobbyIdInput = id
+    override fun dispose() {
+        stage.dispose()
     }
 
-    override fun closeView() {
-        // Handle view closing
+    fun showJoinSuccess() {
+        toastManager.showSuccess("Successfully joined the lobby!")
+    }
+
+    fun showJoinError(message: String) {
+        toastManager.showError("Error: $message")
     }
 }

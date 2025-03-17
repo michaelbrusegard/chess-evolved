@@ -8,9 +8,11 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SpriteComponent
 import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
-import io.github.chessevolved.views.IView
+import io.github.chessevolved.views.AndroidView
 
-class GamePresenter(givenView: IView) : IPresenter {
+class GamePresenter(
+    givenView: AndroidView,
+) : IPresenter {
     val pieces: MutableList<ChessPiece> = mutableListOf()
     val board: ChessBoard = ChessBoard()
 
@@ -18,7 +20,7 @@ class GamePresenter(givenView: IView) : IPresenter {
     var boardScreenPosX: Int = 0
     var boardScreenPosY: Int = 0
     val pixelSize: Int = 32
-    val view: IView = givenView
+    val view: AndroidView = givenView
 
     // Temporary value, should be defined elsewhere
     val boardSize: Int = 8
@@ -39,8 +41,8 @@ class GamePresenter(givenView: IView) : IPresenter {
 
     override fun render() {
         view.beginBatch()
-        for (y in 0..boardSize-1) {
-            for (x in 0..boardSize-1) {
+        for (y in 0..boardSize - 1) {
+            for (x in 0..boardSize - 1) {
                 var sprite = board.getComponent(ChessBoardSpriteComponent::class.java).whiteTileSprite
                 if ((y + x) % 2 == 0) {
                     sprite = board.getComponent(ChessBoardSpriteComponent::class.java).blackTileSprite
@@ -52,9 +54,21 @@ class GamePresenter(givenView: IView) : IPresenter {
 
         val sprite: Sprite = pieces[0].getComponent(SpriteComponent::class.java).sprite
         val posComp: PositionComponent = pieces[0].getComponent(PositionComponent::class.java)
-        sprite.setPosition((boardScreenPosX + (posComp.xPos-1) * pixelSize).toFloat(), (boardScreenPosY + (posComp.yPos-1) * pixelSize).toFloat())
+        sprite.setPosition(
+            (boardScreenPosX + (posComp.xPos - 1) * pixelSize).toFloat(),
+            (boardScreenPosY + (posComp.yPos - 1) * pixelSize).toFloat(),
+        )
         view.render(sprite)
 
         view.endBatch()
+    }
+
+    override fun resize(
+        width: Int,
+        height: Int,
+    ) {
+    }
+
+    override fun dispose() {
     }
 }

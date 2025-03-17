@@ -5,7 +5,6 @@ package io.github.chessevolved.lwjgl3
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import io.github.chessevolved.ChessEvolvedGame
-import io.github.chessevolved.lwjgl3.StartupHelper
 
 /** Launches the desktop (LWJGL3) application. */
 fun main() {
@@ -18,7 +17,13 @@ fun main() {
         Lwjgl3ApplicationConfiguration().apply {
             setTitle("Chess Evolved")
             setWindowedMode(360, 800)
-            setWindowIcon(*(arrayOf(128, 64, 32, 16).map { "libgdx$it.png" }.toTypedArray()))
+            setWindowIcon(
+                *(
+                    arrayOf(128, 64, 32, 16)
+                        .map { "libgdx$it.png" }
+                        .toTypedArray()
+                ),
+            )
         },
     )
 }
