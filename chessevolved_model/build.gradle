@@ -1,5 +1,6 @@
 apply plugin: 'java-library'
 apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 
 dependencies {
   api "com.badlogicgames.ashley:ashley:$ashleyVersion"
@@ -35,4 +36,5 @@ dependencies {
   api "io.github.libktx:ktx-vis:$ktxVersion"
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+  api "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0"
 }
