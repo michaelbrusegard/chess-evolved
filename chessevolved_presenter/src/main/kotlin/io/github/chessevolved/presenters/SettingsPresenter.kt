@@ -54,4 +54,8 @@ class SettingsPresenter : IPresenter {
 
     override fun dispose() {
     }
+
+    override fun setInputProcessor() {
+        TODO("Not yet implemented")
+    }
 }

@@ -71,4 +71,8 @@ class GamePresenter(
 
     override fun dispose() {
     }
+
+    override fun setInputProcessor() {
+        TODO("Not yet implemented")
+    }
 }
