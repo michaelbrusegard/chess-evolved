@@ -1,27 +1,44 @@
 package io.github.chessevolved.presenters
 
+import SettingsView
 import io.github.chessevolved.singletons.GameSettings
 
-class SettingsPresenter : IPresenter {
+class SettingsPresenter(
+    private val view: SettingsView,
+) : IPresenter {
+    init {
+        view.init()
+        view.onApply = { fowSetting, sizeSetting ->
+            onApplyPressed(fowSetting, sizeSetting)
+        }
+    }
+
     // TODO: wait for implementation of ScenePresenterStateManager
     private val gameSettings = GameSettings
     // val presenterManager = ScenePresenterStateManager
 
     /**
-     * Applies the chosen game settings
+     * Applies the chosen game settings and returns to lobby
      *
      * @param fowSetting Boolean for Fog of War
      * @param sizeSetting Int for size of chessboard
      */
-    fun onApply(
+    private fun onApplyPressed(
         fowSetting: Boolean,
         sizeSetting: Int,
     ) {
-        // TODO: Consider if game settings should be applied manually or automatically
         gameSettings.setFOW(fowSetting)
-
-        // TODO: validate max/min boardsize here?
         gameSettings.setBoardSize(sizeSetting)
+
+        returnToLobby()
+    }
+
+    /**
+     *  Switch to LobbyPresenter
+     */
+    private fun returnToLobby() {
+        // TODO: wait for implementation of ScenePresenterStateManager
+        println("SettingsPresenter: Returning to lobby")
     }
 
     /**
@@ -35,23 +52,18 @@ class SettingsPresenter : IPresenter {
             "BoardSize" to gameSettings.getBoardSize(),
         )
 
-    /**
-     *  Switch to LobbyPresenter
-     */
-    fun returnToLobby() {
-        // TODO: wait for implementation of ScenePresenterStateManager
-    }
-
     override fun render() {
-        // Required by IPresenter
+        view.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
+        view.resize(width, height)
     }
 
     override fun dispose() {
+        view.dispose()
     }
 }
