@@ -2,8 +2,8 @@ package io.github.chessevolved
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import io.github.chessevolved.presenters.JoinGamePresenter
-import io.github.chessevolved.views.JoinGameView
+import io.github.chessevolved.presenters.MenuPresenter
+import io.github.chessevolved.views.MenuView
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
@@ -23,35 +23,33 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
 
 class FirstScreen : KtxScreen {
     // We create the view outside of the presenter so that it is easier to test the presenter with a mock view
-    private val joinGameView: JoinGameView =
-        JoinGameView().apply {
-            onJoinButtonClicked = { lobbyId: String ->
-                joinGamePresenter.joinGame(lobbyId)
-            }
-            onReturnButtonClicked = {
-                joinGamePresenter.returnToMenu()
-            }
+
+    // First screen to always be displayed is the Menu Screen.
+    // Future discussion, should we have a loading screen showing credits at the start?
+    private val menuView = MenuView()
+
+    private val menuPresenter = MenuPresenter(menuView)
+
+    init {
+        menuView.apply {
+            onCreateLobbyViewButtonClicked = { menuPresenter.enterCreateGame() }
+            onJoinGameViewButtonClicked = { menuPresenter.enterJoinGame() }
         }
-
-    private val joinGamePresenter = JoinGamePresenter(joinGameView)
-
-    // Commented out old presenter for testing joingame presenter
-    // val presenter: GamePresenter = GamePresenter(AndroidView())
+    }
 
     override fun render(delta: Float) {
         clearScreen(red = 0.5f, green = 0.5f, blue = 0.75f)
-        joinGamePresenter.render()
-        // presenter.render()
+        menuPresenter.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        joinGamePresenter.resize(width, height)
+        menuPresenter.resize(width, height)
     }
 
     override fun dispose() {
-        joinGamePresenter.dispose()
+        menuPresenter.dispose()
     }
 }

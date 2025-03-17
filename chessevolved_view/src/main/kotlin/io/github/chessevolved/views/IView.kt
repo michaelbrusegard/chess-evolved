@@ -34,4 +34,9 @@ interface IView {
      * Should be called when the view is no longer needed to prevent memory leaks.
      */
     fun dispose()
+
+    /**
+     * Sets the current View as the current input processor.
+     */
+    fun setInputProcessor()
 }
