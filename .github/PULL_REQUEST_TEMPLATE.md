@@ -1,9 +1,4 @@
----
-name: "Pull Request"
-about: "Add changes to the project"
-title: "[PR] "
-labels: ["enhancement"]
----
+
 <!-- You can remove sections that aren't applicable. -->
 <!-- Please remember to add additional labels as well as related milestone. -->
 
