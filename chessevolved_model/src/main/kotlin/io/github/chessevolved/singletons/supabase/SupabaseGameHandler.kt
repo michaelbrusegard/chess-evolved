@@ -94,17 +94,18 @@ object SupabaseGameHandler {
 
             channel.subscribe()
         } catch (e: IllegalStateException) {
-            // TODO: Implement some kind of error handling for when a player tries to join a lobby they have already joined
+            // Error when a player tries to join a game they have already joined
             throw e
         }
     }
 
-    // TODO: updateGameBoard does not work yet, as i'm wondering how we want to update the data on supabase.
-
     /**
-     * updateGameBoard does not work yet, as i'm wondering how we want to update the data on supabase. // TODO: Remove this line when method is updated
      * Method to update the board-column in a specific game.
      * @param lobbyCode of the game to update the column for
+     * @param pieces representing the placement of pieces
+     * @param boardSquares representing the events occurring on specific tiles
+     * @param turn representing which player's turn it is
+     * @param lastMove representing what the last move was
      * @throws Error if the game does not exist
      */
     suspend fun updateGameState(

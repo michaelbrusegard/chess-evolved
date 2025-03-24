@@ -64,7 +64,6 @@ object SupabaseLobbyHandler {
      * @throws PostgrestRestException if creating a lobby fails three times.
      */
     suspend fun createLobby(onEventListener: KSuspendFunction1<Lobby, Unit>): String {
-        println("LAUNCHING LOBBY")
         var lobbyCode = getRandomString(LOBBY_CODE_LENGTH)
 
         for (attempts in 1..3) {
@@ -92,7 +91,6 @@ object SupabaseLobbyHandler {
         lobbyCode: String,
         onEventListener: KSuspendFunction1<Lobby, Unit>,
     ) {
-        // TODO: Change up what type of error is thrown upon full and non-existent lobbies. Make them more specific.
         val response =
             supabase
                 .from(SUPABASE_LOBBY_TABLE_NAME)
@@ -122,7 +120,8 @@ object SupabaseLobbyHandler {
                     }
                 }
         } catch (e: PostgrestRestException) {
-            // TODO: If lobby row is deleted right after checking if the lobby exists, we might get an exception here.
+            // If lobby row is deleted right after checking if the lobby exists, we might get an exception here. Throwing error.
+            throw e
         }
     }
 
@@ -156,7 +155,7 @@ object SupabaseLobbyHandler {
                     }
                 }
             } catch (e: PostgrestRestException) {
-                // TODO: Error handling for when trying to delete a lobby
+                // Error trying to delete a lobby
                 throw e
             }
         } else {
@@ -173,7 +172,8 @@ object SupabaseLobbyHandler {
                         }
                     }
             } catch (e: PostgrestRestException) {
-                // TODO: If lobby row is deleted right after checking if the lobby exists, we might get an exception here.
+                // If lobby row is deleted right after checking if the lobby exists, we might get an exception here.
+                throw e
             }
         }
 
@@ -210,7 +210,7 @@ object SupabaseLobbyHandler {
 
             channel.subscribe()
         } catch (e: IllegalStateException) {
-            // TODO: Implement some kind of error handling for when a player tries to join a lobby they have already joined
+            // When a player tries to join a lobby they have already joined an error will be thrown
             throw e
         }
     }
@@ -253,7 +253,8 @@ object SupabaseLobbyHandler {
                     }
                 }
         } catch (e: PostgrestRestException) {
-            // TODO: Handle error when trying to start a game for a lobby that does not exist. OR when both players try to start the lobby at the same time.
+            // Error when trying to start a game for a lobby that does not exist. OR when both players try to start the lobby at the same time.
+            throw e
         }
     }
 }

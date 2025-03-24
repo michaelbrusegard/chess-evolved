@@ -10,7 +10,7 @@ import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.joinGame
-import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.updateGameBoard
+import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.updateGameState
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.startGame
 import io.github.chessevolved.views.AndroidView
@@ -54,7 +54,7 @@ class GamePresenter(
         startGame(lobbyCode, arrayOf<String>())
         Thread.sleep(3000L)
 
-        updateGameBoard(lobbyCode, arrayOf<String>(), arrayOf<String>(), SupabaseGameHandler.TurnColor.BLACK, "b3")
+        updateGameState(lobbyCode, arrayOf<String>(), arrayOf<String>(), SupabaseGameHandler.TurnColor.BLACK, "b3")
         // leaveLobby(lobbyCode)
     }
     // END testing for supabase
