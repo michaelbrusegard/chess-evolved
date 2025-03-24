@@ -40,7 +40,8 @@ object SupabaseLobbyHandler {
         val lobby_code: String,
         val second_player: Boolean,
         val game_started: Boolean,
-        val settings: Array<String>, // TODO: Turn this into a settings-type array when implemented
+        // TODO: Turn this into a settings-type array when implemented
+        val settings: Array<String>,
     )
 
     // Taken from https://stackoverflow.com/questions/46943860/idiomatic-way-to-generate-a-random-alphanumeric-string-in-kotlin

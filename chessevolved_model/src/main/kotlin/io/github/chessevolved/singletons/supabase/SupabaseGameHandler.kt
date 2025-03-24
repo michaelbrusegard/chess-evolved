@@ -38,9 +38,12 @@ object SupabaseGameHandler {
         val lobby_code: String,
         val last_move: String?,
         val turn: TurnColor,
-        val pieces: Array<String>, // TODO: Change this to be an array of pieces when that is implemented
-        val board_squares: Array<String>, // TODO: Change this to be an array of board squares when that is implemented
-        val settings: Array<String>, // TODO: Change this into a settings type array when implemented
+        // TODO: Change this to be an array of pieces when that is implemented
+        val pieces: Array<String>,
+        // TODO: Change this to be an array of board squares when that is implemented
+        val board_squares: Array<String>,
+        // TODO: Change this into a settings type array when implemented
+        val settings: Array<String>,
     )
 
     /**
