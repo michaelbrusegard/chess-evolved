@@ -10,6 +10,16 @@ This project was generated with a Kotlin project template that includes Kotlin a
 - `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
 - `android`: Android mobile platform. Needs Android SDK.
 
+## Creating a Supabase client
+
+When trying to access the supabase client, you should first initialize the SupabaseClient-singleton
+within io.github.chessevolved.singletons.supabase. Then you're free to call methods within the classes in the
+supabase-singleton-package. 
+- `SupabaseLobbyHandler` is used to create, join, update and start lobbies.
+- `SupabaseGameHandler` is used to join and update a game.
+
+
+
 ## Gradle
 
 This project uses [Gradle](https://gradle.org/) to manage dependencies.
