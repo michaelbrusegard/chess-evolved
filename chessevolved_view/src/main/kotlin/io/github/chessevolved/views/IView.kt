@@ -1,22 +1,37 @@
 package io.github.chessevolved.views
 
-import com.badlogic.gdx.graphics.g2d.Sprite
-
+/**
+ * Interface for all views.
+ * Views are responsible for rendering UI elements and handling user input.
+ * All methods will be called by or passed through the presenter.
+ */
 interface IView {
     /**
-     * Updates the Viewport and Camera before starting a Sprite batch.
+     * Initializes the view with necessary components and resources.
+     * This should be called before first use in the presenter.
      */
-    fun beginBatch()
+    fun init()
 
     /**
-     * Ends the batch sprite.
+     * Renders the view content in the current frame.
+     * Called on each render cycle.
      */
-    fun endBatch()
+    fun render()
 
     /**
-     * Render a specific sprite.
-     * Position and other render data should be determined in the Sprite class.
-     * @param sprite The sprite to be rendered.
+     * Handles screen size changes.
+     *
+     * @param width The new screen width in pixels
+     * @param height The new screen height in pixels
      */
-    fun render(sprite: Sprite)
+    fun resize(
+        width: Int,
+        height: Int,
+    )
+
+    /**
+     * Releases resources used by the view.
+     * Should be called when the view is no longer needed to prevent memory leaks.
+     */
+    fun dispose()
 }

@@ -1,45 +1,32 @@
 package io.github.chessevolved.presenters
 
 import ScenePresenterStateManage
-import State
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import io.github.chessevolved.views.AndroidView
-import io.github.chessevolved.views.IView
+import SettingsView
+import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.MenuView
 
 class MenuPresenter(
-    givenView: IView,
-    //menuView: MenuView,
-) : State() {
-    val view: IView = givenView
-
-    override fun render(sb: SpriteBatch) {
-        sb.begin()
-        println("Menu: Rendering menu")
-        sb.end()
+    private val view: MenuView
+) : IPresenter {
+    override fun render() {
+        view.render()
     }
 
-    fun enterJoinGame() {
-        // TODO: Append JoinGamePresenter to the Stack.
-    }
-
-    fun enterCreateGame() {
-        // TODO: Append CreateGamePresenter to the stack.
-    }
-
-    override fun handleInput() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            ScenePresenterStateManage.pop()
-        }
-    }
-
-    override fun update(dt: Float) {
-        handleInput()
+    override fun resize(width: Int, height: Int) {
+        view.resize(width, height)
     }
 
     override fun dispose() {
-        println("Disposing menu")
+        view.dispose()
+    }
+
+    fun enterJoinGame() {
+        val joinGamePresenter = JoinGamePresenter(JoinGameView())
+        ScenePresenterStateManage.push(StatePresenter(joinGamePresenter))
+    }
+
+    fun enterSettings() {
+        val settingsPresenter = SettingsPresenter(SettingsView())
+        ScenePresenterStateManage.push(StatePresenter(settingsPresenter))
     }
 }

@@ -2,55 +2,42 @@ package io.github.chessevolved
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import io.github.chessevolved.presenters.GamePresenter
-import io.github.chessevolved.views.AndroidView
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import io.github.chessevolved.presenters.JoinGamePresenter
+import io.github.chessevolved.presenters.MenuPresenter
+import io.github.chessevolved.presenters.StatePresenter
+import io.github.chessevolved.views.JoinGameView
+import io.github.chessevolved.views.MenuView
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ktx.async.KtxAsync
+import ktx.scene2d.Scene2DSkin
 
 class ChessEvolvedGame : KtxGame<KtxScreen>() {
-    // private lateinit var gsm: ScenePresenterStateManage //
-    private lateinit var batch: SpriteBatch
-
     override fun create() {
         KtxAsync.initiate()
+        val skin = Skin(Gdx.files.internal("skin/plain-james-ui.json"))
+        Scene2DSkin.defaultSkin = skin
 
-        batch = SpriteBatch()
-        // gsm = ScenePresenterStateManage//
-
-        addScreen(FirstScreen(batch)) // GamePresenter(AndroidView())//
-        setScreen<FirstScreen>()
-        ScenePresenterStateManage.push(GamePresenter(AndroidView()))
+        //TODO: Remove joingame as the the starting screen
+        // Made the stack like this since JOIN GAME is the first screen to "usable"
+        // and to test the state-chaning
+        val menuPresenter = MenuPresenter(MenuView())
+        ScenePresenterStateManage.push(StatePresenter(menuPresenter))
+        val joinPresenter = JoinGamePresenter(JoinGameView())
+        ScenePresenterStateManage.push(StatePresenter(joinPresenter))
     }
 
     override fun render() {
+        clearScreen(red = 0.5f, green = 0.5f, blue = 0.75f)
         super.render()
         val delta = Gdx.graphics.deltaTime
         ScenePresenterStateManage.update(delta)
-        ScenePresenterStateManage.render(batch)
+        ScenePresenterStateManage.render(SpriteBatch())
     }
 
     override fun dispose() {
-        batch.dispose()
-        // gsm.dispose()//
         ScenePresenterStateManage.dispose()
-    }
-}
-
-class FirstScreen(
-    // private val gsm: ScenePresenterStateManage,  Pass gsm to manage states//
-    private val batch: SpriteBatch,
-    // private val presenter: GamePresenter//
-) : KtxScreen {
-    override fun render(delta: Float) {
-        clearScreen(red = 0.1f, green = 0.1f, blue = 0.23f)
-        ScenePresenterStateManage.update(delta)
-        ScenePresenterStateManage.render(batch)
-        // presenter.render()
-    }
-
-    override fun dispose() {
-        // Clean up resources if needed//
     }
 }
