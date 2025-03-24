@@ -23,6 +23,11 @@ object SupabaseGameHandler {
      */
     private val SUPABASE_GAME_TABLE_NAME = "games"
 
+    enum class TurnColor {
+        WHITE,
+        BLACK,
+    }
+
     /**
      * Type used for games saved in database.
      */
@@ -32,8 +37,10 @@ object SupabaseGameHandler {
         val updated_at: String,
         val lobby_code: String,
         val last_move: String?,
-        val turn: String, // TODO: Make this a color enum?
-        val board: Array<String>, // TODO: Make a board-class that the board-json can be decoded to.
+        val turn: TurnColor,
+        val pieces: Array<String>, // TODO: Change this to be an array of pieces when that is implemented
+        val board_squares: Array<String>, // TODO: Change this to be an array of board squares when that is implemented
+        val settings: Array<String>, // TODO: Change this into a settings type array when implemented
     )
 
     /**
@@ -100,21 +107,25 @@ object SupabaseGameHandler {
      * @param lobbyCode of the game to update the column for
      * @throws Error if the game does not exist
      */
-    suspend fun updateGameBoard(
+    suspend fun updateGameState(
         lobbyCode: String,
-        board: String,
+        pieces: Array<String>,
+        boardSquares: Array<String>,
+        turn: TurnColor,
+        lastMove: String,
     ) {
         if (!checkIfGameExists(lobbyCode)) {
             throw Error("Game does not exist!")
         }
 
-        val stringArray = arrayOf<String>()
-
         supabase
             .from("games")
             .update(
                 {
-                    set("board", value = stringArray)
+                    set("pieces", value = pieces)
+                    set("board_squares", value = boardSquares)
+                    set("turn", value = turn)
+                    set("last_move", value = lastMove)
                 },
             ) {
                 filter {

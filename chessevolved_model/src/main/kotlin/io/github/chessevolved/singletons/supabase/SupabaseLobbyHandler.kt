@@ -40,6 +40,7 @@ object SupabaseLobbyHandler {
         val lobby_code: String,
         val second_player: Boolean,
         val game_started: Boolean,
+        val settings: Array<String>, // TODO: Turn this into a settings-type array when implemented
     )
 
     // Taken from https://stackoverflow.com/questions/46943860/idiomatic-way-to-generate-a-random-alphanumeric-string-in-kotlin
@@ -215,15 +216,30 @@ object SupabaseLobbyHandler {
     }
 
     /**
+     * Class used to create a new row in game table.
+     */
+    @Serializable
+    private class InsertGame(
+        val lobby_code: String,
+        val settings: Array<String>,
+    )
+
+    /**
      * Method to set the "game_started"-column for the lobby table to true in supabase.
      * Also creates a row in the game table on supabase.
      * @param lobbyCode which is the code of the lobby to start the game for.
+     * @param gameSettings which are the game-settings to use for this game.
      */
-    suspend fun startGame(lobbyCode: String) {
+    suspend fun startGame(
+        lobbyCode: String,
+        gameSettings: Array<String>,
+    ) {
         try {
             supabase
                 .from("games")
-                .insert(mapOf("lobby_code" to lobbyCode))
+                .insert(
+                    InsertGame(lobby_code = lobbyCode, settings = gameSettings),
+                )
 
             supabase
                 .from("lobbies")

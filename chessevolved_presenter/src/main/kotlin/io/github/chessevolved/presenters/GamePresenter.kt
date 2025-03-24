@@ -47,13 +47,14 @@ class GamePresenter(
     }
 
     private suspend fun testSupabase() {
+        println("Testing")
         val lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
 
         Thread.sleep(3000L)
-        startGame(lobbyCode)
+        startGame(lobbyCode, arrayOf<String>())
         Thread.sleep(3000L)
 
-        updateGameBoard(lobbyCode, "asd")
+        updateGameBoard(lobbyCode, arrayOf<String>(), arrayOf<String>(), SupabaseGameHandler.TurnColor.BLACK, "b3")
         // leaveLobby(lobbyCode)
     }
     // END testing for supabase
