@@ -14,6 +14,7 @@ class SettingsPresenter(
     }
 
     // TODO: wait for implementation of ScenePresenterStateManager
+    //  UPDATE: just add to stack where necessary, but a setting-button doesnt exist yet
     private val gameSettings = GameSettings
     // val presenterManager = ScenePresenterStateManager
 
@@ -27,7 +28,10 @@ class SettingsPresenter(
         fowSetting: Boolean,
         sizeSetting: Int,
     ) {
+        // TODO: Consider if game settings should be applied manually or automatically
         gameSettings.setFOW(fowSetting)
+
+        // TODO: validate max/min boardsize here?
         gameSettings.setBoardSize(sizeSetting)
 
         returnToLobby()

@@ -1,17 +1,32 @@
 package io.github.chessevolved.presenters
 
+import ScenePresenterStateManage
+import SettingsView
+import io.github.chessevolved.views.JoinGameView
+import io.github.chessevolved.views.MenuView
+
 class MenuPresenter(
-    // menuView: MenuView,
-) {
-    fun render() {
-        TODO("Not yet implemented")
+    private val view: MenuView
+) : IPresenter {
+    override fun render() {
+        view.render()
+    }
+
+    override fun resize(width: Int, height: Int) {
+        view.resize(width, height)
+    }
+
+    override fun dispose() {
+        view.dispose()
     }
 
     fun enterJoinGame() {
-        // TODO: Append JoinGamePresenter to the Stack.
+        val joinGamePresenter = JoinGamePresenter(JoinGameView())
+        ScenePresenterStateManage.push(StatePresenter(joinGamePresenter))
     }
 
-    fun enterCreateGame() {
-        // TODO: Append CreateGamePresenter to the stack.
+    fun enterSettings() {
+        val settingsPresenter = SettingsPresenter(SettingsView())
+        ScenePresenterStateManage.push(StatePresenter(settingsPresenter))
     }
 }

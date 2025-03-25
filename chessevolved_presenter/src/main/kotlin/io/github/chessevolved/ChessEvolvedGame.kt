@@ -1,9 +1,13 @@
 package io.github.chessevolved
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import io.github.chessevolved.presenters.JoinGamePresenter
+import io.github.chessevolved.presenters.MenuPresenter
+import io.github.chessevolved.presenters.StatePresenter
 import io.github.chessevolved.views.JoinGameView
+import io.github.chessevolved.views.MenuView
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
@@ -16,42 +20,24 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
         val skin = Skin(Gdx.files.internal("skin/plain-james-ui.json"))
         Scene2DSkin.defaultSkin = skin
 
-        addScreen(FirstScreen())
-        setScreen<FirstScreen>()
+        //TODO: Remove joingame as the the starting screen
+        // Made the stack like this since JOIN GAME is the first screen to "usable"
+        // and to test the state-chaning
+        val menuPresenter = MenuPresenter(MenuView())
+        ScenePresenterStateManage.push(StatePresenter(menuPresenter))
+        val joinPresenter = JoinGamePresenter(JoinGameView())
+        ScenePresenterStateManage.push(StatePresenter(joinPresenter))
     }
-}
 
-class FirstScreen : KtxScreen {
-    // We create the view outside of the presenter so that it is easier to test the presenter with a mock view
-    private val joinGameView: JoinGameView =
-        JoinGameView().apply {
-            onJoinButtonClicked = { lobbyId: String ->
-                joinGamePresenter.joinGame(lobbyId)
-            }
-            onReturnButtonClicked = {
-                joinGamePresenter.returnToMenu()
-            }
-        }
-
-    private val joinGamePresenter = JoinGamePresenter(joinGameView)
-
-    // Commented out old presenter for testing joingame presenter
-    // val presenter: GamePresenter = GamePresenter(AndroidView())
-
-    override fun render(delta: Float) {
+    override fun render() {
         clearScreen(red = 0.5f, green = 0.5f, blue = 0.75f)
-        joinGamePresenter.render()
-        // presenter.render()
-    }
-
-    override fun resize(
-        width: Int,
-        height: Int,
-    ) {
-        joinGamePresenter.resize(width, height)
+        super.render()
+        val delta = Gdx.graphics.deltaTime
+        ScenePresenterStateManage.update(delta)
+        ScenePresenterStateManage.render(SpriteBatch())
     }
 
     override fun dispose() {
-        joinGamePresenter.dispose()
+        ScenePresenterStateManage.dispose()
     }
 }

@@ -8,6 +8,7 @@ class JoinGamePresenter(
 ) : IPresenter {
     init {
         view.init()
+        view.onReturnButtonClicked = { returnToMenu() }
     }
 
     /**
@@ -35,8 +36,7 @@ class JoinGamePresenter(
      */
     fun returnToMenu() {
         println("JoinGamePresenter: Returning to menu")
-        // TODO: idk but this should return here to let another presenter handle it
-        // presenterManager.popToPresenter(MenuPresenter::class)
+        ScenePresenterStateManage.pop()
     }
 
     override fun render() {
