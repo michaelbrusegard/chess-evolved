@@ -10,7 +10,7 @@ import io.github.jan.supabase.serializer.KotlinXSerializer
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
-object SupabaseClient {
+internal object SupabaseClient {
     private val dotenv = dotenv()
     private val supabase: SupabaseClient =
         createSupabaseClient(
