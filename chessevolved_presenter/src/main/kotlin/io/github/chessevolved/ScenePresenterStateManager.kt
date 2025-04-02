@@ -1,7 +1,7 @@
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import java.util.ArrayDeque
 
-object ScenePresenterStateManage {
+object ScenePresenterStateManager {
     private val states = ArrayDeque<State>()
 
     fun push(state: State) {

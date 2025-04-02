@@ -36,7 +36,7 @@ class JoinGamePresenter(
      */
     fun returnToMenu() {
         println("JoinGamePresenter: Returning to menu")
-        ScenePresenterStateManage.pop()
+        ScenePresenterStateManager.pop()
     }
 
     override fun render() {

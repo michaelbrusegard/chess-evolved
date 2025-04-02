@@ -24,20 +24,19 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
         // Made the stack like this since JOIN GAME is the first screen to "usable"
         // and to test the state-chaning
         val menuPresenter = MenuPresenter(MenuView())
-        ScenePresenterStateManage.push(StatePresenter(menuPresenter))
+        ScenePresenterStateManager.push(StatePresenter(menuPresenter))
         val joinPresenter = JoinGamePresenter(JoinGameView())
-        ScenePresenterStateManage.push(StatePresenter(joinPresenter))
+        ScenePresenterStateManager.push(StatePresenter(joinPresenter))
     }
 
     override fun render() {
         clearScreen(red = 0.5f, green = 0.5f, blue = 0.75f)
-        super.render()
         val delta = Gdx.graphics.deltaTime
-        ScenePresenterStateManage.update(delta)
-        ScenePresenterStateManage.render(SpriteBatch())
+        ScenePresenterStateManager.update(delta)
+        ScenePresenterStateManager.render(SpriteBatch())
     }
 
     override fun dispose() {
-        ScenePresenterStateManage.dispose()
+        ScenePresenterStateManager.dispose()
     }
 }
