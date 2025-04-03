@@ -1,4 +1,4 @@
-import io.github.chessevolved.ScenePresenterStateManager
+import io.github.chessevolved.PresenterManager
 import io.github.chessevolved.presenters.IPresenter
 import io.github.chessevolved.presenters.SettingsPresenter
 import io.github.chessevolved.presenters.StatePresenter
@@ -39,14 +39,14 @@ class LobbyPresenter(
      * Change to SettingsPresenter
      */
     private fun enterSettings() {
-        ScenePresenterStateManager.push(StatePresenter(settingsPresenter))
+        PresenterManager.push(StatePresenter(settingsPresenter))
     }
 
     /**
      * Change to MenuPresenter
      */
     private fun returnToMenu() {
-        ScenePresenterStateManager.pop()
+        PresenterManager.pop()
     }
 
     override fun render() {

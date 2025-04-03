@@ -1,7 +1,7 @@
 package io.github.chessevolved.presenters
 
 import SettingsView
-import io.github.chessevolved.ScenePresenterStateManager
+import io.github.chessevolved.PresenterManager
 import io.github.chessevolved.singletons.GameSettings
 
 class SettingsPresenter(
@@ -39,7 +39,7 @@ class SettingsPresenter(
      *  Switch to LobbyPresenter
      */
     private fun returnToLobby() {
-        ScenePresenterStateManager.pop()
+        PresenterManager.pop()
     }
 
     /**

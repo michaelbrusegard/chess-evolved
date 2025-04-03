@@ -25,17 +25,17 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
         menuView.onCreateLobbyButtonClicked = { menuPresenter.enterCreateGame() }
         menuView.onJoinGameButtonClicked = { menuPresenter.enterJoinGame() }
 
-        ScenePresenterStateManager.push(StatePresenter(menuPresenter))
+        PresenterManager.push(StatePresenter(menuPresenter))
     }
 
     override fun render() {
         clearScreen(red = 0.5f, green = 0.5f, blue = 0.75f)
         val delta = Gdx.graphics.deltaTime
-        ScenePresenterStateManager.update(delta)
-        ScenePresenterStateManager.render(SpriteBatch())
+        PresenterManager.update(delta)
+        PresenterManager.render(SpriteBatch())
     }
 
     override fun dispose() {
-        ScenePresenterStateManager.dispose()
+        PresenterManager.dispose()
     }
 }

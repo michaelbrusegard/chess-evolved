@@ -1,6 +1,6 @@
 package io.github.chessevolved.presenters
 import LobbyPresenter
-import io.github.chessevolved.ScenePresenterStateManager
+import io.github.chessevolved.PresenterManager
 import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.LobbyView
 import io.github.chessevolved.views.MenuView
@@ -29,12 +29,12 @@ class MenuPresenter(
 
     fun enterJoinGame() {
         val joinGamePresenter = JoinGamePresenter(JoinGameView())
-        ScenePresenterStateManager.push(StatePresenter(joinGamePresenter))
+        PresenterManager.push(StatePresenter(joinGamePresenter))
     }
 
     fun enterCreateGame() {
         // TODO: Create lobby code before showing lobby view
         val lobbyPresenter = LobbyPresenter(LobbyView("123ABC"))
-        ScenePresenterStateManager.push(StatePresenter(lobbyPresenter))
+        PresenterManager.push(StatePresenter(lobbyPresenter))
     }
 }

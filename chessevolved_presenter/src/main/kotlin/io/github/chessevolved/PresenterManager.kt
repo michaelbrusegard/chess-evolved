@@ -3,7 +3,7 @@ package io.github.chessevolved
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import java.util.ArrayDeque
 
-object ScenePresenterStateManager {
+object PresenterManager {
     private val states = ArrayDeque<State>()
 
     fun push(state: State) {

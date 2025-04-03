@@ -1,7 +1,7 @@
 package io.github.chessevolved.presenters
 
 import LobbyPresenter
-import io.github.chessevolved.ScenePresenterStateManager
+import io.github.chessevolved.PresenterManager
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.LobbyView
@@ -30,7 +30,7 @@ class JoinGamePresenter(
 
         if (success) {
             val lobbyPresenter = LobbyPresenter(LobbyView(lobbyId))
-            ScenePresenterStateManager.push(StatePresenter(lobbyPresenter))
+            PresenterManager.push(StatePresenter(lobbyPresenter))
         } else {
             view.showJoinError("Error message should be put here")
         }
@@ -40,7 +40,7 @@ class JoinGamePresenter(
      * Return to the menu scene using the presenter manager??
      */
     fun returnToMenu() {
-        ScenePresenterStateManager.pop()
+        PresenterManager.pop()
     }
 
     override fun render() {
