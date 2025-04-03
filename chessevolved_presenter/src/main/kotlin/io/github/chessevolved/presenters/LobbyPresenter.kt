@@ -6,9 +6,10 @@ class LobbyPresenter(
 ) : IPresenter {
     init {
         lobbyView.onLeaveButtonClicked = { returnToMenu() }
-        lobbyView.onStartGameButtonClicked = { saveLobby() }
+        lobbyView.onStartGameButtonClicked = { startGame() }
         lobbyView.onOpenSettingsButtonClicked = { enterSettings() }
         lobbyView.init()
+        lobbyView.setInputProcessor()
     }
 
     /**
@@ -18,7 +19,7 @@ class LobbyPresenter(
      * @param player2
      * @param lobbyID
      */
-    fun saveLobby(
+    fun startGame(
         // player1: String,
         // player2: String,
         // lobbyID: String,
@@ -26,10 +27,15 @@ class LobbyPresenter(
         // Todo: Finish implementation. temporary using string for player
     }
 
+    fun playerJoinedLeftLobby(playerJoined: Boolean) {
+        lobbyView.setSecondPlayerConnected(playerJoined)
+    }
+
     /**
      * Change to SettingsPresenter
      */
     fun enterSettings() {
+        playerJoinedLeftLobby(true)
         // TODO: Wait for ScenePresenterStateManager
     }
 

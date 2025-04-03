@@ -19,7 +19,7 @@ class LobbyView : IView {
     private var secondPlayerStatusText = scene2d.label("Waiting for second player...")
     private var startGameButton =
         scene2d.textButton("Start Game!") {
-            onClick { onStartGameButtonClicked() }
+            onClick { }
         }
 
     override fun init() {
@@ -34,28 +34,30 @@ class LobbyView : IView {
                 label("Chess Evolved!") { it.padBottom(20f) }
                 row()
 
-                // secondPlayerStatusText
-                // row()
+                add(secondPlayerStatusText)
+                row()
+
+                add(startGameButton)
+                row()
+
+                textButton("Open Lobby Settings") {
+                    onClick { onOpenSettingsButtonClicked() }
+                }
+                row()
 
                 textButton("Leave Lobby") {
                     it.padBottom(5f)
                     onClick { onLeaveButtonClicked() }
                 }
                 row()
-                textButton("Open Lobby Settings") {
-                    onClick { onOpenSettingsButtonClicked() }
-                }
-                row()
-                // startGameButton
             }
-
         stage.addActor(root)
     }
 
     fun setSecondPlayerConnected(isConnected: Boolean) {
         if (isConnected) {
             secondPlayerStatusText.setText("Second player connected!")
-            startGameButton.onClick { onStartGameButtonClicked }
+            startGameButton.onClick { onStartGameButtonClicked() }
         } else {
             secondPlayerStatusText.setText("Waiting for second player...")
             startGameButton.onClick { }
