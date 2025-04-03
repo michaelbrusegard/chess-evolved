@@ -1,15 +1,19 @@
+import io.github.chessevolved.ScenePresenterStateManager
 import io.github.chessevolved.presenters.IPresenter
+import io.github.chessevolved.presenters.SettingsPresenter
+import io.github.chessevolved.presenters.StatePresenter
 import io.github.chessevolved.views.LobbyView
 
 class LobbyPresenter(
     private val lobbyView: LobbyView,
 ) : IPresenter {
+    private val settingsPresenter = SettingsPresenter(SettingsView())
+
     init {
         lobbyView.onLeaveButtonClicked = { returnToMenu() }
         lobbyView.onStartGameButtonClicked = { startGame() }
         lobbyView.onOpenSettingsButtonClicked = { enterSettings() }
         lobbyView.init()
-        lobbyView.setInputProcessor()
     }
 
     /**
@@ -24,7 +28,7 @@ class LobbyPresenter(
         // player2: String,
         // lobbyID: String,
     ) {
-        // Todo: Finish implementation. temporary using string for player
+        // TODO: Switch player over to game.
     }
 
     fun playerJoinedLeftLobby(playerJoined: Boolean) {
@@ -34,15 +38,15 @@ class LobbyPresenter(
     /**
      * Change to SettingsPresenter
      */
-    fun enterSettings() {
-        // TODO: Wait for io.github.chessevolved.ScenePresenterStateManager
+    private fun enterSettings() {
+        ScenePresenterStateManager.push(StatePresenter(settingsPresenter))
     }
 
     /**
      * Change to MenuPresenter
      */
-    fun returnToMenu() {
-        // TODO: Wait for io.github.chessevolved.ScenePresenterStateManager
+    private fun returnToMenu() {
+        ScenePresenterStateManager.pop()
     }
 
     override fun render() {

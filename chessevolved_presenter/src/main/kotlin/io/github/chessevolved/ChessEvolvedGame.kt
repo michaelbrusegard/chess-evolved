@@ -22,8 +22,8 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
         menuView.init()
         val menuPresenter = MenuPresenter(menuView)
 
-        menuView.onCreateLobbyViewButtonClicked = { menuPresenter.enterCreateGame() }
-        menuView.onJoinGameViewButtonClicked = { menuPresenter.enterJoinGame() }
+        menuView.onCreateLobbyButtonClicked = { menuPresenter.enterCreateGame() }
+        menuView.onJoinGameButtonClicked = { menuPresenter.enterJoinGame() }
 
         ScenePresenterStateManager.push(StatePresenter(menuPresenter))
     }

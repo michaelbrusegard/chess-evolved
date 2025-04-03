@@ -115,6 +115,6 @@ class SettingsView : IView {
     }
 
     override fun setInputProcessor() {
-        TODO("Not yet implemented")
+        Gdx.input.inputProcessor = stage
     }
 }

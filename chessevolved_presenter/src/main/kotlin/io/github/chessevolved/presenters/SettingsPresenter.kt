@@ -1,22 +1,20 @@
 package io.github.chessevolved.presenters
 
 import SettingsView
+import io.github.chessevolved.ScenePresenterStateManager
 import io.github.chessevolved.singletons.GameSettings
 
 class SettingsPresenter(
-    private val view: SettingsView,
+    private val settingsView: SettingsView,
 ) : IPresenter {
     init {
-        view.init()
-        view.onApply = { fowSetting, sizeSetting ->
+        settingsView.init()
+        settingsView.onApply = { fowSetting, sizeSetting ->
             onApplyPressed(fowSetting, sizeSetting)
         }
     }
 
-    // TODO: wait for implementation of io.github.chessevolved.ScenePresenterStateManager
-    //  UPDATE: just add to stack where necessary, but a setting-button doesnt exist yet
     private val gameSettings = GameSettings
-    // val presenterManager = io.github.chessevolved.ScenePresenterStateManager
 
     /**
      * Applies the chosen game settings and returns to lobby
@@ -41,8 +39,7 @@ class SettingsPresenter(
      *  Switch to LobbyPresenter
      */
     private fun returnToLobby() {
-        // TODO: wait for implementation of io.github.chessevolved.ScenePresenterStateManager
-        println("SettingsPresenter: Returning to lobby")
+        ScenePresenterStateManager.pop()
     }
 
     /**
@@ -57,21 +54,21 @@ class SettingsPresenter(
         )
 
     override fun render() {
-        view.render()
+        settingsView.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        view.resize(width, height)
+        settingsView.resize(width, height)
     }
 
     override fun dispose() {
-        view.dispose()
+        settingsView.dispose()
     }
 
     override fun setInputProcessor() {
-        TODO("Not yet implemented")
+        settingsView.setInputProcessor()
     }
 }

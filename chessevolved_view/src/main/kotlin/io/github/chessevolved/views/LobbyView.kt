@@ -9,7 +9,9 @@ import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.textButton
 
-class LobbyView : IView {
+class LobbyView(
+    val lobbyCode: String,
+) : IView {
     private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
 
     var onLeaveButtonClicked: () -> Unit = {}
@@ -24,6 +26,7 @@ class LobbyView : IView {
         }
 
     override fun init() {
+        // TODO: Check if second player is already in lobby, and if so, update secondPlayerStatusText.
         val root =
             scene2d.table {
                 // Set size of layout parent to screen.
@@ -33,6 +36,9 @@ class LobbyView : IView {
 
                 // Perhaps replace label in the future with a logo. Or custom sprite text.
                 label("Chess Evolved!") { it.padBottom(20f) }
+                row()
+
+                label("Lobby Code: $lobbyCode")
                 row()
 
                 add(secondPlayerStatusText)
