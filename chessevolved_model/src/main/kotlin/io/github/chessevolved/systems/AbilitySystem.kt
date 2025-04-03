@@ -8,9 +8,10 @@ class AbilitySystem {
     fun addAbilityToChessPiece(
         chesspiece: ChessPiece,
         type: Int,
-        ability: String
+        ability: String,
+        description: String
     ) {
         val abilities: AbilityComponent = Mappers.getAbilities(chesspiece)
-        abilities.addAbility(type, ability)
+        abilities.addAbility(type, ability, description)
     }
 }
