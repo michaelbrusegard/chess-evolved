@@ -10,12 +10,14 @@ import ktx.scene2d.table
 import ktx.scene2d.textButton
 
 class MenuView : IView {
-    private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
+    private lateinit var stage: Stage
 
     var onCreateLobbyButtonClicked: () -> Unit = {}
     var onJoinGameButtonClicked: () -> Unit = {}
 
     override fun init() {
+        stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
+
         val root =
             scene2d.table {
                 // Set size of layout parent to screen.

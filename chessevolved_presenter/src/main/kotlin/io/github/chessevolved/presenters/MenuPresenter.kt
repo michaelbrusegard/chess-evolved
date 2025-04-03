@@ -1,41 +1,40 @@
 package io.github.chessevolved.presenters
-
+import LobbyPresenter
+import io.github.chessevolved.PresenterManager
+import io.github.chessevolved.views.JoinGameView
+import io.github.chessevolved.views.LobbyView
 import io.github.chessevolved.views.MenuView
 
 class MenuPresenter(
-    private val menuView: MenuView,
+    private val view: MenuView,
 ) : IPresenter {
-    init {
-        menuView.init()
-        // The Presenter manager should activate the current input processor.
-        // This here is temporary.
-        setInputProcessor()
-    }
-
     override fun render() {
-        menuView.render()
+        view.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        menuView.resize(width, height)
+        view.resize(width, height)
     }
 
     override fun dispose() {
-        menuView.dispose()
+        view.dispose()
     }
 
     override fun setInputProcessor() {
-        menuView.setInputProcessor()
+        view.setInputProcessor()
     }
 
     fun enterJoinGame() {
-        println("Joined Game")
+        val joinGamePresenter = JoinGamePresenter(JoinGameView())
+        PresenterManager.push(StatePresenter(joinGamePresenter))
     }
 
     fun enterCreateGame() {
-        println("Created Game")
+        // TODO: Create lobby code before showing lobby view
+        val lobbyPresenter = LobbyPresenter(LobbyView("123ABC"))
+        PresenterManager.push(StatePresenter(lobbyPresenter))
     }
 }
