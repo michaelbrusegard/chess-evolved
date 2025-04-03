@@ -113,4 +113,7 @@ class SettingsView : IView {
     override fun dispose() {
         stage.dispose()
     }
+
+    override fun setInputProcessor() {
+    }
 }
