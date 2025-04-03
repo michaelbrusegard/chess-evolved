@@ -35,6 +35,7 @@ class LobbyPresenter(
      * Change to SettingsPresenter
      */
     fun enterSettings() {
+        playerJoinedLeftLobby(true)
         // TODO: Wait for ScenePresenterStateManager
     }
 

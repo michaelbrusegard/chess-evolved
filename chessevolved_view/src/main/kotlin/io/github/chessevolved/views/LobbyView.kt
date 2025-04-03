@@ -20,6 +20,7 @@ class LobbyView : IView {
     private var startGameButton =
         scene2d.textButton("Start Game!") {
             onClick { }
+            setColor(0f, 0f, 0f, 0.3f)
         }
 
     override fun init() {
@@ -51,6 +52,7 @@ class LobbyView : IView {
                 }
                 row()
             }
+
         stage.addActor(root)
     }
 
@@ -58,9 +60,11 @@ class LobbyView : IView {
         if (isConnected) {
             secondPlayerStatusText.setText("Second player connected!")
             startGameButton.onClick { onStartGameButtonClicked() }
+            startGameButton.color = scene2d.label("tex").color
         } else {
             secondPlayerStatusText.setText("Waiting for second player...")
             startGameButton.onClick { }
+            startGameButton.setColor(0f, 0f, 0f, 0.3f)
         }
     }
 
