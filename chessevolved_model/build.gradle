@@ -43,4 +43,18 @@ dependencies {
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
   api "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
+
+  // BEGIN SUPABASE DEPENDENCIES
+  implementation platform("io.github.jan-tennert.supabase:bom:$supabaseVersion")
+  implementation 'io.github.jan-tennert.supabase:postgrest-kt' //DB Operations
+  implementation 'io.github.jan-tennert.supabase:realtime-kt' // Websockets
+  // We'll be using CIO as our HTTP client engine implementation, cause it supports JVM, Android, and Native, as well
+  // as using websockets! https://ktor.io/docs/client-engines.html#limitations
+  implementation("io.ktor:ktor-client-cio:$ktor_version")
+  // Our serializer for JSON objects.
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+  //END SUPABASE DEPENDENCIES
+
+  // We need this to be able to retrieve .env variables. See https://github.com/cdimascio/dotenv-kotlin?tab=readme-ov-file#faq
+  implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 }
