@@ -1,5 +1,4 @@
 package io.github.chessevolved.presenters
-
 import ScenePresenterStateManager
 import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.MenuView
@@ -19,8 +18,15 @@ class MenuPresenter(
         view.dispose()
     }
 
+    override fun setInputProcessor() {
+        view.setInputProcessor()
+    }
+
     fun enterJoinGame() {
         val joinGamePresenter = JoinGamePresenter(JoinGameView())
         ScenePresenterStateManager.push(StatePresenter(joinGamePresenter))
+    }
+    fun enterCreateGame() {
+        println("Created Game")
     }
 }

@@ -13,12 +13,18 @@ import ktx.async.KtxAsync
 import ktx.scene2d.Scene2DSkin
 
 class ChessEvolvedGame : KtxGame<KtxScreen>() {
+
     override fun create() {
         KtxAsync.initiate()
         val skin = Skin(Gdx.files.internal("skin/plain-james-ui.json"))
         Scene2DSkin.defaultSkin = skin
 
-        val menuPresenter = MenuPresenter(MenuView())
+        val menuView = MenuView()
+        menuView.init()
+        val menuPresenter = MenuPresenter(menuView)
+        menuView.onCreateLobbyViewButtonClicked = { menuPresenter.enterCreateGame() }
+        menuView.onJoinGameViewButtonClicked = { menuPresenter.enterJoinGame() }
+
         ScenePresenterStateManager.push(StatePresenter(menuPresenter))
     }
 

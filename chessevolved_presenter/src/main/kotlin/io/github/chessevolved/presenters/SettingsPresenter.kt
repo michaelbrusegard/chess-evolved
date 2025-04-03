@@ -70,4 +70,8 @@ class SettingsPresenter(
     override fun dispose() {
         view.dispose()
     }
+
+    override fun setInputProcessor() {
+        TODO("Not yet implemented")
+    }
 }

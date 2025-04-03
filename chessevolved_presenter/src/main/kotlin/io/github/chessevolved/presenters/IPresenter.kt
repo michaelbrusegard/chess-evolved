@@ -27,4 +27,9 @@ interface IPresenter {
      * Should be called when the presenter is no longer needed to prevent memory leaks.
      */
     fun dispose()
+
+    /**
+     * Sets the current View as the current input processor.
+     */
+    fun setInputProcessor()
 }
