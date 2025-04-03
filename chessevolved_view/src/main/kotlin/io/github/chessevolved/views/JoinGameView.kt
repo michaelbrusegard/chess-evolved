@@ -75,8 +75,6 @@ class JoinGameView : IView {
 
         stage.addActor(root)
         toastManager = ToastManager(stage)
-
-        Gdx.input.inputProcessor = stage
     }
 
     override fun render() {
@@ -93,6 +91,10 @@ class JoinGameView : IView {
 
     override fun dispose() {
         stage.dispose()
+    }
+
+    override fun setInputProcessor() {
+        Gdx.input.inputProcessor = stage
     }
 
     fun showJoinSuccess() {

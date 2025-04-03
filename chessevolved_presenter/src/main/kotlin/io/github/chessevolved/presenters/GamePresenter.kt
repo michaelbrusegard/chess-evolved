@@ -8,7 +8,14 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SpriteComponent
 import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
+import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
+import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.joinGame
+import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.updateGameState
+import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
+import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.startGame
 import io.github.chessevolved.views.AndroidView
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class GamePresenter(
     givenView: AndroidView,
@@ -25,7 +32,35 @@ class GamePresenter(
     // Temporary value, should be defined elsewhere
     val boardSize: Int = 8
 
+    // Testing methods for supabase. Just to provide an example
+    val supabaseLobbyHandler = SupabaseLobbyHandler
+
+    private fun onGameEvent(newGameRow: SupabaseGameHandler.Game) {
+        println("Game was updated! $newGameRow")
+    }
+
+    private suspend fun onLobbyEvent(newLobbyRow: SupabaseLobbyHandler.Lobby) {
+        println("Registered lobby event in lobby event handler! $newLobbyRow")
+        if (newLobbyRow.game_started) {
+            joinGame(newLobbyRow.lobby_code, ::onGameEvent)
+        }
+    }
+
+    private suspend fun testSupabase() {
+        println("Testing")
+        val lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
+
+        Thread.sleep(3000L)
+        startGame(lobbyCode, arrayOf<String>())
+        Thread.sleep(3000L)
+
+        updateGameState(lobbyCode, arrayOf<String>(), arrayOf<String>(), SupabaseGameHandler.TurnColor.BLACK, "b3")
+        // leaveLobby(lobbyCode)
+    }
+    // END testing for supabase
+
     init {
+        GlobalScope.launch { testSupabase() }
         board.add(BoardSizeComponent(boardSize))
         board.add(ChessBoardSpriteComponent())
 
@@ -70,5 +105,9 @@ class GamePresenter(
     }
 
     override fun dispose() {
+    }
+
+    override fun setInputProcessor() {
+        TODO("Not yet implemented")
     }
 }

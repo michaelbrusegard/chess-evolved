@@ -1,3 +1,9 @@
+plugins {
+
+  // Our serializer for HTTP-stuff will be KotlinX Serialization
+  id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion"
+}
+
 apply plugin: 'java-library'
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
