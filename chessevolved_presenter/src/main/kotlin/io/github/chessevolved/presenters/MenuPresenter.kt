@@ -1,7 +1,6 @@
 package io.github.chessevolved.presenters
 
 import ScenePresenterStateManager
-import SettingsView
 import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.MenuView
 
@@ -23,10 +22,5 @@ class MenuPresenter(
     fun enterJoinGame() {
         val joinGamePresenter = JoinGamePresenter(JoinGameView())
         ScenePresenterStateManager.push(StatePresenter(joinGamePresenter))
-    }
-
-    fun enterSettings() {
-        val settingsPresenter = SettingsPresenter(SettingsView())
-        ScenePresenterStateManager.push(StatePresenter(settingsPresenter))
     }
 }
