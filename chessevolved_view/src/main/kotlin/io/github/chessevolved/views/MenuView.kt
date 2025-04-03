@@ -12,8 +12,8 @@ import ktx.scene2d.textButton
 class MenuView : IView {
     private lateinit var stage: Stage
 
-    var onCreateLobbyViewButtonClicked: () -> Unit = {}
-    var onJoinGameViewButtonClicked: () -> Unit = {}
+    var onCreateLobbyButtonClicked: () -> Unit = {}
+    var onJoinGameButtonClicked: () -> Unit = {}
 
     override fun init() {
         stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
@@ -30,11 +30,11 @@ class MenuView : IView {
                 row()
                 textButton("Create a Lobby") {
                     it.padBottom(5f)
-                    onClick { onCreateLobbyViewButtonClicked() }
+                    onClick { onCreateLobbyButtonClicked() }
                 }
                 row()
                 textButton("Join Game") {
-                    onClick { onJoinGameViewButtonClicked() }
+                    onClick { onJoinGameButtonClicked() }
                 }
             }
 
