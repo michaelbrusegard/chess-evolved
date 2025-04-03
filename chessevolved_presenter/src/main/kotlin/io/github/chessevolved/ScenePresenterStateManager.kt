@@ -1,3 +1,5 @@
+package io.github.chessevolved
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import java.util.ArrayDeque
 
@@ -6,19 +8,15 @@ object ScenePresenterStateManager {
 
     fun push(state: State) {
         states.push(state)
+        state.setInputProcessor()
     }
 
     fun pop() {
         if (states.isNotEmpty()) {
             states.pop()
         }
-    }
-
-    fun set(state: State) {
-        if (states.isNotEmpty()) {
-            states.pop()
-        }
-        states.push(state)
+        if (states.isEmpty()) return
+        states.peekFirst().setInputProcessor()
     }
 
     fun update(dt: Float) {

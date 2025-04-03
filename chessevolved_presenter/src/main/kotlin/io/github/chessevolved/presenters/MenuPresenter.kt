@@ -1,5 +1,5 @@
 package io.github.chessevolved.presenters
-import ScenePresenterStateManager
+import io.github.chessevolved.ScenePresenterStateManager
 import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.MenuView
 
@@ -31,6 +31,5 @@ class MenuPresenter(
     }
 
     fun enterCreateGame() {
-        println("Created Game")
     }
 }

@@ -20,14 +20,14 @@ class LobbyPresenter : IPresenter {
      * Change to SettingsPresenter
      */
     fun enterSettings() {
-        // TODO: Wait for ScenePresenterStateManager
+        // TODO: Wait for io.github.chessevolved.ScenePresenterStateManager
     }
 
     /**
      * Change to MenuPresenter
      */
     fun returnToMenu() {
-        // TODO: Wait for ScenePresenterStateManager
+        // TODO: Wait for io.github.chessevolved.ScenePresenterStateManager
     }
 
     override fun render() {

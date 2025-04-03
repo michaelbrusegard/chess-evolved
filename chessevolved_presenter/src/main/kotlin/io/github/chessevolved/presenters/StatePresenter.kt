@@ -1,9 +1,11 @@
 package io.github.chessevolved.presenters
 
-import State
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.State
 
-class StatePresenter(private val presenter: IPresenter) : State() {
+class StatePresenter(
+    private val presenter: IPresenter,
+) : State() {
     override fun handleInput() {
     }
 
@@ -17,5 +19,9 @@ class StatePresenter(private val presenter: IPresenter) : State() {
 
     override fun dispose() {
         presenter.dispose()
+    }
+
+    override fun setInputProcessor() {
+        presenter.setInputProcessor()
     }
 }

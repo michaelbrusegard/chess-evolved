@@ -13,10 +13,10 @@ class SettingsPresenter(
         }
     }
 
-    // TODO: wait for implementation of ScenePresenterStateManager
+    // TODO: wait for implementation of io.github.chessevolved.ScenePresenterStateManager
     //  UPDATE: just add to stack where necessary, but a setting-button doesnt exist yet
     private val gameSettings = GameSettings
-    // val presenterManager = ScenePresenterStateManager
+    // val presenterManager = io.github.chessevolved.ScenePresenterStateManager
 
     /**
      * Applies the chosen game settings and returns to lobby
@@ -41,7 +41,7 @@ class SettingsPresenter(
      *  Switch to LobbyPresenter
      */
     private fun returnToLobby() {
-        // TODO: wait for implementation of ScenePresenterStateManager
+        // TODO: wait for implementation of io.github.chessevolved.ScenePresenterStateManager
         println("SettingsPresenter: Returning to lobby")
     }
 

@@ -1,3 +1,5 @@
+package io.github.chessevolved
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
 abstract class State {
@@ -8,4 +10,6 @@ abstract class State {
     abstract fun render(sb: SpriteBatch)
 
     abstract fun dispose()
+
+    abstract fun setInputProcessor()
 }

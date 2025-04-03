@@ -1,5 +1,6 @@
 package io.github.chessevolved.presenters
 
+import io.github.chessevolved.ScenePresenterStateManager
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.views.JoinGameView
 
@@ -55,6 +56,6 @@ class JoinGamePresenter(
     }
 
     override fun setInputProcessor() {
-        TODO("Not yet implemented")
+        view.setInputProcessor()
     }
 }
