@@ -14,4 +14,6 @@ class AbilitySystem {
         val abilities: AbilityComponent = Mappers.getAbilities(chesspiece)
         abilities.addAbility(type, ability, description)
     }
+
+    // TODO : abilities need to its own entity, and need to interact with it, and add attributes logic etc to it
 }
