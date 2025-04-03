@@ -9,11 +9,23 @@ import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.textButton
 
-class MenuView : IView {
+class EndGameView : IView {
     private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
 
-    var onCreateLobbyButtonClicked: () -> Unit = {}
-    var onJoinGameButtonClicked: () -> Unit = {}
+    /**
+     * Weather to show win or loss
+     *
+     * true = win
+     *
+     * false = loss
+     */
+    var endGameStatus: Boolean = false
+        set(value) {
+            field = value
+        }
+
+    var onReturnToMenu: () -> Unit = {}
+    var onRematch: () -> Unit = {}
 
     override fun init() {
         val root =
@@ -24,15 +36,23 @@ class MenuView : IView {
                 defaults().pad(10f)
 
                 // Perhaps replace label in the future with a logo. Or custom sprite text.
-                label("Chess Evolved!") { it.padBottom(20f) }
-                row()
-                textButton("Create a Lobby") {
-                    it.padBottom(5f)
-                    onClick { onCreateLobbyButtonClicked() }
+                if (endGameStatus) {
+                    label("Congratulations!") { it.padBottom(20f).center() }
+                    row()
+                    label("You won!") { it.padBottom(20f).center() }
+                } else {
+                    label("Better luck next time!") { it.padBottom(20f).center() }
+                    row()
+                    label("You lost!") { it.padBottom(20f).center() }
                 }
                 row()
-                textButton("Join Game") {
-                    onClick { onJoinGameButtonClicked() }
+                textButton("Return to menu") {
+                    it.padBottom(5f)
+                    onClick { onReturnToMenu() }
+                }
+                row()
+                textButton("Request rematch") {
+                    onClick { onRematch() }
                 }
             }
 
@@ -56,7 +76,6 @@ class MenuView : IView {
     }
 
     override fun setInputProcessor() {
-        // The Presenter should activate the input processor for this stage.
         Gdx.input.inputProcessor = stage
     }
 }

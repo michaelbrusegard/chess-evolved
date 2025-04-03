@@ -32,8 +32,8 @@ class FirstScreen : KtxScreen {
 
     init {
         menuView.apply {
-            onCreateLobbyViewButtonClicked = { menuPresenter.enterCreateGame() }
-            onJoinGameViewButtonClicked = { menuPresenter.enterJoinGame() }
+            onCreateLobbyButtonClicked = { menuPresenter.enterCreateGame() }
+            onJoinGameButtonClicked = { menuPresenter.enterJoinGame() }
         }
     }
 

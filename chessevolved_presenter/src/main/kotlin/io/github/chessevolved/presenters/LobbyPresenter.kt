@@ -1,6 +1,17 @@
 import io.github.chessevolved.presenters.IPresenter
+import io.github.chessevolved.views.LobbyView
 
-class LobbyPresenter : IPresenter {
+class LobbyPresenter(
+    private val lobbyView: LobbyView,
+) : IPresenter {
+    init {
+        lobbyView.onLeaveButtonClicked = { returnToMenu() }
+        lobbyView.onStartGameButtonClicked = { startGame() }
+        lobbyView.onOpenSettingsButtonClicked = { enterSettings() }
+        lobbyView.init()
+        lobbyView.setInputProcessor()
+    }
+
     /**
      * Save lobby in backend
      *
@@ -8,12 +19,16 @@ class LobbyPresenter : IPresenter {
      * @param player2
      * @param lobbyID
      */
-    fun saveLobby(
+    fun startGame(
         // player1: String,
         // player2: String,
         // lobbyID: String,
     ) {
         // Todo: Finish implementation. temporary using string for player
+    }
+
+    fun playerJoinedLeftLobby(playerJoined: Boolean) {
+        lobbyView.setSecondPlayerConnected(playerJoined)
     }
 
     /**
@@ -31,7 +46,7 @@ class LobbyPresenter : IPresenter {
     }
 
     override fun render() {
-        // Required by IPresenter
+        lobbyView.render()
     }
 
     override fun resize(
@@ -41,9 +56,10 @@ class LobbyPresenter : IPresenter {
     }
 
     override fun dispose() {
+        lobbyView.dispose()
     }
 
     override fun setInputProcessor() {
-        TODO("Not yet implemented")
+        lobbyView.setInputProcessor()
     }
 }
