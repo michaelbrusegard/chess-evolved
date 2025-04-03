@@ -36,7 +36,10 @@ class AndroidView {
         batch.dispose()
     }
 
-    fun resize(width: Int, height: Int) {
+    fun resize(
+        width: Int,
+        height: Int,
+    ) {
         viewport.update(width, height)
         camera.setToOrtho(false, width.toFloat(), height.toFloat())
         camera.update()

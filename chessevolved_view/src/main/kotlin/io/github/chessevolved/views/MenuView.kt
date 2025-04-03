@@ -10,7 +10,7 @@ import ktx.scene2d.table
 import ktx.scene2d.textButton
 
 class MenuView : IView {
-    private lateinit var stage : Stage
+    private lateinit var stage: Stage
 
     var onCreateLobbyViewButtonClicked: () -> Unit = {}
     var onJoinGameViewButtonClicked: () -> Unit = {}

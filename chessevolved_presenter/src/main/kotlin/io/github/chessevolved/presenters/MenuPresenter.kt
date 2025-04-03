@@ -4,13 +4,16 @@ import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.MenuView
 
 class MenuPresenter(
-    private val view: MenuView
+    private val view: MenuView,
 ) : IPresenter {
     override fun render() {
         view.render()
     }
 
-    override fun resize(width: Int, height: Int) {
+    override fun resize(
+        width: Int,
+        height: Int,
+    ) {
         view.resize(width, height)
     }
 
@@ -26,6 +29,7 @@ class MenuPresenter(
         val joinGamePresenter = JoinGamePresenter(JoinGameView())
         ScenePresenterStateManager.push(StatePresenter(joinGamePresenter))
     }
+
     fun enterCreateGame() {
         println("Created Game")
     }

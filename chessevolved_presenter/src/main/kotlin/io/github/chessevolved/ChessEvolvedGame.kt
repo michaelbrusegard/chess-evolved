@@ -13,7 +13,6 @@ import ktx.async.KtxAsync
 import ktx.scene2d.Scene2DSkin
 
 class ChessEvolvedGame : KtxGame<KtxScreen>() {
-
     override fun create() {
         KtxAsync.initiate()
         val skin = Skin(Gdx.files.internal("skin/plain-james-ui.json"))

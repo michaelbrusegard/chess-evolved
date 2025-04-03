@@ -97,7 +97,10 @@ class GamePresenter(
         view.endBatch()
     }
 
-    override fun resize(width: Int, height: Int) {
+    override fun resize(
+        width: Int,
+        height: Int,
+    ) {
         TODO("Not yet implemented")
     }
 
