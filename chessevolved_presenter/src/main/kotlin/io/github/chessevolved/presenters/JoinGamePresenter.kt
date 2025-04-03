@@ -1,13 +1,22 @@
 package io.github.chessevolved.presenters
 
+import LobbyPresenter
+import io.github.chessevolved.PresenterManager
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.views.JoinGameView
+import io.github.chessevolved.views.LobbyView
 
 class JoinGamePresenter(
     private val view: JoinGameView,
 ) : IPresenter {
     init {
         view.init()
+        view.onReturnButtonClicked = { returnToMenu() }
+        view.onJoinButtonClicked = {
+            joinGame(
+                lobbyId = it,
+            )
+        }
     }
 
     /**
@@ -16,27 +25,22 @@ class JoinGamePresenter(
      * @param lobbyID String representing the lobby to join
      * @return Boolean indicating success or failure
      */
-    fun joinGame(lobbyId: String) {
+    private fun joinGame(lobbyId: String) {
         val success = Lobby.joinLobby(lobbyId)
 
         if (success) {
-            view.showJoinSuccess()
+            val lobbyPresenter = LobbyPresenter(LobbyView(lobbyId))
+            PresenterManager.push(StatePresenter(lobbyPresenter))
         } else {
             view.showJoinError("Error message should be put here")
         }
-    }
-
-    fun onJoinButtonPressed(lobbyId: String) {
-        joinGame(lobbyId)
     }
 
     /**
      * Return to the menu scene using the presenter manager??
      */
     fun returnToMenu() {
-        println("JoinGamePresenter: Returning to menu")
-        // TODO: idk but this should return here to let another presenter handle it
-        // presenterManager.popToPresenter(MenuPresenter::class)
+        PresenterManager.pop()
     }
 
     override fun render() {
@@ -55,6 +59,6 @@ class JoinGamePresenter(
     }
 
     override fun setInputProcessor() {
-        TODO("Not yet implemented")
+        view.setInputProcessor()
     }
 }
