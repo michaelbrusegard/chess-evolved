@@ -2,6 +2,7 @@ package io.github.chessevolved.singletons
 
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
+import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.BoardSizeComponent
 import io.github.chessevolved.components.ChessBoardSpriteComponent
 import io.github.chessevolved.components.PositionComponent
@@ -12,6 +13,7 @@ object Mappers {
     private val position: ComponentMapper<PositionComponent> = ComponentMapper.getFor(PositionComponent::class.java)
     private val chessboardSprite: ComponentMapper<ChessBoardSpriteComponent> = ComponentMapper.getFor(ChessBoardSpriteComponent::class.java)
     private val sprite: ComponentMapper<SpriteComponent> = ComponentMapper.getFor(SpriteComponent::class.java)
+    private val abilities: ComponentMapper<AbilityComponent> = ComponentMapper.getFor(AbilityComponent::class.java)
 
     fun getBoardSize(entity: Entity): BoardSizeComponent {
         return boardSize.get(entity)
@@ -27,5 +29,9 @@ object Mappers {
 
     fun getSprite(entity: Entity): SpriteComponent {
         return sprite.get(entity)
+    }
+
+    fun getAbilities(entity: Entity): AbilityComponent {
+        return abilities.get(entity)
     }
 }
