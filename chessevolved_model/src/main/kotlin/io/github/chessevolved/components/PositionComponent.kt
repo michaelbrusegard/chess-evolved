@@ -2,18 +2,17 @@ package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
 
-class PositionComponent(
-    x: Int,
-    y: Int,
-) : Component {
-    var xPos: Int = x
-    var yPos: Int = y
+data class Position(
+    val x: Int,
+    val y: Int,
+)
 
-    fun changePosition(
-        x: Int,
-        y: Int,
-    ) {
-        xPos = x
-        yPos = y
+class PositionComponent(
+    position: Position = Position(0, 0),
+) : Component {
+    var position: Position = position
+
+    fun changePosition(newPosition: Position) {
+        position = newPosition
     }
 }
