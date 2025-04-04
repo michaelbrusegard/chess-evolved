@@ -1,21 +1,20 @@
 package io.github.chessevolved.presenters
 
 import SettingsView
+import io.github.chessevolved.PresenterManager
 import io.github.chessevolved.singletons.GameSettings
 
 class SettingsPresenter(
-    private val view: SettingsView,
+    private val settingsView: SettingsView,
 ) : IPresenter {
     init {
-        view.init()
-        view.onApply = { fowSetting, sizeSetting ->
+        settingsView.init()
+        settingsView.onApply = { fowSetting, sizeSetting ->
             onApplyPressed(fowSetting, sizeSetting)
         }
     }
 
-    // TODO: wait for implementation of ScenePresenterStateManager
     private val gameSettings = GameSettings
-    // val presenterManager = ScenePresenterStateManager
 
     /**
      * Applies the chosen game settings and returns to lobby
@@ -27,7 +26,10 @@ class SettingsPresenter(
         fowSetting: Boolean,
         sizeSetting: Int,
     ) {
+        // TODO: Consider if game settings should be applied manually or automatically
         gameSettings.setFOW(fowSetting)
+
+        // TODO: validate max/min boardsize here?
         gameSettings.setBoardSize(sizeSetting)
 
         returnToLobby()
@@ -37,8 +39,7 @@ class SettingsPresenter(
      *  Switch to LobbyPresenter
      */
     private fun returnToLobby() {
-        // TODO: wait for implementation of ScenePresenterStateManager
-        println("SettingsPresenter: Returning to lobby")
+        PresenterManager.pop()
     }
 
     /**
@@ -53,21 +54,21 @@ class SettingsPresenter(
         )
 
     override fun render() {
-        view.render()
+        settingsView.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        view.resize(width, height)
+        settingsView.resize(width, height)
     }
 
     override fun dispose() {
-        view.dispose()
+        settingsView.dispose()
     }
 
     override fun setInputProcessor() {
-        TODO("Not yet implemented")
+        settingsView.setInputProcessor()
     }
 }

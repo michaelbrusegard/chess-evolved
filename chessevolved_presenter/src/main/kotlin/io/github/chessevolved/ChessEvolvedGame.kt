@@ -1,8 +1,10 @@
 package io.github.chessevolved
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import io.github.chessevolved.presenters.MenuPresenter
+import io.github.chessevolved.presenters.StatePresenter
 import io.github.chessevolved.views.MenuView
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
@@ -16,40 +18,24 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
         val skin = Skin(Gdx.files.internal("skin/plain-james-ui.json"))
         Scene2DSkin.defaultSkin = skin
 
-        addScreen(FirstScreen())
-        setScreen<FirstScreen>()
-    }
-}
+        val menuView = MenuView()
+        menuView.init()
+        val menuPresenter = MenuPresenter(menuView)
 
-class FirstScreen : KtxScreen {
-    // We create the view outside of the presenter so that it is easier to test the presenter with a mock view
+        menuView.onCreateLobbyButtonClicked = { menuPresenter.enterCreateGame() }
+        menuView.onJoinGameButtonClicked = { menuPresenter.enterJoinGame() }
 
-    // First screen to always be displayed is the Menu Screen.
-    // Future discussion, should we have a loading screen showing credits at the start?
-    private val menuView = MenuView()
-
-    private val menuPresenter = MenuPresenter(menuView)
-
-    init {
-        menuView.apply {
-            onCreateLobbyButtonClicked = { menuPresenter.enterCreateGame() }
-            onJoinGameButtonClicked = { menuPresenter.enterJoinGame() }
-        }
+        PresenterManager.push(StatePresenter(menuPresenter))
     }
 
-    override fun render(delta: Float) {
+    override fun render() {
         clearScreen(red = 0.5f, green = 0.5f, blue = 0.75f)
-        menuPresenter.render()
-    }
-
-    override fun resize(
-        width: Int,
-        height: Int,
-    ) {
-        menuPresenter.resize(width, height)
+        val delta = Gdx.graphics.deltaTime
+        PresenterManager.update(delta)
+        PresenterManager.render(SpriteBatch())
     }
 
     override fun dispose() {
-        menuPresenter.dispose()
+        PresenterManager.dispose()
     }
 }

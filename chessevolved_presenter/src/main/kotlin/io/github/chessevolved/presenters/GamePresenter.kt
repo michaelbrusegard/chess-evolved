@@ -94,7 +94,6 @@ class GamePresenter(
             (boardScreenPosY + (posComp.yPos - 1) * pixelSize).toFloat(),
         )
         view.render(sprite)
-
         view.endBatch()
     }
 
@@ -102,9 +101,11 @@ class GamePresenter(
         width: Int,
         height: Int,
     ) {
+        TODO("Not yet implemented")
     }
 
     override fun dispose() {
+        TODO("Not yet implemented")
     }
 
     override fun setInputProcessor() {
