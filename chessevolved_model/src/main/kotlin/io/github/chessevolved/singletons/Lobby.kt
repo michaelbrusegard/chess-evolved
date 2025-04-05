@@ -9,15 +9,18 @@ object Lobby {
     private var lobbyId: String? = null
     private var subscribers = Array<KFunction1<Lobby, Unit>>()
 
-    suspend fun joinLobby(lobbyId: String): Boolean {
+    /**
+     * Method to join a lobby.
+     * @param lobbyId that is the lobbyId of the lobby to join
+     * @throws Exception if something goes wrong.
+     */
+    suspend fun joinLobby(lobbyId: String) {
         println("Lobby: Joining lobby with ID: $lobbyId...")
         try {
             SupabaseLobbyHandler.joinLobby(lobbyId, ::onLobbyRowUpdate)
             this.lobbyId = lobbyId
-            return true
         } catch (e: Exception) {
-            // TODO: Elevate exception with appropriate message.
-            return false
+            throw e
         }
     }
 

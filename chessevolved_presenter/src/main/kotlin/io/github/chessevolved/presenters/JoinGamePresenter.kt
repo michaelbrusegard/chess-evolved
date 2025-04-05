@@ -30,12 +30,12 @@ class JoinGamePresenter(
     private fun joinGame(lobbyId: String) {
         runBlocking {
             launch {
-                val success = Lobby.joinLobby(lobbyId)
-                if (success) {
+                try {
+                    Lobby.joinLobby(lobbyId)
                     val lobbyPresenter = LobbyPresenter(LobbyView(lobbyId))
                     PresenterManager.push(StatePresenter(lobbyPresenter))
-                } else {
-                    view.showJoinError("Error message should be put here")
+                } catch (e: Exception) {
+                    view.showJoinError(e.message ?: "Internal error.")
                 }
             }
         }
