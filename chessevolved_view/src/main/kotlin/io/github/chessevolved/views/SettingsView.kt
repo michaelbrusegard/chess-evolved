@@ -23,7 +23,13 @@ class SettingsView : IView {
     private lateinit var boardSizefield: TextField
     private lateinit var toastManager: ToastManager
 
+    private var gameSettings: Map<String, String> = emptyMap()
+
     var onApply: (Boolean, Int) -> Unit = { _, _ -> }
+
+    fun setCurrentSettings(currentSettings: Map<String, String>) {
+        gameSettings = currentSettings
+    }
 
     override fun init() {
         val root =
@@ -94,6 +100,12 @@ class SettingsView : IView {
 
         stage.addActor(root)
         toastManager = ToastManager(stage)
+
+        val fogSetting = gameSettings["fogOfWar"] as? Boolean ?: false
+        fogOfWarCheckBox.isChecked = fogSetting
+
+        val boardSize = gameSettings["boardSize"] as? Int ?: 8
+        boardSizefield.text = boardSize.toString()
 
         Gdx.input.inputProcessor = stage
     }

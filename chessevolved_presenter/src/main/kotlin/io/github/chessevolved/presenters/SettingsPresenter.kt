@@ -1,13 +1,18 @@
 package io.github.chessevolved.presenters
 
 import SettingsView
+import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.PresenterManager
 import io.github.chessevolved.singletons.GameSettings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SettingsPresenter(
-    private val settingsView: SettingsView,
+    private val settingsView: SettingsView
 ) : IPresenter {
     init {
+        settingsView.setCurrentSettings(GameSettings.getGameSettings())
         settingsView.init()
         settingsView.onApply = { fowSetting, sizeSetting ->
             onApplyPressed(fowSetting, sizeSetting)
@@ -26,11 +31,12 @@ class SettingsPresenter(
         fowSetting: Boolean,
         sizeSetting: Int,
     ) {
-        // TODO: Consider if game settings should be applied manually or automatically
         gameSettings.setFOW(fowSetting)
-
-        // TODO: validate max/min boardsize here?
         gameSettings.setBoardSize(sizeSetting)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            Lobby.setLobbySettings()
+        }
 
         returnToLobby()
     }
@@ -47,11 +53,10 @@ class SettingsPresenter(
      *
      * @return Current settings as a Map
      */
-    fun getCurrentSettings(): Map<String, Any> =
-        mapOf(
-            "FogOfWar" to gameSettings.isFOWEnabled(),
-            "BoardSize" to gameSettings.getBoardSize(),
-        )
+    fun getCurrentSettings(): Map<String, String> {
+        return GameSettings.getGameSettings()
+    }
+        
 
     override fun render() {
         settingsView.render()
