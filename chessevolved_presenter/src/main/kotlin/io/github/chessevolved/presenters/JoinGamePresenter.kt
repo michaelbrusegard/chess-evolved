@@ -5,6 +5,8 @@ import io.github.chessevolved.PresenterManager
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.LobbyView
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class JoinGamePresenter(
     private val view: JoinGameView,
@@ -26,13 +28,16 @@ class JoinGamePresenter(
      * @return Boolean indicating success or failure
      */
     private fun joinGame(lobbyId: String) {
-        val success = Lobby.joinLobby(lobbyId)
-
-        if (success) {
-            val lobbyPresenter = LobbyPresenter(LobbyView(lobbyId))
-            PresenterManager.push(StatePresenter(lobbyPresenter))
-        } else {
-            view.showJoinError("Error message should be put here")
+        runBlocking {
+            launch {
+                val success = Lobby.joinLobby(lobbyId)
+                if (success) {
+                    val lobbyPresenter = LobbyPresenter(LobbyView(lobbyId))
+                    PresenterManager.push(StatePresenter(lobbyPresenter))
+                } else {
+                    view.showJoinError("Error message should be put here")
+                }
+            }
         }
     }
 

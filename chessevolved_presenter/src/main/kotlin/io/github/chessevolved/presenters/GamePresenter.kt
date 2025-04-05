@@ -9,7 +9,6 @@ import io.github.chessevolved.components.SpriteComponent
 import io.github.chessevolved.entities.ChessBoard
 import io.github.chessevolved.entities.ChessPiece
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
-import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.joinGame
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.updateGameState
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.startGame
@@ -39,11 +38,8 @@ class GamePresenter(
         println("Game was updated! $newGameRow")
     }
 
-    private suspend fun onLobbyEvent(newLobbyRow: SupabaseLobbyHandler.Lobby) {
+    private fun onLobbyEvent(newLobbyRow: SupabaseLobbyHandler.Lobby) {
         println("Registered lobby event in lobby event handler! $newLobbyRow")
-        if (newLobbyRow.game_started) {
-            joinGame(newLobbyRow.lobby_code, ::onGameEvent)
-        }
     }
 
     private suspend fun testSupabase() {
@@ -51,7 +47,7 @@ class GamePresenter(
         val lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
 
         Thread.sleep(3000L)
-        startGame(lobbyCode, arrayOf<String>())
+        startGame(lobbyCode, mapOf())
         Thread.sleep(3000L)
 
         updateGameState(lobbyCode, arrayOf<String>(), arrayOf<String>(), SupabaseGameHandler.TurnColor.BLACK, "b3")
