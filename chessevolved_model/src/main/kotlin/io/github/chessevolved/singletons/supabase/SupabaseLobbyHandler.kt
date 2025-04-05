@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlin.reflect.KSuspendFunction1
+import kotlin.reflect.KFunction1
 
 object SupabaseLobbyHandler {
     /**
@@ -64,7 +64,7 @@ object SupabaseLobbyHandler {
      * @return string containing the lobby-code of the lobby created.
      * @throws PostgrestRestException if creating a lobby fails three times.
      */
-    suspend fun createLobby(onEventListener: KSuspendFunction1<Lobby, Unit>): String {
+    suspend fun createLobby(onEventListener: KFunction1<Lobby, Unit>): String {
         var lobbyCode = getRandomString(LOBBY_CODE_LENGTH)
 
         for (attempts in 1..3) {
@@ -90,7 +90,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun joinLobby(
         lobbyCode: String,
-        onEventListener: KSuspendFunction1<Lobby, Unit>,
+        onEventListener: KFunction1<Lobby, Unit>,
     ) {
         val response =
             supabase
@@ -189,7 +189,7 @@ object SupabaseLobbyHandler {
      */
     private suspend fun addLobbyListener(
         lobbyCode: String,
-        onEventListener: KSuspendFunction1<Lobby, Unit>,
+        onEventListener: KFunction1<Lobby, Unit>,
     ) {
         val channel = SupabaseChannelManager.getOrCreateChannel("lobby_$lobbyCode")
         try {
@@ -222,7 +222,7 @@ object SupabaseLobbyHandler {
     @Serializable
     private class InsertGame(
         val lobby_code: String,
-        val settings: Array<String>,
+        val settings: Map<String, String>,
     )
 
     /**
@@ -233,7 +233,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun startGame(
         lobbyCode: String,
-        gameSettings: Array<String>,
+        gameSettings: Map<String, String>,
     ) {
         try {
             supabase
@@ -255,6 +255,33 @@ object SupabaseLobbyHandler {
                 }
         } catch (e: PostgrestRestException) {
             // Error when trying to start a game for a lobby that does not exist. OR when both players try to start the lobby at the same time.
+            throw e
+        }
+    }
+
+    /**
+     * Method to update the settings set in a lobby.
+     * @param lobbyCode the code of the lobby to update settings for
+     * @param gameSettings the settings to set for the lobby
+     * @throws PostgrestRestException if a supabase-error were to happen
+     */
+    suspend fun updateLobbySettings(
+        lobbyCode: String,
+        gameSettings: Map<String, String>,
+    ) {
+        try {
+            supabase
+                .from(SUPABASE_LOBBY_TABLE_NAME)
+                .update(
+                    {
+                        set("settings", value = Json.encodeToString(gameSettings))
+                    },
+                ) {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
+                }
+        } catch (e: PostgrestRestException) {
             throw e
         }
     }

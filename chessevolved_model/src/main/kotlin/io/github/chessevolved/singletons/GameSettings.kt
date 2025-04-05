@@ -18,9 +18,7 @@ object GameSettings {
      *
      * @return Current FOW setting as Boolean
      */
-    fun isFOWEnabled(): Boolean {
-        return fogOfWar
-    }
+    fun isFOWEnabled(): Boolean = fogOfWar
 
     /**
      * Sets a new size for the chessboard
@@ -36,7 +34,14 @@ object GameSettings {
      *
      * @return Size of the chessboard as Int
      */
-    fun getBoardSize(): Int {
-        return boardSize
+    fun getBoardSize(): Int = boardSize
+
+    fun getGameSettings(): Map<String, String> {
+        val settingMap =
+            mapOf(
+                "boardSize" to boardSize.toString(),
+                "fogOfWar" to fogOfWar.toString(),
+            )
+        return settingMap
     }
 }
