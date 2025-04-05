@@ -7,8 +7,8 @@ import io.github.chessevolved.singletons.Lobby.leaveLobby
 import io.github.chessevolved.singletons.Lobby.subscribeToLobbyUpdates
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import io.github.chessevolved.views.LobbyView
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -72,9 +72,8 @@ class LobbyPresenter(
     /**
      * Change to MenuPresenter
      */
-    @OptIn(DelicateCoroutinesApi::class)
     private fun returnToMenu() {
-        GlobalScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 leaveLobby()
             } catch (e: Exception) {

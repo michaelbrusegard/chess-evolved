@@ -36,7 +36,7 @@ class JoinGameView : IView {
                 inputField =
                     textField("") {
                         it.width(125f)
-                        maxLength = 6
+                        maxLength = 5
                         messageText = "XXXXXX"
 
                         textFieldFilter =
@@ -56,10 +56,10 @@ class JoinGameView : IView {
                     it.width(150f).padTop(20f)
                     onClick {
                         val code = inputField.text
-                        if (code.length == 6) {
+                        if (code.length == 5) {
                             onJoinButtonClicked(code)
                         } else {
-                            toastManager.showError("Lobby code must be 6 characters")
+                            toastManager.showError("Lobby code must be 5 characters")
                         }
                     }
                 }

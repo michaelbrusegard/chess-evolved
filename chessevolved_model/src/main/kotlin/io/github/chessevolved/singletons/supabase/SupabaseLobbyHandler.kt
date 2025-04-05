@@ -18,7 +18,7 @@ object SupabaseLobbyHandler {
     /**
      * Length of lobby-codes
      */
-    private const val LOBBY_CODE_LENGTH = 6
+    private const val LOBBY_CODE_LENGTH = 5
 
     /**
      * Supabase client used to query supabase
