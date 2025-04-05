@@ -20,8 +20,13 @@ class SettingsView : IView {
     private lateinit var boardSizeField: TextField
     private lateinit var toastManager: ToastManager
 
-    var onApplyClicked: (Boolean, Int) -> Unit = { _, _ -> }
-    var onCancelClicked: () -> Unit = {}
+    private var gameSettings: Map<String, String> = emptyMap()
+
+    var onApply: (Boolean, Int) -> Unit = { _, _ -> }
+
+    fun setCurrentSettings(currentSettings: Map<String, String>) {
+        gameSettings = currentSettings
+    }
 
     override fun init() {
         stage =
