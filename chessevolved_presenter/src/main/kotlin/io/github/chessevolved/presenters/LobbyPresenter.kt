@@ -5,6 +5,7 @@ import io.github.chessevolved.presenters.StatePresenter
 import io.github.chessevolved.singletons.Lobby.getLobby
 import io.github.chessevolved.singletons.Lobby.leaveLobby
 import io.github.chessevolved.singletons.Lobby.subscribeToLobbyUpdates
+import io.github.chessevolved.singletons.Lobby.unsubscribeFromLobbyUpdates
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import io.github.chessevolved.views.LobbyView
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +23,7 @@ class LobbyPresenter(
         lobbyView.onStartGameButtonClicked = { startGame() }
         lobbyView.onOpenSettingsButtonClicked = { enterSettings() }
         lobbyView.init()
-        subscribeToLobbyUpdates(::lobbyUpdateHandler)
+        subscribeToLobbyUpdates(this.toString(), ::lobbyUpdateHandler)
         runBlocking {
             launch {
                 val lobby = getLobby()
@@ -79,6 +80,7 @@ class LobbyPresenter(
                 error("Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
             }
         }
+        unsubscribeFromLobbyUpdates(this.toString())
         PresenterManager.pop()
     }
 

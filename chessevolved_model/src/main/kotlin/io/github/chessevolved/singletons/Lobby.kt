@@ -1,13 +1,12 @@
 package io.github.chessevolved.singletons
 
-import com.badlogic.gdx.utils.Array
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.Lobby
 import kotlin.reflect.KFunction1
 
 object Lobby {
     private var lobbyId: String? = null
-    private var subscribers = Array<KFunction1<Lobby, Unit>>()
+    private var subscribers = mutableMapOf<String, KFunction1<Lobby, Unit>>()
 
     /**
      * Method to join a lobby.
@@ -80,16 +79,22 @@ object Lobby {
 
     private fun onLobbyRowUpdate(lobby: SupabaseLobbyHandler.Lobby) {
         subscribers.forEach {
-            it.invoke(lobby)
+            it.value.invoke(lobby)
         }
     }
 
-    fun subscribeToLobbyUpdates(onEventListener: KFunction1<Lobby, Unit>) {
-        subscribers.add(onEventListener)
+    fun subscribeToLobbyUpdates(
+        subscriberName: String,
+        onEventListener: KFunction1<Lobby, Unit>,
+    ) {
+        subscribers.put(subscriberName, onEventListener)
     }
 
-    fun unsubscribeFromLobbyUpdates() {
-        // TODO: Might have to change up implementation of subscribing to make it possible to find which function to remove from the subscribed-arraylist.
-        // Maybe switch out the array-list with a HashMap, and pass class-name to subscribe-function, so you can unsubscribe by passing class-name.
+    fun unsubscribeFromLobbyUpdates(subscriberName: String) {
+        if (!subscribers.containsKey(subscriberName)) {
+            return
+        }
+
+        subscribers.remove(subscriberName)
     }
 }
