@@ -34,7 +34,7 @@ object Lobby {
     }
 
     suspend fun leaveLobby() {
-        if (lobbyId == null) {
+        if (!isInLobby()) {
             throw Exception("Can't leave lobby when not in a lobby!")
         }
         try {
@@ -45,14 +45,26 @@ object Lobby {
     }
 
     suspend fun setLobbySettings() {
-        if (lobbyId == null) {
+        if (!isInLobby()) {
             throw IllegalStateException("Can't update game settings when not in a lobby!")
         }
         SupabaseLobbyHandler.updateLobbySettings(lobbyId!!, GameSettings.getGameSettings())
     }
 
+    suspend fun getLobby(): Lobby {
+        if (!isInLobby()) {
+            throw IllegalStateException("Can't retrieve lobby if not in a lobby yet.")
+        }
+        try {
+            val lobby = SupabaseLobbyHandler.getLobbyRow(lobbyId!!)
+            return lobby
+        } catch (e: Exception) {
+            throw Exception("Something went wrong trying to fetch lobby: " + e.message)
+        }
+    }
+
     suspend fun startGame() {
-        if (lobbyId == null) {
+        if (!isInLobby()) {
             throw IllegalStateException("Can't start game when not in a lobby!")
         }
         try {

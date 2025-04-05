@@ -18,7 +18,7 @@ object SupabaseLobbyHandler {
     /**
      * Length of lobby-codes
      */
-    private const val LOBBY_CODE_LENGTH = 5
+    private const val LOBBY_CODE_LENGTH = 6
 
     /**
      * Supabase client used to query supabase
@@ -284,5 +284,27 @@ object SupabaseLobbyHandler {
         } catch (e: PostgrestRestException) {
             throw e
         }
+    }
+
+    /**
+     * Method to get the row for a specific lobby
+     * @param lobbyCode that is the code of the lobby to retrieve information about
+     * @return Lobby-object representing the data.
+     * @throws IllegalArgumentException if the lobby does not exist.
+     */
+    suspend fun getLobbyRow(lobbyCode: String): Lobby {
+        val response =
+            supabase
+                .from(SUPABASE_LOBBY_TABLE_NAME)
+                .select {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
+                }.decodeList<Lobby>()
+
+        if (response.isEmpty()) {
+            throw IllegalArgumentException("Lobby does not exist.")
+        }
+        return response[0]
     }
 }

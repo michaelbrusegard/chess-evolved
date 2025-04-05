@@ -44,7 +44,6 @@ class MenuPresenter(
                     val lobbyPresenter = LobbyPresenter(LobbyView(getLobbyId() ?: throw Exception("Unexpected state when creating lobby!")))
                     PresenterManager.push(StatePresenter(lobbyPresenter))
                 } catch (e: Exception) {
-                    // TODO: Show toast.
                     view.showCreateGameError(e.message ?: "Internal error!")
                 }
             }
