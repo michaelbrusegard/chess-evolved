@@ -2,7 +2,10 @@ import io.github.chessevolved.PresenterManager
 import io.github.chessevolved.presenters.IPresenter
 import io.github.chessevolved.presenters.SettingsPresenter
 import io.github.chessevolved.presenters.StatePresenter
+import io.github.chessevolved.singletons.Lobby.leaveLobby
 import io.github.chessevolved.views.LobbyView
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class LobbyPresenter(
     private val lobbyView: LobbyView,
@@ -46,6 +49,15 @@ class LobbyPresenter(
      * Change to MenuPresenter
      */
     private fun returnToMenu() {
+        runBlocking {
+            launch {
+                try {
+                    leaveLobby()
+                } catch (e: Exception) {
+                    error("Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
+                }
+            }
+        }
         PresenterManager.pop()
     }
 

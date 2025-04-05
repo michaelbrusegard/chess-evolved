@@ -15,6 +15,8 @@ class MenuView : IView {
     var onCreateLobbyButtonClicked: () -> Unit = {}
     var onJoinGameButtonClicked: () -> Unit = {}
 
+    private lateinit var toastManager: ToastManager
+
     override fun init() {
         stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
 
@@ -38,6 +40,7 @@ class MenuView : IView {
                 }
             }
 
+        toastManager = ToastManager(stage)
         stage.addActor(root)
     }
 
@@ -60,5 +63,9 @@ class MenuView : IView {
     override fun setInputProcessor() {
         // The Presenter should activate the input processor for this stage.
         Gdx.input.inputProcessor = stage
+    }
+
+    fun showCreateGameError(message: String) {
+        toastManager.showError("Error: $message")
     }
 }

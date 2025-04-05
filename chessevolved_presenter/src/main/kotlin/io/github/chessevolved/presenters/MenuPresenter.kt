@@ -1,9 +1,13 @@
 package io.github.chessevolved.presenters
 import LobbyPresenter
 import io.github.chessevolved.PresenterManager
+import io.github.chessevolved.singletons.Lobby.createLobby
+import io.github.chessevolved.singletons.Lobby.getLobbyId
 import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.LobbyView
 import io.github.chessevolved.views.MenuView
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MenuPresenter(
     private val view: MenuView,
@@ -33,8 +37,17 @@ class MenuPresenter(
     }
 
     fun enterCreateGame() {
-        // TODO: Create lobby code before showing lobby view
-        val lobbyPresenter = LobbyPresenter(LobbyView("123ABC"))
-        PresenterManager.push(StatePresenter(lobbyPresenter))
+        runBlocking {
+            launch {
+                try {
+                    createLobby()
+                    val lobbyPresenter = LobbyPresenter(LobbyView(getLobbyId() ?: throw Exception("Unexpected state when creating lobby!")))
+                    PresenterManager.push(StatePresenter(lobbyPresenter))
+                } catch (e: Exception) {
+                    // TODO: Show toast.
+                    view.showCreateGameError(e.message ?: "Internal error!")
+                }
+            }
+        }
     }
 }

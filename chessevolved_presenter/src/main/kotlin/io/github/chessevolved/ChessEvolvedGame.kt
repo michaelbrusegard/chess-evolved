@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import io.github.chessevolved.presenters.MenuPresenter
 import io.github.chessevolved.presenters.StatePresenter
+import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import io.github.chessevolved.views.MenuView
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
@@ -13,6 +14,11 @@ import ktx.async.KtxAsync
 import ktx.scene2d.Scene2DSkin
 
 class ChessEvolvedGame : KtxGame<KtxScreen>() {
+    init {
+        // Initialize lobby-handler early to avoid stutter when trying to join/create lobby for the first time after launching app.
+        SupabaseLobbyHandler
+    }
+
     override fun create() {
         KtxAsync.initiate()
         val skin = Skin(Gdx.files.internal("skin/plain-james-ui.json"))

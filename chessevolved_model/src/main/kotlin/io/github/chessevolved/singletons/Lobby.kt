@@ -24,14 +24,23 @@ object Lobby {
         }
     }
 
-    suspend fun createLobby(): Boolean {
+    suspend fun createLobby() {
         try {
             val lobbyId = SupabaseLobbyHandler.createLobby(::onLobbyRowUpdate)
             this.lobbyId = lobbyId
-            return true
         } catch (e: Exception) {
-            // TODO: Elevate exception with appropriate message.
-            return false
+            throw Exception("Problem when creating lobby! " + e.message)
+        }
+    }
+
+    suspend fun leaveLobby() {
+        if (lobbyId == null) {
+            throw Exception("Can't leave lobby when not in a lobby!")
+        }
+        try {
+            SupabaseLobbyHandler.leaveLobby(lobbyId!!)
+        } catch (e: Exception) {
+            throw e
         }
     }
 

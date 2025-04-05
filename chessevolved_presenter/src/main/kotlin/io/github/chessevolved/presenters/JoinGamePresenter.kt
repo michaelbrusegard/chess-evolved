@@ -44,7 +44,7 @@ class JoinGamePresenter(
     /**
      * Return to the menu scene using the presenter manager??
      */
-    fun returnToMenu() {
+    private fun returnToMenu() {
         PresenterManager.pop()
     }
 
