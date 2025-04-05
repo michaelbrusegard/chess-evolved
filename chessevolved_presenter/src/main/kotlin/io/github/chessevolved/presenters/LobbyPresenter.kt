@@ -57,7 +57,6 @@ class LobbyPresenter(
     }
 
     private fun lobbyUpdateHandler(newLobby: SupabaseLobbyHandler.Lobby) {
-        println("First check.")
         playerJoinedLeftLobbyCheck(newLobby.second_player)
         lobbyStartedCheck(newLobby.game_started)
     }
