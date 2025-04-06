@@ -6,25 +6,25 @@ import io.github.chessevolved.views.LobbyView
 import io.github.chessevolved.views.MenuView
 
 class MenuPresenter(
-    private val view: MenuView,
+    private val menuView: MenuView,
 ) : IPresenter {
     override fun render() {
-        view.render()
+        menuView.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        view.resize(width, height)
+        menuView.resize(width, height)
     }
 
     override fun dispose() {
-        view.dispose()
+        menuView.dispose()
     }
 
     override fun setInputProcessor() {
-        view.setInputProcessor()
+        menuView.setInputProcessor()
     }
 
     fun enterJoinGame() {

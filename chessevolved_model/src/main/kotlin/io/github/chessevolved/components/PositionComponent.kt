@@ -1,7 +1,9 @@
 package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Position(
     val x: Int,
     val y: Int,

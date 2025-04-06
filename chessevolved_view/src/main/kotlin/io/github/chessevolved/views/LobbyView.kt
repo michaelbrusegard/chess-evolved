@@ -60,6 +60,9 @@ class LobbyView(
             }
 
         stage.addActor(root)
+
+        // Temp to actually be able to test the game view
+        setSecondPlayerConnected(true)
     }
 
     fun setSecondPlayerConnected(isConnected: Boolean) {

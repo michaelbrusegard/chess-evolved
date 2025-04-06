@@ -1,114 +1,103 @@
 package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.g2d.Sprite
-import io.github.chessevolved.components.BoardSizeComponent
-import io.github.chessevolved.components.ChessBoardSpriteComponent
-import io.github.chessevolved.components.PositionComponent
-import io.github.chessevolved.components.SpriteComponent
-import io.github.chessevolved.entities.ChessBoard
-import io.github.chessevolved.entities.ChessPiece
-import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
-import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.joinGame
-import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.updateGameState
-import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
-import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.startGame
-import io.github.chessevolved.views.AndroidView
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import io.github.chessevolved.components.PlayerColor
+import io.github.chessevolved.components.Position
+import io.github.chessevolved.entities.BoardSquareFactory
+import io.github.chessevolved.entities.PieceFactory
+import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.systems.BoardRenderingSystem
+import io.github.chessevolved.views.GameView
 
 class GamePresenter(
-    givenView: AndroidView,
+    private val view: GameView,
 ) : IPresenter {
-    val pieces: MutableList<ChessPiece> = mutableListOf()
-    val board: ChessBoard = ChessBoard()
+    private val engine = ECSEngine
+    private val pieceFactory = PieceFactory(engine)
+    private val boardSquareFactory = BoardSquareFactory(engine)
 
-    val boardViewportSize: Float = Gdx.graphics.width - 10f
-    var boardScreenPosX: Int = 0
-    var boardScreenPosY: Int = 0
-    val pixelSize: Int = 32
-    val view: AndroidView = givenView
+    private val boardSize = 8
+    private val pixelSize = view.getBoardSize().toInt() / boardSize
+    private var boardScreenPosX = 0
+    private var boardScreenPosY = 0
 
-    // Temporary value, should be defined elsewhere
-    val boardSize: Int = 8
-
-    // Testing methods for supabase. Just to provide an example
-    val supabaseLobbyHandler = SupabaseLobbyHandler
-
-    private fun onGameEvent(newGameRow: SupabaseGameHandler.Game) {
-        println("Game was updated! $newGameRow")
-    }
-
-    private suspend fun onLobbyEvent(newLobbyRow: SupabaseLobbyHandler.Lobby) {
-        println("Registered lobby event in lobby event handler! $newLobbyRow")
-        if (newLobbyRow.game_started) {
-            joinGame(newLobbyRow.lobby_code, ::onGameEvent)
-        }
-    }
-
-    private suspend fun testSupabase() {
-        println("Testing")
-        val lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
-
-        Thread.sleep(3000L)
-        startGame(lobbyCode, arrayOf<String>())
-        Thread.sleep(3000L)
-
-        updateGameState(lobbyCode, arrayOf<String>(), arrayOf<String>(), SupabaseGameHandler.TurnColor.BLACK, "b3")
-        // leaveLobby(lobbyCode)
-    }
-    // END testing for supabase
+    // private val supabaseLobbyHandler = SupabaseLobbyHandler
+    //
+    // private suspend fun onLobbyEvent(lobby: SupabaseLobbyHandler.Lobby) {
+    //     println("Lobby event received: $lobby")
+    // }
+    //
+    // private suspend fun testSupabase() {
+    //     println("Testing Supabase connection")
+    //     val lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
+    //     println("Created lobby with code: $lobbyCode")
+    // }
 
     init {
-        GlobalScope.launch { testSupabase() }
-        board.add(BoardSizeComponent(boardSize))
-        board.add(ChessBoardSpriteComponent())
+        view.init()
 
-        val piece: ChessPiece = ChessPiece()
-        piece.add(PositionComponent(4, 4))
-        piece.add(SpriteComponent("pieces/rookBlackExample.png"))
+        updateBoardPosition(Gdx.graphics.width, Gdx.graphics.height)
 
-        pieces.add(piece)
+        engine.addSystem(
+            BoardRenderingSystem(
+                view.getBatch(),
+                boardSize,
+                pixelSize,
+                boardScreenPosX,
+                boardScreenPosY,
+            ),
+        )
 
-        boardScreenPosX = (Gdx.graphics.width - (boardSize * pixelSize)) / 2
-        boardScreenPosY = (Gdx.graphics.height - (boardSize * pixelSize)) / 2
+        // engine.addSystem(
+        //     RenderingSystem(
+        //         view.getBatch(),
+        //         pixelSize,
+        //         boardScreenPosX,
+        //         boardScreenPosY,
+        //     ),
+        // )
+
+        setupBoard()
+
+        // Just a tiny test for now to see if the Supabase connection works
+        // GlobalScope.launch { testSupabase() }
+    }
+
+    private fun updateBoardPosition(
+        width: Int,
+        height: Int,
+    ) {
+        boardScreenPosX = (width - (boardSize * pixelSize)) / 2
+        boardScreenPosY = (height - (boardSize * pixelSize)) / 2
+    }
+
+    private fun setupBoard() {
+        pieceFactory.createRook(
+            Position(4, 4),
+            PlayerColor.BLACK,
+        )
     }
 
     override fun render() {
         view.beginBatch()
-        for (y in 0..boardSize - 1) {
-            for (x in 0..boardSize - 1) {
-                var sprite = board.getComponent(ChessBoardSpriteComponent::class.java).whiteTileSprite
-                if ((y + x) % 2 == 0) {
-                    sprite = board.getComponent(ChessBoardSpriteComponent::class.java).blackTileSprite
-                }
-                sprite.setPosition(boardScreenPosX.toFloat() + pixelSize * x, boardScreenPosY.toFloat() + pixelSize * y)
-                view.render(sprite)
-            }
-        }
-
-        val sprite: Sprite = pieces[0].getComponent(SpriteComponent::class.java).sprite
-        val posComp: PositionComponent = pieces[0].getComponent(PositionComponent::class.java)
-        sprite.setPosition(
-            (boardScreenPosX + (posComp.xPos - 1) * pixelSize).toFloat(),
-            (boardScreenPosY + (posComp.yPos - 1) * pixelSize).toFloat(),
-        )
-        view.render(sprite)
+        engine.update(Gdx.graphics.deltaTime)
         view.endBatch()
+        view.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        TODO("Not yet implemented")
+        view.resize(width, height)
+        updateBoardPosition(width, height)
     }
 
     override fun dispose() {
-        TODO("Not yet implemented")
+        view.dispose()
     }
 
     override fun setInputProcessor() {
-        TODO("Not yet implemented")
+        view.setInputProcessor()
     }
 }

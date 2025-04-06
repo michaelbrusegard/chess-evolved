@@ -1,13 +1,16 @@
 import io.github.chessevolved.PresenterManager
+import io.github.chessevolved.presenters.GamePresenter
 import io.github.chessevolved.presenters.IPresenter
 import io.github.chessevolved.presenters.SettingsPresenter
 import io.github.chessevolved.presenters.StatePresenter
+import io.github.chessevolved.views.GameView
 import io.github.chessevolved.views.LobbyView
 
 class LobbyPresenter(
     private val lobbyView: LobbyView,
 ) : IPresenter {
     private val settingsPresenter = SettingsPresenter(SettingsView())
+    private val gamePresenter = GamePresenter(GameView())
 
     init {
         lobbyView.onLeaveButtonClicked = { returnToMenu() }
@@ -29,6 +32,7 @@ class LobbyPresenter(
         // lobbyID: String,
     ) {
         // TODO: Switch player over to game.
+        PresenterManager.push(StatePresenter(gamePresenter))
     }
 
     fun playerJoinedLeftLobby(playerJoined: Boolean) {
