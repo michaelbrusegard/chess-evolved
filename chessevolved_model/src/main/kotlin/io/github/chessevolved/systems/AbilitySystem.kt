@@ -30,7 +30,8 @@ class AbilitySystem(
     )
 ) {
     /**
-     * @param ability - ability name as a string in lowercase
+     * @param ability - ability name as a string in lowercase.
+     * Call getAbilityInventory() to get valid ability names.
      */
     fun setAbilityToChessPiece(
         chesspiece: ChessPiece,
@@ -49,50 +50,51 @@ class AbilitySystem(
     fun ability(
         abilityName: String
     ) {
-        if (!abilityInventory.contains(abilityName)) {
-            throw IllegalArgumentException("Invalid ability name: '$abilityName'.")
+        val abilityNameLowercase = abilityName.lowercase()
+        if (!abilityInventory.contains(abilityNameLowercase)) {
+            throw IllegalArgumentException("Invalid ability name: '$abilityNameLowercase'.")
         }
         // Active abilities
-        if (abilityName.equals("explosion")) {
+        if (abilityNameLowercase.equals("explosion")) {
             //TODO: implement logic for the explosion ability
             // An explosion erupts on the chosen tile, and all adjacent tiles excluding
             // diagonal tiles, destroying all pieces and clearing all weather events.
         }
-        if (abilityName.equals("conscription")) {
+        if (abilityNameLowercase.equals("conscription")) {
             //TODO: implement logic for the conscription ability
             // Summon a permanent friendly pawn in an empty adjacent empty tile.
         }
-        if (abilityName.equals("shadow_step")) {
+        if (abilityNameLowercase.equals("shadow_step")) {
             //TODO: implement logic for the shadow step ability
             // Teleport on the other side of an adjacent piece.
         }
-        if (abilityName.equals("earthquake")) {
+        if (abilityNameLowercase.equals("earthquake")) {
             //TODO: implement logic for the earthquake ability
             // Make a move as normal with this piece. When moving into the new
             // chosen tile, stun all adjacent enemy pieces for 1 turn.
         }
         // Passive abilities
-        if (abilityName.equals("shield")) {
+        if (abilityNameLowercase.equals("shield")) {
             //TODO: implement logic for the shield ability
             // Protect a piece from harm, such as being taken by other pieces or abilities.
             // Lasts for 2 turns or until the shield blocks an attack.
         }
-        if (abilityName.equals("aura_of_terror")) {
+        if (abilityNameLowercase.equals("aura_of_terror")) {
             //TODO: implement logic for the aura of terror ability
             // Enemy pieces may not move adjacent to this piece. Enemy pieces already adjacent to
             // this piece are not affected. Lasts for 2 turns or until the piece is destroyed.
         }
-        if (abilityName.equals("royal_guard")) {
+        if (abilityNameLowercase.equals("royal_guard")) {
             //TODO: implement logic for the royal guard ability
             // This piece cannot be taken or destroyed, as long as it is adjacent to its king piece.
             // Lasts for 2 turns or until the piece is destroyed.
         }
-        if (abilityName.equals("short_range_teleport")) {
+        if (abilityNameLowercase.equals("short_range_teleport")) {
             //TODO: implement logic for the short range teleport ability
             // At the start of your turn, this piece will randomly teleport in a adjacent tile.
             // Lasts for 3 turns or until the piece is destroyed.
         }
-        if (abilityName.equals("checkers")) {
+        if (abilityNameLowercase.equals("checkers")) {
             //TODO: implement logic for the checkers ability
             // Transform this piece into a checkers piece, making it follow checkers rules instead
             // of chess rules. This effect is permanent.
