@@ -1,19 +1,104 @@
 package io.github.chessevolved.systems
 
+import com.badlogic.gdx.graphics.Texture
 import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.entities.ChessPiece
 import io.github.chessevolved.singletons.Mappers
+import ktx.assets.toInternalFile
 
-class AbilitySystem {
-    fun addAbilityToChessPiece(
+class AbilitySystem (
+    private var abilityInventory: ArrayList<String>,
+    private var abilityDescriptionInventory: HashMap<String, String>
+) {
+    /**
+     * @param ability - ability name as a string in lowercase
+     */
+    fun setAbilityToChessPiece(
         chesspiece: ChessPiece,
-        type: Int,
-        ability: String,
-        description: String
+        ability: String
     ) {
         val abilities: AbilityComponent = Mappers.getAbilities(chesspiece)
-        abilities.addAbility(type, ability, description)
+        abilities.setAbility(ability)
     }
 
-    // TODO : abilities need to its own entity, and need to interact with it, and add attributes logic etc to it
+    //TODO: each ability could possibly be its own system
+    // Abilities occur after the first round. 1 round = 2 turns, 1 turn = a player turn such as
+    // white moving a piece. So 1 round happens after both players have made their first move
+    /**
+     * @param abilityName - A valid ability name as a string
+     */
+    fun ability(
+        abilityName: String
+    ) {
+        if (!abilityInventory.contains(abilityName)) {
+            throw IllegalArgumentException("Invalid ability name: '$abilityName'.")
+        }
+        // Active abilities
+        if (abilityName.equals("explosion")) {
+            //TODO: implement logic for the explosion ability
+            // An explosion erupts on the chosen tile, and all adjacent tiles excluding
+            // diagonal tiles, destroying all pieces and clearing all weather events.
+        }
+        if (abilityName.equals("conscription")) {
+            //TODO: implement logic for the conscription ability
+            // Summon a permanent friendly pawn in an adjacent empty tile.
+        }
+        if (abilityName.equals("shadow_step")) {
+            //TODO: implement logic for the shadow step ability
+            // Teleport on the other side of an adjacent piece.
+        }
+        if (abilityName.equals("earthquake")) {
+            //TODO: implement logic for the earthquake ability
+            // Make a move as normal with this piece. When moving into the new
+            // chosen tile, stun all adjacent enemy pieces for 1 turn.
+        }
+        // Passive abilities
+        if (abilityName.equals("shield")) {
+            //TODO: implement logic for the shield ability
+            // Protect a piece from harm, such as being taken by other pieces or abilities.
+            // Lasts for 2 turns or until the shield blocks an attack.
+        }
+        if (abilityName.equals("aura_of_terror")) {
+            //TODO: implement logic for the aura of terror ability
+            // Enemy pieces may not move adjacent to this piece. Enemy pieces already adjacent to
+            // this piece are not affected. Lasts for 2 turns or until the piece is destroyed.
+        }
+        if (abilityName.equals("royal_guard")) {
+            //TODO: implement logic for the royal guard ability
+            // This piece cannot be taken or destroyed, as long as it is adjacent to its king piece.
+            // Lasts for 2 turns or until the piece is destroyed.
+        }
+        if (abilityName.equals("short_range_teleport")) {
+            //TODO: implement logic for the short range teleport ability
+            // At the start of your turn, this piece will randomly teleport in a adjacent tile.
+            // Lasts for 3 turns or until the piece is destroyed.
+        }
+        if (abilityName.equals("checkers")) {
+            //TODO: implement logic for the checkers ability
+            // Transform this piece into a checkers piece, making it follow checkers rules instead
+            // of chess rules. This effect is permanent.
+        }
+    }
+
+    /** @return - Entire list of active abilities */
+    fun getAbilityInventory(): ArrayList<String> {
+        return abilityInventory
+    }
+
+    /** @return - Entire HashMap of ability descriptions */
+    fun getAbilityDescriptionInventory(): HashMap<String, String> {
+        return abilityDescriptionInventory
+    }
+
+    fun getAbilityDescription(
+        ability: String
+    ): String? {
+        return abilityDescriptionInventory[ability]
+    }
+
+    fun getAbilityTexture(
+        ability: String
+    ): Texture {
+        return Texture(("abilities/$ability.png").toInternalFile())
+    }
 }
