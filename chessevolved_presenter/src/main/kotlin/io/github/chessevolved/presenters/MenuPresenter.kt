@@ -8,6 +8,12 @@ import io.github.chessevolved.views.MenuView
 class MenuPresenter(
     private val menuView: MenuView,
 ) : IPresenter {
+    init {
+        menuView.onCreateLobbyButtonClicked = { enterCreateGame() }
+        menuView.onJoinGameButtonClicked = { enterJoinGame() }
+        menuView.init()
+    }
+
     override fun render() {
         menuView.render()
     }

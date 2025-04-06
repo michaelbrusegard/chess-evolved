@@ -40,7 +40,7 @@ If you make changes on the remote supabase database, you can pull those changes 
 
 1. You first need to run `supabase login`.
 2. Afterwards you need to link the remote database to this project by running `supabase link --project-ref tsmubattgglbqaarktnw`. You will be prompted for a password. The password is saved on The Progarkening google-drive shared with the whole group.
-3. After linking, you should now be able to pull the schema from supabase by using the command `supabase db pull`. It might tell you to run a `supabase migration repair`-command, and you should do that if it tells you. If you had to run the migration repair command, run `supabase db pull` one last time.
+3. After linking, you should now be able to pull the schema from Supabase by using the command `supabase db pull`. It might tell you to run a `supabase migration repair`-command, and you should do that if it tells you. If you had to run the migration repair command, run `supabase db pull` one last time.
 4. That should do it!
 
 ## Gradle

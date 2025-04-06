@@ -18,12 +18,7 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
         val skin = Skin(Gdx.files.internal("skin/plain-james-ui.json"))
         Scene2DSkin.defaultSkin = skin
 
-        val menuView = MenuView()
-        menuView.init()
-        val menuPresenter = MenuPresenter(menuView)
-
-        menuView.onCreateLobbyButtonClicked = { menuPresenter.enterCreateGame() }
-        menuView.onJoinGameButtonClicked = { menuPresenter.enterJoinGame() }
+        val menuPresenter = MenuPresenter(MenuView())
 
         PresenterManager.push(StatePresenter(menuPresenter))
     }

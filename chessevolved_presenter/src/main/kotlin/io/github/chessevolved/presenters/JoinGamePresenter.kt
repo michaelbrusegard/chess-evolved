@@ -7,12 +7,12 @@ import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.LobbyView
 
 class JoinGamePresenter(
-    private val view: JoinGameView,
+    private val joinGameView: JoinGameView,
 ) : IPresenter {
     init {
-        view.init()
-        view.onReturnButtonClicked = { returnToMenu() }
-        view.onJoinButtonClicked = {
+        joinGameView.init()
+        joinGameView.onReturnButtonClicked = { returnToMenu() }
+        joinGameView.onJoinButtonClicked = {
             joinGame(
                 lobbyId = it,
             )
@@ -32,7 +32,7 @@ class JoinGamePresenter(
             val lobbyPresenter = LobbyPresenter(LobbyView(lobbyId))
             PresenterManager.push(StatePresenter(lobbyPresenter))
         } else {
-            view.showJoinError("Error message should be put here")
+            joinGameView.showJoinError("Error message should be put here")
         }
     }
 
@@ -44,21 +44,21 @@ class JoinGamePresenter(
     }
 
     override fun render() {
-        view.render()
+        joinGameView.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        view.resize(width, height)
+        joinGameView.resize(width, height)
     }
 
     override fun dispose() {
-        view.dispose()
+        joinGameView.dispose()
     }
 
     override fun setInputProcessor() {
-        view.setInputProcessor()
+        joinGameView.setInputProcessor()
     }
 }
