@@ -23,14 +23,11 @@ When working on the project, you should be doing development within a dev-databa
 
 ### Get it up and running
 
-1. Install [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started). This guide tells you to install a docker compatible API as well. [Docker Desktop](https://docs.docker.com/desktop/) works well for this purpose.
+1. Install [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started). This guide tells you to install a docker compatible API as well. [Docker Desktop](https://docs.docker.com/desktop/) works well for this purpose. NOTE: Docker desktop is only licensed for non commercial use and is very bloated, running Docker without it is better if you are not on Windows.
 2. If you're on windows, open up Docker Desktop, go to Settings->General and turn on `Add the *.docker.internal names to the host's /etc/hosts file (Requires password)`.
 3. Keep Docker Desktop running in the background.
-4. Open a terminal in the root directory of the project repository and run `supabase start`.
-5. Add a .env file to the root of the repository and add `SUPABASE_ADMIN_KEY={service_role_key}` and `SUPABASE_URL={project_url}` to this file.
-
-> Look at the output from your "supabase start" command. You should replace {service_role_key} with the string after "service_role key:" and {project_url} with the string after "API URL:"
-
+4. Open a terminal in the root directory of the project repository and run `supabase start`. Running `supabase status` will also provide the information if Supabase is running.
+5. Add a .env file to the root of the repository and add `SUPABASE_URL={project_url}` to this file.
 6. While your database is running, you can access it's dashboard at <http://localhost:54323>.
 7. You can now run the project, and it should connect to your local database.
 8. When you're done developing, you can run `supabase stop` to stop your database.
