@@ -51,7 +51,7 @@ class LobbyView(
                 label("Lobby Code: $lobbyCode") { it.padBottom(10f) }
                 imageButton {
                     it.size(40f, 40f)
-                    it.padLeft(-45f)
+                    it.padLeft(-41f)
                     image(iconDrawable)
                     onClick { copyLobbyCode() }
                 }
