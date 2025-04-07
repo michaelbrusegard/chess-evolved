@@ -37,7 +37,7 @@ class JoinGameView : IView {
                     textField("") {
                         it.width(125f)
                         maxLength = 5
-                        messageText = "XXXXXX"
+                        messageText = "XXXXX"
 
                         textFieldFilter =
                             TextField.TextFieldFilter { _, c ->
