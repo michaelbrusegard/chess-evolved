@@ -42,8 +42,6 @@ object SupabaseGameHandler {
         val pieces: Array<String>,
         // TODO: Change this to be an array of board squares when that is implemented
         val board_squares: Array<String>,
-        // TODO: Change this into a settings type array when implemented
-        val settings: Array<String>,
     )
 
     /**

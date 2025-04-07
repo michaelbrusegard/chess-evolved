@@ -3,6 +3,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
@@ -18,58 +20,60 @@ import java.awt.datatransfer.StringSelection
 class LobbyView(
     val lobbyCode: String,
 ) : IView {
-    private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
+    private lateinit var stage: Stage
+    private lateinit var secondPlayerStatusLabel: Label
+    private lateinit var startGameButton: TextButton
 
     var onLeaveButtonClicked: () -> Unit = {}
     var onOpenSettingsButtonClicked: () -> Unit = {}
     var onStartGameButtonClicked: () -> Unit = {}
 
-    private var secondPlayerStatusText = scene2d.label("Waiting for second player...")
-    private var startGameButton =
-        scene2d.textButton("Start Game!") {
-            onClick { }
-            setColor(0f, 0f, 0f, 0.3f)
-        }
-
     override fun init() {
+        stage =
+            Stage(
+                FitViewport(
+                    Gdx.graphics.width.toFloat(),
+                    Gdx.graphics.height.toFloat(),
+                ),
+            )
+
         val copyIconTexture = Texture(Gdx.files.internal("icons/copy-icon.png"))
         val iconDrawable = TextureRegionDrawable(TextureRegion(copyIconTexture))
 
+
         val root =
             scene2d.table {
-                // Set size of layout parent to screen.
                 setFillParent(true)
-                // Set padding to 10f
-                defaults().pad(10f)
+                defaults().pad(10f).center()
 
-                // Perhaps replace label in the future with a logo. Or custom sprite text.
                 label("Chess Evolved!") { it.padBottom(20f) }
                 row()
 
-                label("Lobby Code: $lobbyCode")
+                label("Lobby Code: $lobbyCode") { it.padBottom(10f) }
                 imageButton {
                     it.size(40f, 40f)
                     it.padLeft(-45f)
                     image(iconDrawable)
+                    onClick { copyLobbyCode() }
                 }
                 row()
 
-                add(secondPlayerStatusText)
+                secondPlayerStatusLabel =
+                    label("Waiting for second player...") { it.padBottom(10f) }
                 row()
 
-                add(startGameButton)
+                startGameButton =
+                    textButton("Start Game") {
+                        it.padBottom(20f)
+                    }
                 row()
 
-                textButton("Open Lobby Settings") {
+                textButton("Lobby Settings") {
                     onClick { onOpenSettingsButtonClicked() }
                 }
                 row()
 
-                textButton("Leave Lobby") {
-                    it.padBottom(5f)
-                    onClick { onLeaveButtonClicked() }
-                }
-                row()
+                textButton("Leave Lobby") { onClick { onLeaveButtonClicked() } }
             }
 
         stage.addActor(root)
@@ -77,12 +81,14 @@ class LobbyView(
 
     fun setSecondPlayerConnected(isConnected: Boolean) {
         if (isConnected) {
-            secondPlayerStatusText.setText("Second player connected!")
+            secondPlayerStatusLabel.setText("Second player connected!")
+            startGameButton.isDisabled = false
             startGameButton.onClick { onStartGameButtonClicked() }
             startGameButton.color = scene2d.label("tex").color
         } else {
-            secondPlayerStatusText.setText("Waiting for second player...")
-            startGameButton.onClick { }
+            secondPlayerStatusLabel.setText("Waiting for second player...")
+            startGameButton.isDisabled = true
+            startGameButton.clearListeners()
             startGameButton.setColor(0f, 0f, 0f, 0.3f)
         }
     }

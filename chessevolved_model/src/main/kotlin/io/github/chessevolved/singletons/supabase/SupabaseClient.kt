@@ -15,8 +15,7 @@ internal object SupabaseClient {
     private val supabase: SupabaseClient =
         createSupabaseClient(
             supabaseUrl = dotenv["SUPABASE_URL"] ?: "no_url_found",
-            // This key is an admin (service role) key.
-            supabaseKey = dotenv["SUPABASE_ADMIN_KEY"] ?: "no_key_found",
+            supabaseKey = dotenv["SUPABASE_ANON_KEY"],
         ) {
             install(Postgrest)
             install(Realtime) {

@@ -1,69 +1,51 @@
 package io.github.chessevolved.presenters
 
-import LobbyPresenter
-import io.github.chessevolved.PresenterManager
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.views.JoinGameView
-import io.github.chessevolved.views.LobbyView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class JoinGamePresenter(
-    private val view: JoinGameView,
+    private val joinGameView: JoinGameView,
+    private val navigator: Navigator,
 ) : IPresenter {
     init {
-        view.init()
-        view.onReturnButtonClicked = { returnToMenu() }
-        view.onJoinButtonClicked = {
-            joinGame(
-                lobbyId = it,
-            )
-        }
+        joinGameView.init()
+        joinGameView.onReturnButtonClicked = { navigator.goBack() }
+        joinGameView.onJoinButtonClicked = { lobbyId -> joinGame(lobbyId) }
     }
 
-    /**
-     * Attempts to join a game lobby by ID
-     *
-     * @param lobbyID String representing the lobby to join
-     * @return Boolean indicating success or failure
-     */
     private fun joinGame(lobbyId: String) {
         runBlocking {
             launch {
                 try {
                     Lobby.joinLobby(lobbyId)
-                    val lobbyPresenter = LobbyPresenter(LobbyView(lobbyId))
-                    PresenterManager.push(StatePresenter(lobbyPresenter))
+                    navigator.navigateToLobby(lobbyId)
                 } catch (e: Exception) {
-                    view.showJoinError(e.message ?: "Internal error.")
+                    joinGameView.showJoinError(e.message ?: "Internal error.")
                 }
             }
         }
     }
 
-    /**
-     * Return to the menu scene using the presenter manager??
-     */
-    private fun returnToMenu() {
-        PresenterManager.pop()
-    }
-
-    override fun render() {
-        view.render()
+    override fun render(sb: SpriteBatch) {
+        joinGameView.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        view.resize(width, height)
+        joinGameView.resize(width, height)
     }
 
     override fun dispose() {
-        view.dispose()
+        joinGameView.dispose()
     }
 
     override fun setInputProcessor() {
-        view.setInputProcessor()
+        joinGameView.setInputProcessor()
     }
 }

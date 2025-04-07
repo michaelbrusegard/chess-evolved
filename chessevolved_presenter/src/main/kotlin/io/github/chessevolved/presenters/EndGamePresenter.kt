@@ -1,31 +1,23 @@
 package io.github.chessevolved.presenters
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.views.EndGameView
 
 class EndGamePresenter(
     private val endGameView: EndGameView,
     private val endGameStatus: Boolean,
+    private val navigator: Navigator,
 ) : IPresenter {
     init {
         endGameView.endGameStatus = endGameStatus
         endGameView.init()
+        endGameView.onReturnToMenuClicked = { navigator.goBack() }
+        // We need to get the current lobby ID
+        endGameView.onRematchClicked = { navigator.navigateToLobby("222222") }
     }
 
-    /**
-     * Returns to the MenuPresenter
-     */
-    fun returnToMenu() {
-        print("Returning to menu...")
-    }
-
-    /**
-     * Restarts Game
-     */
-    fun rematch() {
-        print("Requesting rematch...")
-    }
-
-    override fun render() {
+    override fun render(sb: SpriteBatch) {
         endGameView.render()
     }
 

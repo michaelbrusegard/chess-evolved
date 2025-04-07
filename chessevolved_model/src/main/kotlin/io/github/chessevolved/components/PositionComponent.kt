@@ -1,19 +1,20 @@
 package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Position(
+    val x: Int,
+    val y: Int,
+)
 
 class PositionComponent(
-    x: Int,
-    y: Int,
+    position: Position = Position(0, 0),
 ) : Component {
-    var xPos: Int = x
-    var yPos: Int = y
+    var position: Position = position
 
-    fun changePosition(
-        x: Int,
-        y: Int,
-    ) {
-        xPos = x
-        yPos = y
+    fun changePosition(newPosition: Position) {
+        position = newPosition
     }
 }

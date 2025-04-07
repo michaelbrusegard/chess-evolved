@@ -13,7 +13,6 @@ buildscript {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
   }
 }
-
 plugins {
   id "org.jlleitschuh.gradle.ktlint" version "11.6.1" apply false
 }

@@ -18,26 +18,34 @@ class MenuView : IView {
     private lateinit var toastManager: ToastManager
 
     override fun init() {
-        stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
+        stage =
+            Stage(
+                FitViewport(
+                    Gdx.graphics.width.toFloat(),
+                    Gdx.graphics.height.toFloat(),
+                ),
+            )
 
         val root =
             scene2d.table {
-                // Set size of layout parent to screen.
                 setFillParent(true)
-                // Set padding to 10f
-                defaults().pad(10f)
+                defaults().pad(10f).center()
 
-                // Perhaps replace label in the future with a logo. Or custom sprite text.
                 label("Chess Evolved!") { it.padBottom(20f) }
                 row()
-                textButton("Create a Lobby") {
-                    it.padBottom(5f)
+
+                textButton("Create Lobby") {
+                    it.padBottom(5f).width(200f)
                     onClick { onCreateLobbyButtonClicked() }
                 }
                 row()
+
                 textButton("Join Game") {
+                    it.width(200f)
                     onClick { onJoinGameButtonClicked() }
                 }
+                row()
+                textButton("Exit") { onClick { Gdx.app.exit() } }
             }
 
         toastManager = ToastManager(stage)
@@ -61,7 +69,6 @@ class MenuView : IView {
     }
 
     override fun setInputProcessor() {
-        // The Presenter should activate the input processor for this stage.
         Gdx.input.inputProcessor = stage
     }
 

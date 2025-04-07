@@ -1,7 +1,7 @@
-import io.github.chessevolved.PresenterManager
-import io.github.chessevolved.presenters.IPresenter
-import io.github.chessevolved.presenters.SettingsPresenter
-import io.github.chessevolved.presenters.StatePresenter
+package io.github.chessevolved.presenters
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.singletons.Lobby.getLobby
 import io.github.chessevolved.singletons.Lobby.leaveLobby
 import io.github.chessevolved.singletons.Lobby.subscribeToLobbyUpdates
@@ -15,13 +15,12 @@ import kotlinx.coroutines.runBlocking
 
 class LobbyPresenter(
     private val lobbyView: LobbyView,
+    private val navigator: Navigator,
 ) : IPresenter {
-    private val settingsPresenter = SettingsPresenter(SettingsView())
-
     init {
         lobbyView.onLeaveButtonClicked = { returnToMenu() }
-        lobbyView.onStartGameButtonClicked = { startGame() }
-        lobbyView.onOpenSettingsButtonClicked = { enterSettings() }
+        lobbyView.onStartGameButtonClicked = { navigator.navigateToGame() }
+        lobbyView.onOpenSettingsButtonClicked = { navigator.navigateToSettings() }
         lobbyView.init()
         subscribeToLobbyUpdates(this.toString(), ::lobbyUpdateHandler)
         runBlocking {
@@ -32,22 +31,7 @@ class LobbyPresenter(
         }
     }
 
-    /**
-     * Save lobby in backend
-     *
-     * @param player1
-     * @param player2
-     * @param lobbyID
-     */
-    fun startGame(
-        // player1: String,
-        // player2: String,
-        // lobbyID: String,
-    ) {
-        // TODO: Switch player over to game.
-    }
-
-    private fun playerJoinedLeftLobbyCheck(playerJoined: Boolean) {
+    fun playerJoinedLeftLobby(playerJoined: Boolean) {
         lobbyView.setSecondPlayerConnected(playerJoined)
     }
 
@@ -58,15 +42,8 @@ class LobbyPresenter(
     }
 
     private fun lobbyUpdateHandler(newLobby: SupabaseLobbyHandler.Lobby) {
-        playerJoinedLeftLobbyCheck(newLobby.second_player)
+        playerJoinedLeftLobby(newLobby.second_player)
         lobbyStartedCheck(newLobby.game_started)
-    }
-
-    /**
-     * Change to SettingsPresenter
-     */
-    private fun enterSettings() {
-        PresenterManager.push(StatePresenter(settingsPresenter))
     }
 
     /**
@@ -81,10 +58,10 @@ class LobbyPresenter(
             }
         }
         unsubscribeFromLobbyUpdates(this.toString())
-        PresenterManager.pop()
+        navigator.goBack()
     }
 
-    override fun render() {
+    override fun render(sb: SpriteBatch) {
         lobbyView.render()
     }
 
@@ -92,6 +69,7 @@ class LobbyPresenter(
         width: Int,
         height: Int,
     ) {
+        lobbyView.resize(width, height)
     }
 
     override fun dispose() {

@@ -1,110 +1,144 @@
 package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.g2d.Sprite
-import io.github.chessevolved.components.BoardSizeComponent
-import io.github.chessevolved.components.ChessBoardSpriteComponent
-import io.github.chessevolved.components.PositionComponent
-import io.github.chessevolved.components.SpriteComponent
-import io.github.chessevolved.entities.ChessBoard
-import io.github.chessevolved.entities.ChessPiece
-import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
-import io.github.chessevolved.singletons.supabase.SupabaseGameHandler.updateGameState
-import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
-import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.startGame
-import io.github.chessevolved.views.AndroidView
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.Viewport
+import io.github.chessevolved.Navigator
+import io.github.chessevolved.components.PieceType
+import io.github.chessevolved.components.PlayerColor
+import io.github.chessevolved.components.Position
+import io.github.chessevolved.components.WeatherEvent
+import io.github.chessevolved.entities.BoardSquareFactory
+import io.github.chessevolved.entities.PieceFactory
+import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.systems.RenderingSystem
+import io.github.chessevolved.views.GameView
 
 class GamePresenter(
-    givenView: AndroidView,
+    private val view: GameView,
+    private val navigator: Navigator,
+    private val assetManager: AssetManager,
 ) : IPresenter {
-    val pieces: MutableList<ChessPiece> = mutableListOf()
-    val board: ChessBoard = ChessBoard()
+    private val engine = ECSEngine
+    private val pieceFactory = PieceFactory(engine, assetManager)
+    private val boardSquareFactory = BoardSquareFactory(engine, assetManager)
 
-    val boardViewportSize: Float = Gdx.graphics.width - 10f
-    var boardScreenPosX: Int = 0
-    var boardScreenPosY: Int = 0
-    val pixelSize: Int = 32
-    val view: AndroidView = givenView
+    private val gameCamera = OrthographicCamera()
+    private val boardWorldSize = 8
+    private val gameViewport: Viewport =
+        FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
+    private val gameBatch: SpriteBatch
 
-    // Temporary value, should be defined elsewhere
-    val boardSize: Int = 8
-
-    // Testing methods for supabase. Just to provide an example
-    val supabaseLobbyHandler = SupabaseLobbyHandler
-
-    private fun onGameEvent(newGameRow: SupabaseGameHandler.Game) {
-        println("Game was updated! $newGameRow")
-    }
-
-    private fun onLobbyEvent(newLobbyRow: SupabaseLobbyHandler.Lobby) {
-        println("Registered lobby event in lobby event handler! $newLobbyRow")
-    }
-
-    private suspend fun testSupabase() {
-        println("Testing")
-        val lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
-
-        Thread.sleep(3000L)
-        startGame(lobbyCode, mapOf())
-        Thread.sleep(3000L)
-
-        updateGameState(lobbyCode, arrayOf<String>(), arrayOf<String>(), SupabaseGameHandler.TurnColor.BLACK, "b3")
-        // leaveLobby(lobbyCode)
-    }
-    // END testing for supabase
+    private val renderingSystem: RenderingSystem
 
     init {
-        GlobalScope.launch { testSupabase() }
-        board.add(BoardSizeComponent(boardSize))
-        board.add(ChessBoardSpriteComponent())
+        view.init()
+        gameBatch = view.getGameBatch()
 
-        val piece: ChessPiece = ChessPiece()
-        piece.add(PositionComponent(4, 4))
-        piece.add(SpriteComponent("pieces/rookBlackExample.png"))
+        gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
+        gameCamera.update()
 
-        pieces.add(piece)
+        renderingSystem = RenderingSystem(gameBatch)
+        engine.addSystem(renderingSystem)
 
-        boardScreenPosX = (Gdx.graphics.width - (boardSize * pixelSize)) / 2
-        boardScreenPosY = (Gdx.graphics.height - (boardSize * pixelSize)) / 2
+        loadRequiredAssets()
+        assetManager.finishLoading()
+
+        setupBoard()
+
+        // If we do not call this the board will not be displayed
+        resize(Gdx.graphics.width, Gdx.graphics.height)
     }
 
-    override fun render() {
-        view.beginBatch()
-        for (y in 0..boardSize - 1) {
-            for (x in 0..boardSize - 1) {
-                var sprite = board.getComponent(ChessBoardSpriteComponent::class.java).whiteTileSprite
-                if ((y + x) % 2 == 0) {
-                    sprite = board.getComponent(ChessBoardSpriteComponent::class.java).blackTileSprite
-                }
-                sprite.setPosition(boardScreenPosX.toFloat() + pixelSize * x, boardScreenPosY.toFloat() + pixelSize * y)
-                view.render(sprite)
+    private fun loadRequiredAssets() {
+        assetManager.load("board/black-tile.png", Texture::class.java)
+        assetManager.load("board/white-tile.png", Texture::class.java)
+
+        assetManager.load("pieces/black-rook.png", Texture::class.java)
+        // PlayerColor.entries.forEach { color ->
+        //     PieceType.entries.forEach { type ->
+        //             val colorStr = color.name.lowercase()
+        //             val typeStr = type.name.lowercase()
+        //             val filename = "pieces/$colorStr-$typeStr.png"
+        //             assetManager.load(filename, Texture::class.java)
+        //     }
+        // }
+    }
+
+    private fun setupBoard() {
+        for (y in 0 until boardWorldSize) {
+            for (x in 0 until boardWorldSize) {
+                val tileColor =
+                    if ((x + y) % 2 == 0) PlayerColor.BLACK else PlayerColor.WHITE
+                boardSquareFactory.createBoardSquare(
+                    Position(x, y),
+                    WeatherEvent.NONE,
+                    tileColor,
+                )
             }
         }
 
-        val sprite: Sprite = pieces[0].getComponent(SpriteComponent::class.java).sprite
-        val posComp: PositionComponent = pieces[0].getComponent(PositionComponent::class.java)
-        sprite.setPosition(
-            (boardScreenPosX + (posComp.xPos - 1) * pixelSize).toFloat(),
-            (boardScreenPosY + (posComp.yPos - 1) * pixelSize).toFloat(),
+        pieceFactory.createRook(
+            Position(4, 4),
+            PlayerColor.BLACK,
         )
-        view.render(sprite)
-        view.endBatch()
+    }
+
+    override fun render(sb: SpriteBatch) {
+        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+        gameViewport.apply()
+        gameBatch.projectionMatrix = gameCamera.combined
+
+        gameBatch.begin()
+        engine.update(Gdx.graphics.deltaTime)
+        gameBatch.end()
+
+        // In case we want part of the UI to be scene2d, we render the view on top
+        view.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        TODO("Not yet implemented")
+        gameViewport.update(width, height, false)
+        view.resize(width, height)
     }
 
     override fun dispose() {
-        TODO("Not yet implemented")
+        view.dispose()
+        engine.removeAllEntities()
+        unloadAssets()
+    }
+
+    private fun unloadAssets() {
+        if (assetManager.isLoaded("board/black-tile.png")) {
+            assetManager.unload("board/black-tile.png")
+        }
+        if (assetManager.isLoaded("board/white-tile.png")) {
+            assetManager.unload("board/white-tile.png")
+        }
+
+        PlayerColor.entries.forEach { color ->
+            PieceType.entries.forEach { type ->
+                val colorStr = color.name.lowercase()
+                val typeStr = type.name.lowercase()
+                val filename = "pieces/$colorStr-$typeStr.png"
+                if (assetManager.isLoaded(filename)) {
+                    assetManager.unload(filename)
+                }
+            }
+        }
     }
 
     override fun setInputProcessor() {
-        TODO("Not yet implemented")
+        view.setInputProcessor()
     }
 }

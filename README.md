@@ -12,8 +12,8 @@ This project was generated with a Kotlin project template that includes Kotlin a
 
 ## Setting up Supabase for production
 
-Add a .env file to the project and add `SUPABASE_ADMIN_KEY={service_role_key}` and `SUPABASE_URL={project_url}` to this file.
-> You should replace {service_role_key} and {project_url} with the key and url you find under Project Settings->Data API on supabase.
+Add a .env file to the project and add `SUPABASE_ANON_KEY={anon_key}` and `SUPABASE_URL={project_url}` to this file.
+> You should replace {anon_key} and {project_url} with the key and url you find under Project Settings->Data API on supabase.
 
 That's it!
 
@@ -23,17 +23,17 @@ When working on the project, you should be doing development within a dev-databa
 
 ### Get it up and running
 
-1. Install [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started). This guide tells you to install a docker compatible API as well. [Docker Desktop](https://docs.docker.com/desktop/) works well for this purpose.
+1. Install [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started). This guide tells you to install a docker compatible API as well. [Docker Desktop](https://docs.docker.com/desktop/) works well for this purpose. NOTE: Docker desktop is only licensed for non commercial use and is very bloated, running Docker without it is better if you are not on Windows.
 2. If you're on windows, open up Docker Desktop, go to Settings->General and turn on `Add the *.docker.internal names to the host's /etc/hosts file (Requires password)`.
 3. Keep Docker Desktop running in the background.
-4. Open a terminal in the root directory of the project repository and run `supabase start`.
-5. Add a .env file to the root of the repository and add `SUPABASE_ADMIN_KEY={service_role_key}` and `SUPABASE_URL={project_url}` to this file.
-
-> Look at the output from your "supabase start" command. You should replace {service_role_key} with the string after "service_role key:" and {project_url} with the string after "API URL:"
-
-6. While your database is running, you can access it's dashboard at <http://localhost:54323>.
-7. You can now run the project, and it should connect to your local database.
-8. When you're done developing, you can run `supabase stop` to stop your database.
+4. Open a terminal in the root directory of the project repository and run `supabase start`. Running `supabase status` will also provide the information if Supabase is running.
+5. Add a .env file to the root of the repository and add `SUPABASE_URL={project_url}` and `SUPABASE_ANON_KEY={anon_key}` to this file.
+6. While your database is running, you can access it's dashboard at <http://localhost:54323>. 
+7. Go to this dashboard, and click the button at the bottom left of the webpage called "Command Menu".
+8. Type in `copy api url`, press enter, and replace `{project_url}` in your .env file with whatever gets copied to your clipboard.
+9. Type in `get api keys`, press enter, type `copy anonymous api key`, press enter and replace `{anon_key}` in your .env file with whatever gets copied to your clipboard.
+10. You can now run the project, and it should connect to your local database.
+11. When you're done developing, you can run `supabase stop` to stop your database.
 
 ### Extend functionality
 
@@ -43,7 +43,7 @@ If you make changes on the remote supabase database, you can pull those changes 
 
 1. You first need to run `supabase login`.
 2. Afterwards you need to link the remote database to this project by running `supabase link --project-ref tsmubattgglbqaarktnw`. You will be prompted for a password. The password is saved on The Progarkening google-drive shared with the whole group.
-3. After linking, you should now be able to pull the schema from supabase by using the command `supabase db pull`. It might tell you to run a `supabase migration repair`-command, and you should do that if it tells you. If you had to run the migration repair command, run `supabase db pull` one last time.
+3. After linking, you should now be able to pull the schema from Supabase by using the command `supabase db pull`. It might tell you to run a `supabase migration repair`-command, and you should do that if it tells you. If you had to run the migration repair command, run `supabase db pull` one last time.
 4. That should do it!
 
 ## Gradle

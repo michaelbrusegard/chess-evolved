@@ -1,50 +1,49 @@
 package io.github.chessevolved.presenters
-import LobbyPresenter
-import io.github.chessevolved.PresenterManager
-import io.github.chessevolved.singletons.Lobby.createLobby
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
+import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.singletons.Lobby.getLobbyId
-import io.github.chessevolved.views.JoinGameView
-import io.github.chessevolved.views.LobbyView
 import io.github.chessevolved.views.MenuView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class MenuPresenter(
-    private val view: MenuView,
+    private val menuView: MenuView,
+    private val navigator: Navigator,
 ) : IPresenter {
-    override fun render() {
-        view.render()
+    init {
+        menuView.onCreateLobbyButtonClicked = { createLobby() }
+        menuView.onJoinGameButtonClicked = { navigator.navigateToJoinGame() }
+        menuView.init()
+    }
+
+    override fun render(sb: SpriteBatch) {
+        menuView.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        view.resize(width, height)
+        menuView.resize(width, height)
     }
 
     override fun dispose() {
-        view.dispose()
+        menuView.dispose()
     }
 
     override fun setInputProcessor() {
-        view.setInputProcessor()
+        menuView.setInputProcessor()
     }
 
-    fun enterJoinGame() {
-        val joinGamePresenter = JoinGamePresenter(JoinGameView())
-        PresenterManager.push(StatePresenter(joinGamePresenter))
-    }
-
-    fun enterCreateGame() {
+    private fun createLobby() {
         runBlocking {
             launch {
                 try {
-                    createLobby()
-                    val lobbyPresenter = LobbyPresenter(LobbyView(getLobbyId() ?: throw Exception("Unexpected state when creating lobby!")))
-                    PresenterManager.push(StatePresenter(lobbyPresenter))
+                    Lobby.createLobby()
+                    navigator.navigateToCreateLobby(getLobbyId() ?: throw Exception("Unexpected state when creating lobby!"))
                 } catch (e: Exception) {
-                    view.showCreateGameError(e.message ?: "Internal error!")
+                    menuView.showCreateGameError(e.message ?: "Internal error!")
                 }
             }
         }
