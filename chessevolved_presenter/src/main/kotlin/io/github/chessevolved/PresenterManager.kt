@@ -26,10 +26,6 @@ object PresenterManager {
         push(presenter)
     }
 
-    fun update(dt: Float) {
-        presenters.peekFirst()?.update(dt)
-    }
-
     fun render(sb: SpriteBatch) {
         presenters.peekFirst()?.render(sb)
     }

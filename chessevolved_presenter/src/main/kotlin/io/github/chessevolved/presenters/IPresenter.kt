@@ -8,12 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
  */
 interface IPresenter {
     /**
-     * Updates the presenter's logic.
-     * Called on each game loop cycle before rendering.
-     */
-    fun update(dt: Float)
-
-    /**
      * Renders the presenter's view.
      * Called on each render cycle.
      */

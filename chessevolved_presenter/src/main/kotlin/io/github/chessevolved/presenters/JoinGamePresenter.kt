@@ -25,9 +25,6 @@ class JoinGamePresenter(
         }
     }
 
-    override fun update(dt: Float) {
-    }
-
     override fun render(sb: SpriteBatch) {
         joinGameView.render()
     }

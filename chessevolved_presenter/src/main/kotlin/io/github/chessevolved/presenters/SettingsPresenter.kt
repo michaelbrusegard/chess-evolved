@@ -42,9 +42,6 @@ class SettingsPresenter(
             "BoardSize" to GameSettings.getBoardSize(),
         )
 
-    override fun update(dt: Float) {
-    }
-
     override fun render(sb: SpriteBatch) {
         settingsView.render()
     }

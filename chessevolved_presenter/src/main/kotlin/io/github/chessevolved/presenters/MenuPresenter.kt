@@ -14,9 +14,6 @@ class MenuPresenter(
         menuView.init()
     }
 
-    override fun update(dt: Float) {
-    }
-
     override fun render(sb: SpriteBatch) {
         menuView.render()
     }

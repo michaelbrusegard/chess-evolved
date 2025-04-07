@@ -1,6 +1,5 @@
 package io.github.chessevolved
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
@@ -31,7 +30,6 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
 
     override fun render() {
         clearScreen(red = 0.5f, green = 0.5f, blue = 0.75f)
-        PresenterManager.update(Gdx.graphics.deltaTime)
         PresenterManager.render(batch)
     }
 

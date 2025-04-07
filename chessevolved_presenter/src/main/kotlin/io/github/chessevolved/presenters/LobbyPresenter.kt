@@ -19,9 +19,6 @@ class LobbyPresenter(
         lobbyView.setSecondPlayerConnected(playerJoined)
     }
 
-    override fun update(dt: Float) {
-    }
-
     override fun render(sb: SpriteBatch) {
         lobbyView.render()
     }

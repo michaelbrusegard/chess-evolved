@@ -17,9 +17,6 @@ class EndGamePresenter(
         endGameView.onRematchClicked = { navigator.navigateToLobby("222222") }
     }
 
-    override fun update(dt: Float) {
-    }
-
     override fun render(sb: SpriteBatch) {
         endGameView.render()
     }

@@ -89,10 +89,6 @@ class GamePresenter(
         )
     }
 
-    override fun update(dt: Float) {
-        // engine.update(dt)
-    }
-
     override fun render(sb: SpriteBatch) {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
