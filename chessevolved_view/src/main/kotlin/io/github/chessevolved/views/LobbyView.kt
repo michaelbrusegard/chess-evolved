@@ -32,15 +32,8 @@ class LobbyView(
         }
 
     override fun init() {
-        val copyButton =
-            scene2d.imageButton {
-                onClick { copyLobbyCode() }
-            }
-
-        val iconTexture = Texture(Gdx.files.internal("copy-icon.png"))
-        val iconDrawable = TextureRegionDrawable(TextureRegion(iconTexture))
-
-        copyButton.image(iconDrawable)
+        val copyIconTexture = Texture(Gdx.files.internal("icons/copy-icon.png"))
+        val iconDrawable = TextureRegionDrawable(TextureRegion(copyIconTexture))
 
         val root =
             scene2d.table {
@@ -54,7 +47,11 @@ class LobbyView(
                 row()
 
                 label("Lobby Code: $lobbyCode")
-                add(copyButton).size(40f, 40f).padLeft(-45f)
+                imageButton {
+                    it.size(40f, 40f)
+                    it.padLeft(-45f)
+                    image(iconDrawable)
+                }
                 row()
 
                 add(secondPlayerStatusText)
