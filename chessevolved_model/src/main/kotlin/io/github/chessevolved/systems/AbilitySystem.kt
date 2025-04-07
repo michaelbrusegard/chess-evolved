@@ -55,46 +55,46 @@ class AbilitySystem(
             throw IllegalArgumentException("Invalid ability name: '$abilityNameLowercase'.")
         }
         // Active abilities
-        if (abilityNameLowercase.equals("explosion")) {
+        if (abilityNameLowercase == "explosion") {
             //TODO: implement logic for the explosion ability
             // An explosion erupts on the chosen tile, and all adjacent tiles excluding
             // diagonal tiles, destroying all pieces and clearing all weather events.
         }
-        if (abilityNameLowercase.equals("conscription")) {
+        if (abilityNameLowercase == "conscription") {
             //TODO: implement logic for the conscription ability
             // Summon a permanent friendly pawn in an empty adjacent empty tile.
         }
-        if (abilityNameLowercase.equals("shadow_step")) {
+        if (abilityNameLowercase == "shadow_step") {
             //TODO: implement logic for the shadow step ability
             // Teleport on the other side of an adjacent piece.
         }
-        if (abilityNameLowercase.equals("earthquake")) {
+        if (abilityNameLowercase == "earthquake") {
             //TODO: implement logic for the earthquake ability
             // Make a move as normal with this piece. When moving into the new
             // chosen tile, stun all adjacent enemy pieces for 1 turn.
         }
         // Passive abilities
-        if (abilityNameLowercase.equals("shield")) {
+        if (abilityNameLowercase == "shield") {
             //TODO: implement logic for the shield ability
             // Protect a piece from harm, such as being taken by other pieces or abilities.
             // Lasts for 2 turns or until the shield blocks an attack.
         }
-        if (abilityNameLowercase.equals("aura_of_terror")) {
+        if (abilityNameLowercase == "aura_of_terror") {
             //TODO: implement logic for the aura of terror ability
             // Enemy pieces may not move adjacent to this piece. Enemy pieces already adjacent to
             // this piece are not affected. Lasts for 2 turns or until the piece is destroyed.
         }
-        if (abilityNameLowercase.equals("royal_guard")) {
+        if (abilityNameLowercase == "royal_guard") {
             //TODO: implement logic for the royal guard ability
             // This piece cannot be taken or destroyed, as long as it is adjacent to its king piece.
             // Lasts for 2 turns or until the piece is destroyed.
         }
-        if (abilityNameLowercase.equals("short_range_teleport")) {
+        if (abilityNameLowercase == "short_range_teleport") {
             //TODO: implement logic for the short range teleport ability
             // At the start of your turn, this piece will randomly teleport in a adjacent tile.
             // Lasts for 3 turns or until the piece is destroyed.
         }
-        if (abilityNameLowercase.equals("checkers")) {
+        if (abilityNameLowercase == "checkers") {
             //TODO: implement logic for the checkers ability
             // Transform this piece into a checkers piece, making it follow checkers rules instead
             // of chess rules. This effect is permanent.
