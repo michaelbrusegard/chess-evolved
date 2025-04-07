@@ -1,40 +1,41 @@
 package io.github.chessevolved.presenters
-import LobbyPresenter
-import io.github.chessevolved.PresenterManager
-import io.github.chessevolved.views.JoinGameView
-import io.github.chessevolved.views.LobbyView
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.views.MenuView
 
 class MenuPresenter(
-    private val view: MenuView,
+    private val menuView: MenuView,
+    private val navigator: Navigator,
 ) : IPresenter {
-    override fun render() {
-        view.render()
+    init {
+        menuView.onCreateLobbyButtonClicked = { createLobby() }
+        menuView.onJoinGameButtonClicked = { navigator.navigateToJoinGame() }
+        menuView.init()
+    }
+
+    override fun render(sb: SpriteBatch) {
+        menuView.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        view.resize(width, height)
+        menuView.resize(width, height)
     }
 
     override fun dispose() {
-        view.dispose()
+        menuView.dispose()
     }
 
     override fun setInputProcessor() {
-        view.setInputProcessor()
+        menuView.setInputProcessor()
     }
 
-    fun enterJoinGame() {
-        val joinGamePresenter = JoinGamePresenter(JoinGameView())
-        PresenterManager.push(StatePresenter(joinGamePresenter))
-    }
-
-    fun enterCreateGame() {
-        // TODO: Create lobby code before showing lobby view
-        val lobbyPresenter = LobbyPresenter(LobbyView("123ABC"))
-        PresenterManager.push(StatePresenter(lobbyPresenter))
+    private fun createLobby() {
+        // TODO: Implement actual lobby creation logic here or delegate
+        val newLobbyId = "ABCDEF"
+        navigator.navigateToCreateLobby(newLobbyId)
     }
 }

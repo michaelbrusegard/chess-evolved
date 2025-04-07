@@ -2,6 +2,7 @@ package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
 import ktx.scene2d.label
@@ -10,53 +11,60 @@ import ktx.scene2d.table
 import ktx.scene2d.textButton
 
 class EndGameView : IView {
-    private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
+    private lateinit var stage: Stage
+    private lateinit var statusLabel1: Label
+    private lateinit var statusLabel2: Label
 
-    /**
-     * Weather to show win or loss
-     *
-     * true = win
-     *
-     * false = loss
-     */
     var endGameStatus: Boolean = false
         set(value) {
             field = value
+            if (::stage.isInitialized) {
+                updateStatusLabels()
+            }
         }
 
-    var onReturnToMenu: () -> Unit = {}
-    var onRematch: () -> Unit = {}
+    var onReturnToMenuClicked: () -> Unit = {}
+    var onRematchClicked: () -> Unit = {}
 
     override fun init() {
+        stage =
+            Stage(
+                FitViewport(
+                    Gdx.graphics.width.toFloat(),
+                    Gdx.graphics.height.toFloat(),
+                ),
+            )
+
         val root =
             scene2d.table {
-                // Set size of layout parent to screen.
                 setFillParent(true)
-                // Set padding to 10f
-                defaults().pad(10f)
+                defaults().pad(10f).center()
 
-                // Perhaps replace label in the future with a logo. Or custom sprite text.
-                if (endGameStatus) {
-                    label("Congratulations!") { it.padBottom(20f).center() }
-                    row()
-                    label("You won!") { it.padBottom(20f).center() }
-                } else {
-                    label("Better luck next time!") { it.padBottom(20f).center() }
-                    row()
-                    label("You lost!") { it.padBottom(20f).center() }
-                }
+                statusLabel1 = label("") { it.padBottom(5f) }
                 row()
-                textButton("Return to menu") {
+                statusLabel2 = label("") { it.padBottom(20f) }
+                row()
+
+                textButton("Return to Menu") {
                     it.padBottom(5f)
-                    onClick { onReturnToMenu() }
+                    onClick { onReturnToMenuClicked() }
                 }
                 row()
-                textButton("Request rematch") {
-                    onClick { onRematch() }
-                }
+                textButton("Request Rematch") { onClick { onRematchClicked() } }
             }
 
         stage.addActor(root)
+        updateStatusLabels()
+    }
+
+    private fun updateStatusLabels() {
+        if (endGameStatus) {
+            statusLabel1.setText("Congratulations!")
+            statusLabel2.setText("You won!")
+        } else {
+            statusLabel1.setText("Better luck next time!")
+            statusLabel2.setText("You lost!")
+        }
     }
 
     override fun render() {
