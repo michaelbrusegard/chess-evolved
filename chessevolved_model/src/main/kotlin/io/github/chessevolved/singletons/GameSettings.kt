@@ -35,4 +35,13 @@ object GameSettings {
      * @return Size of the chessboard as Int
      */
     fun getBoardSize(): Int = boardSize
+
+    fun getGameSettings(): Map<String, String> {
+        val settingMap =
+            mapOf(
+                "boardSize" to boardSize.toString(),
+                "fogOfWar" to fogOfWar.toString(),
+            )
+        return settingMap
+    }
 }
