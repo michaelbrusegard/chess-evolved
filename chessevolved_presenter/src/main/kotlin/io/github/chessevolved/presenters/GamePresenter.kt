@@ -44,13 +44,15 @@ class GamePresenter(
         gameCamera.update()
 
         renderingSystem = RenderingSystem(gameBatch)
-        renderingSystem.setProcessing(false)
         engine.addSystem(renderingSystem)
 
         loadRequiredAssets()
         assetManager.finishLoading()
 
         setupBoard()
+
+        // If we do not call this the board will not be displayed
+        resize(Gdx.graphics.width, Gdx.graphics.height)
     }
 
     private fun loadRequiredAssets() {
@@ -88,7 +90,7 @@ class GamePresenter(
     }
 
     override fun update(dt: Float) {
-        engine.update(dt)
+        // engine.update(dt)
     }
 
     override fun render(sb: SpriteBatch) {
@@ -99,9 +101,10 @@ class GamePresenter(
         gameBatch.projectionMatrix = gameCamera.combined
 
         gameBatch.begin()
-        renderingSystem.update(0f)
+        engine.update(Gdx.graphics.deltaTime)
         gameBatch.end()
 
+        // In case we want part of the UI to be scene2d, we render the view on top
         view.render()
     }
 
