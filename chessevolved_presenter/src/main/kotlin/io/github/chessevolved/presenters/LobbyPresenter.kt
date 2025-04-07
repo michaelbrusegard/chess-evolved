@@ -2,6 +2,7 @@ package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.singletons.Lobby.getLobby
 import io.github.chessevolved.singletons.Lobby.leaveLobby
 import io.github.chessevolved.singletons.Lobby.subscribeToLobbyUpdates
@@ -74,6 +75,17 @@ class LobbyPresenter(
 
     override fun dispose() {
         lobbyView.dispose()
+        if (Lobby.isInLobby()) {
+            runBlocking {
+                launch {
+                    try {
+                        leaveLobby()
+                    } catch (e: Exception) {
+                        error("Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
+                    }
+                }
+            }
+        }
     }
 
     override fun setInputProcessor() {
