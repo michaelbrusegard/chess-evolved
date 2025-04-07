@@ -44,6 +44,8 @@ class GamePresenter(
         gameCamera.update()
 
         renderingSystem = RenderingSystem(gameBatch)
+        renderingSystem.setProcessing(false)
+        engine.addSystem(renderingSystem)
 
         loadRequiredAssets()
         assetManager.finishLoading()

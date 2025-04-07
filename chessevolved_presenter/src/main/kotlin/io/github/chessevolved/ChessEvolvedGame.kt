@@ -19,9 +19,12 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
     override fun create() {
         KtxAsync.initiate()
         batch = SpriteBatch()
+
+        assetManager = AssetManager()
         assetManager.load("skin/plain-james-ui.json", Skin::class.java)
         assetManager.finishLoading()
         Scene2DSkin.defaultSkin = assetManager.get("skin/plain-james-ui.json", Skin::class.java)
+
         navigator = Navigator(assetManager)
         navigator.navigateToMenu()
     }
