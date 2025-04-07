@@ -18,7 +18,7 @@ import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
 class LobbyView(
-    val lobbyCode: String,
+    private val lobbyCode: String,
 ) : IView {
     private lateinit var stage: Stage
     private lateinit var secondPlayerStatusLabel: Label
@@ -39,7 +39,6 @@ class LobbyView(
 
         val copyIconTexture = Texture(Gdx.files.internal("icons/copy-icon.png"))
         val iconDrawable = TextureRegionDrawable(TextureRegion(copyIconTexture))
-
 
         val root =
             scene2d.table {

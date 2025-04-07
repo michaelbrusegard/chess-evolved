@@ -31,7 +31,7 @@ class LobbyPresenter(
         }
     }
 
-    fun playerJoinedLeftLobby(playerJoined: Boolean) {
+    private fun playerJoinedLeftLobby(playerJoined: Boolean) {
         lobbyView.setSecondPlayerConnected(playerJoined)
     }
 
