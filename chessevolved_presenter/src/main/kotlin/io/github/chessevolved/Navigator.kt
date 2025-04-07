@@ -1,5 +1,6 @@
 package io.github.chessevolved
 
+import com.badlogic.gdx.assets.AssetManager
 import io.github.chessevolved.presenters.EndGamePresenter
 import io.github.chessevolved.presenters.GamePresenter
 import io.github.chessevolved.presenters.JoinGamePresenter
@@ -13,14 +14,16 @@ import io.github.chessevolved.views.LobbyView
 import io.github.chessevolved.views.MenuView
 import io.github.chessevolved.views.SettingsView
 
-class Navigator {
+class Navigator(
+    private val assetManager: AssetManager,
+) {
     private fun createMenuPresenter(): MenuPresenter = MenuPresenter(MenuView(), this)
 
     private fun createJoinGamePresenter(): JoinGamePresenter = JoinGamePresenter(JoinGameView(), this)
 
     private fun createLobbyPresenter(lobbyId: String): LobbyPresenter = LobbyPresenter(LobbyView(lobbyId), this)
 
-    private fun createGamePresenter(): GamePresenter = GamePresenter(GameView(), this)
+    private fun createGamePresenter(): GamePresenter = GamePresenter(GameView(), this, assetManager)
 
     private fun createSettingsPresenter(): SettingsPresenter = SettingsPresenter(SettingsView(), this)
 

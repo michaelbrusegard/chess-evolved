@@ -61,7 +61,7 @@ class LobbyView(
             }
 
         stage.addActor(root)
-        setSecondPlayerConnected(false)
+        setSecondPlayerConnected(true)
     }
 
     fun setSecondPlayerConnected(isConnected: Boolean) {

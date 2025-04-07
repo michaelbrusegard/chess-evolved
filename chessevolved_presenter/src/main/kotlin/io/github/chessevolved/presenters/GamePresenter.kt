@@ -1,6 +1,7 @@
 package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -18,9 +19,10 @@ import io.github.chessevolved.views.GameView
 class GamePresenter(
     private val view: GameView,
     private val navigator: Navigator,
+    private val assetManager: AssetManager,
 ) : IPresenter {
     private val engine = ECSEngine
-    private val pieceFactory = PieceFactory(engine)
+    private val pieceFactory = PieceFactory(engine, assetManager)
     private val boardSquareFactory = BoardSquareFactory(engine)
 
     private val gameCamera = OrthographicCamera()

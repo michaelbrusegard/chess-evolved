@@ -1,6 +1,7 @@
 package io.github.chessevolved
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import ktx.app.KtxGame
@@ -13,13 +14,15 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
     private lateinit var batch: SpriteBatch
     private lateinit var skin: Skin
     private lateinit var navigator: Navigator
+    private lateinit var assetManager: AssetManager
 
     override fun create() {
         KtxAsync.initiate()
         batch = SpriteBatch()
-        skin = Skin(Gdx.files.internal("skin/plain-james-ui.json"))
-        Scene2DSkin.defaultSkin = skin
-        navigator = Navigator()
+        assetManager.load("skin/plain-james-ui.json", Skin::class.java)
+        assetManager.finishLoading()
+        Scene2DSkin.defaultSkin = assetManager.get("skin/plain-james-ui.json", Skin::class.java)
+        navigator = Navigator(assetManager)
         navigator.navigateToMenu()
     }
 
@@ -40,6 +43,6 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
     override fun dispose() {
         PresenterManager.dispose()
         batch.dispose()
-        skin.dispose()
+        assetManager.dispose()
     }
 }
