@@ -1,37 +1,45 @@
 package io.github.chessevolved
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.presenters.IPresenter
 import java.util.ArrayDeque
 
 object PresenterManager {
-    private val states = ArrayDeque<State>()
+    private val presenters = ArrayDeque<IPresenter>()
 
-    fun push(state: State) {
-        states.push(state)
-        state.setInputProcessor()
+    fun push(presenter: IPresenter) {
+        presenters.push(presenter)
+        presenter.setInputProcessor()
     }
 
     fun pop() {
-        if (states.isNotEmpty()) {
-            states.pop()
+        if (presenters.isNotEmpty()) {
+            presenters.pop().dispose()
         }
-        if (states.isEmpty()) return
-        states.peekFirst().setInputProcessor()
+        presenters.peekFirst()?.setInputProcessor()
+    }
+
+    fun set(presenter: IPresenter) {
+        if (presenters.isNotEmpty()) {
+            presenters.pop().dispose()
+        }
+        push(presenter)
     }
 
     fun update(dt: Float) {
-        if (states.isNotEmpty()) {
-            states.peek().update(dt)
-        }
+        presenters.peekFirst()?.update(dt)
     }
 
     fun render(sb: SpriteBatch) {
-        if (states.isNotEmpty()) {
-            states.peek().render(sb)
-        }
+        presenters.peekFirst()?.render(sb)
     }
 
     fun dispose() {
-        states.forEach { it.dispose() }
+        presenters.forEach { it.dispose() }
+        presenters.clear()
     }
+
+    fun getCurrent(): IPresenter? = presenters.peekFirst()
+
+    fun isEmpty(): Boolean = presenters.isEmpty()
 }

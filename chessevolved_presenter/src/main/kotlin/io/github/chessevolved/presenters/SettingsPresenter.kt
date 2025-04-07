@@ -1,51 +1,49 @@
 package io.github.chessevolved.presenters
 
-import SettingsView
-import io.github.chessevolved.PresenterManager
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.singletons.GameSettings
+import io.github.chessevolved.views.SettingsView
 
 class SettingsPresenter(
     private val settingsView: SettingsView,
+    private val navigator: Navigator,
 ) : IPresenter {
     init {
         settingsView.init()
         settingsView.onApply = { fowSetting, sizeSetting ->
             onApplyPressed(fowSetting, sizeSetting)
         }
+        settingsView.onCancel = { returnToLobby() }
+
+        val currentSettings = getCurrentSettings()
+        settingsView.setInitialValues(
+            currentSettings["FogOfWar"] as? Boolean ?: false,
+            currentSettings["BoardSize"] as? Int ?: 8,
+        )
     }
 
     private val gameSettings = GameSettings
 
-    /**
-     * Applies the chosen game settings and returns to lobby
-     *
-     * @param fowSetting Boolean for Fog of War
-     * @param sizeSetting Int for size of chessboard
-     */
     private fun onApplyPressed(
         fowSetting: Boolean,
         sizeSetting: Int,
     ) {
-        // TODO: Consider if game settings should be applied manually or automatically
+        // TODO: Add validation for settings if needed
         gameSettings.setFOW(fowSetting)
-
-        // TODO: validate max/min boardsize here?
         gameSettings.setBoardSize(sizeSetting)
 
         returnToLobby()
     }
 
-    /**
-     *  Switch to LobbyPresenter
-     */
     private fun returnToLobby() {
-        PresenterManager.pop()
+        navigator.goBack()
     }
 
     /**
-     * Retrieves the current game settings
+     * Retrieves the current game settings.
      *
-     * @return Current settings as a Map
+     * @return Current settings as a Map.
      */
     fun getCurrentSettings(): Map<String, Any> =
         mapOf(
@@ -53,7 +51,10 @@ class SettingsPresenter(
             "BoardSize" to gameSettings.getBoardSize(),
         )
 
-    override fun render() {
+    override fun update(dt: Float) {
+    }
+
+    override fun render(sb: SpriteBatch) {
         settingsView.render()
     }
 

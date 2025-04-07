@@ -1,31 +1,35 @@
 package io.github.chessevolved.presenters
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.views.EndGameView
 
 class EndGamePresenter(
     private val endGameView: EndGameView,
     private val endGameStatus: Boolean,
+    private val navigator: Navigator,
 ) : IPresenter {
     init {
         endGameView.endGameStatus = endGameStatus
         endGameView.init()
+        endGameView.onReturnToMenuClicked = { returnToMenu() }
+        endGameView.onRematchClicked = { rematch() }
     }
 
-    /**
-     * Returns to the MenuPresenter
-     */
     fun returnToMenu() {
-        print("Returning to menu...")
+        navigator.goBack()
     }
 
-    /**
-     * Restarts Game
-     */
     fun rematch() {
-        print("Requesting rematch...")
+        // TODO: Implement rematch logic (likely involves navigator)
+        // Example: navigator.navigateToGame() or similar
     }
 
-    override fun render() {
+    override fun update(dt: Float) {
+        // No update logic needed for this simple screen yet
+    }
+
+    override fun render(sb: SpriteBatch) {
         endGameView.render()
     }
 

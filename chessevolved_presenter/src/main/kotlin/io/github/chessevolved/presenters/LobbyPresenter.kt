@@ -1,17 +1,13 @@
-import io.github.chessevolved.PresenterManager
-import io.github.chessevolved.presenters.GamePresenter
-import io.github.chessevolved.presenters.IPresenter
-import io.github.chessevolved.presenters.SettingsPresenter
-import io.github.chessevolved.presenters.StatePresenter
-import io.github.chessevolved.views.GameView
+package io.github.chessevolved.presenters
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.views.LobbyView
 
 class LobbyPresenter(
     private val lobbyView: LobbyView,
+    private val navigator: Navigator,
 ) : IPresenter {
-    private val settingsPresenter = SettingsPresenter(SettingsView())
-    private val gamePresenter = GamePresenter(GameView())
-
     init {
         lobbyView.onLeaveButtonClicked = { returnToMenu() }
         lobbyView.onStartGameButtonClicked = { startGame() }
@@ -20,40 +16,29 @@ class LobbyPresenter(
     }
 
     /**
-     * Save lobby in backend
-     *
-     * @param player1
-     * @param player2
-     * @param lobbyID
+     * Navigate to the Game screen.
      */
-    fun startGame(
-        // player1: String,
-        // player2: String,
-        // lobbyID: String,
-    ) {
-        // TODO: Switch player over to game.
-        PresenterManager.push(StatePresenter(gamePresenter))
+    fun startGame() {
+        navigator.navigateToGame()
     }
 
     fun playerJoinedLeftLobby(playerJoined: Boolean) {
         lobbyView.setSecondPlayerConnected(playerJoined)
     }
 
-    /**
-     * Change to SettingsPresenter
-     */
     private fun enterSettings() {
-        PresenterManager.push(StatePresenter(settingsPresenter))
+        navigator.navigateToSettings()
     }
 
-    /**
-     * Change to MenuPresenter
-     */
     private fun returnToMenu() {
-        PresenterManager.pop()
+        navigator.goBack()
     }
 
-    override fun render() {
+    override fun update(dt: Float) {
+        // TODO: Add lobby update logic (e.g., check connection status)
+    }
+
+    override fun render(sb: SpriteBatch) {
         lobbyView.render()
     }
 
@@ -61,6 +46,7 @@ class LobbyPresenter(
         width: Int,
         height: Int,
     ) {
+        lobbyView.resize(width, height)
     }
 
     override fun dispose() {

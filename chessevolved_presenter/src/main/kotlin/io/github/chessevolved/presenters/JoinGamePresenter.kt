@@ -1,22 +1,18 @@
 package io.github.chessevolved.presenters
 
-import LobbyPresenter
-import io.github.chessevolved.PresenterManager
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.views.JoinGameView
-import io.github.chessevolved.views.LobbyView
 
 class JoinGamePresenter(
     private val joinGameView: JoinGameView,
+    private val navigator: Navigator,
 ) : IPresenter {
     init {
         joinGameView.init()
-        joinGameView.onReturnButtonClicked = { returnToMenu() }
-        joinGameView.onJoinButtonClicked = {
-            joinGame(
-                lobbyId = it,
-            )
-        }
+        joinGameView.onReturnButtonClicked = { navigator.goBack() }
+        joinGameView.onJoinButtonClicked = { lobbyId -> joinGame(lobbyId) }
     }
 
     /**
@@ -29,21 +25,16 @@ class JoinGamePresenter(
         val success = Lobby.joinLobby(lobbyId)
 
         if (success) {
-            val lobbyPresenter = LobbyPresenter(LobbyView(lobbyId))
-            PresenterManager.push(StatePresenter(lobbyPresenter))
+            navigator.navigateToLobby(lobbyId)
         } else {
             joinGameView.showJoinError("Error message should be put here")
         }
     }
 
-    /**
-     * Return to the menu scene using the presenter manager??
-     */
-    fun returnToMenu() {
-        PresenterManager.pop()
+    override fun update(dt: Float) {
     }
 
-    override fun render() {
+    override fun render(sb: SpriteBatch) {
         joinGameView.render()
     }
 

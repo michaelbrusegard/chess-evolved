@@ -1,6 +1,8 @@
 package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
 import io.github.chessevolved.entities.BoardSquareFactory
@@ -11,27 +13,16 @@ import io.github.chessevolved.views.GameView
 
 class GamePresenter(
     private val view: GameView,
+    private val navigator: Navigator,
 ) : IPresenter {
     private val engine = ECSEngine
     private val pieceFactory = PieceFactory(engine)
     private val boardSquareFactory = BoardSquareFactory(engine)
 
-    private val boardSize = 8
+    private val boardSize = 8 // TODO: Get from GameSettings?
     private val pixelSize = view.getBoardSize().toInt() / boardSize
     private var boardScreenPosX = 0
     private var boardScreenPosY = 0
-
-    // private val supabaseLobbyHandler = SupabaseLobbyHandler
-    //
-    // private suspend fun onLobbyEvent(lobby: SupabaseLobbyHandler.Lobby) {
-    //     println("Lobby event received: $lobby")
-    // }
-    //
-    // private suspend fun testSupabase() {
-    //     println("Testing Supabase connection")
-    //     val lobbyCode = supabaseLobbyHandler.createLobby(::onLobbyEvent)
-    //     println("Created lobby with code: $lobbyCode")
-    // }
 
     init {
         view.init()
@@ -48,19 +39,7 @@ class GamePresenter(
             ),
         )
 
-        // engine.addSystem(
-        //     RenderingSystem(
-        //         view.getBatch(),
-        //         pixelSize,
-        //         boardScreenPosX,
-        //         boardScreenPosY,
-        //     ),
-        // )
-
         setupBoard()
-
-        // Just a tiny test for now to see if the Supabase connection works
-        // GlobalScope.launch { testSupabase() }
     }
 
     private fun updateBoardPosition(
@@ -78,10 +57,11 @@ class GamePresenter(
         )
     }
 
-    override fun render() {
-        view.beginBatch()
-        engine.update(Gdx.graphics.deltaTime)
-        view.endBatch()
+    override fun update(dt: Float) {
+        engine.update(dt)
+    }
+
+    override fun render(sb: SpriteBatch) {
         view.render()
     }
 
@@ -95,6 +75,8 @@ class GamePresenter(
 
     override fun dispose() {
         view.dispose()
+        engine.removeAllEntities()
+        engine.systems.forEach { engine.removeSystem(it) }
     }
 
     override fun setInputProcessor() {

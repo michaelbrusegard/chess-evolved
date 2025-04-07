@@ -1,12 +1,12 @@
 package io.github.chessevolved.presenters
-import LobbyPresenter
-import io.github.chessevolved.PresenterManager
-import io.github.chessevolved.views.JoinGameView
-import io.github.chessevolved.views.LobbyView
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.views.MenuView
 
 class MenuPresenter(
     private val menuView: MenuView,
+    private val navigator: Navigator,
 ) : IPresenter {
     init {
         menuView.onCreateLobbyButtonClicked = { enterCreateGame() }
@@ -14,7 +14,10 @@ class MenuPresenter(
         menuView.init()
     }
 
-    override fun render() {
+    override fun update(dt: Float) {
+    }
+
+    override fun render(sb: SpriteBatch) {
         menuView.render()
     }
 
@@ -34,13 +37,12 @@ class MenuPresenter(
     }
 
     fun enterJoinGame() {
-        val joinGamePresenter = JoinGamePresenter(JoinGameView())
-        PresenterManager.push(StatePresenter(joinGamePresenter))
+        navigator.navigateToJoinGame()
     }
 
     fun enterCreateGame() {
-        // TODO: Create lobby code before showing lobby view
-        val lobbyPresenter = LobbyPresenter(LobbyView("123ABC"))
-        PresenterManager.push(StatePresenter(lobbyPresenter))
+        // TODO: Implement actual lobby creation logic here or delegate
+        val newLobbyId = "ABCDEF"
+        navigator.navigateToCreateLobby(newLobbyId)
     }
 }
