@@ -6,26 +6,27 @@ import io.github.chessevolved.components.SpriteComponent
 
 class BoardRenderingSystem(
     private val batch: SpriteBatch,
-    private val boardSize: Int,
-    private val pixelSize: Int,
-    private val boardScreenPosX: Int,
-    private val boardScreenPosY: Int,
+    private val boardWorldSize: Int,
 ) : EntitySystem() {
+    private val blackTileSprite = SpriteComponent("board/black-tile.png").sprite
+    private val whiteTileSprite = SpriteComponent("board/white-tile.png").sprite
+
+    init {
+        blackTileSprite.setSize(1f, 1f)
+        whiteTileSprite.setSize(1f, 1f)
+    }
+
     override fun update(deltaTime: Float) {
-        for (y in 0 until boardSize) {
-            for (x in 0 until boardSize) {
+        for (y in 0 until boardWorldSize) {
+            for (x in 0 until boardWorldSize) {
                 val sprite =
                     if ((x + y) % 2 == 0) {
-                        SpriteComponent("board/black-tile.png").sprite
+                        blackTileSprite
                     } else {
-                        SpriteComponent("board/white-tile.png").sprite
+                        whiteTileSprite
                     }
 
-                sprite.setPosition(
-                    boardScreenPosX + x * pixelSize.toFloat(),
-                    boardScreenPosY + y * pixelSize.toFloat(),
-                )
-                sprite.setSize(pixelSize.toFloat(), pixelSize.toFloat())
+                sprite.setPosition(x.toFloat(), y.toFloat())
                 sprite.draw(batch)
             }
         }

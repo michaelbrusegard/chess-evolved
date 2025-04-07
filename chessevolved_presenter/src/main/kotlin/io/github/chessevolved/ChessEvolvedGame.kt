@@ -20,6 +20,7 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
         skin = Skin(Gdx.files.internal("skin/plain-james-ui.json"))
         Scene2DSkin.defaultSkin = skin
         navigator = Navigator()
+        navigator.navigateToMenu()
     }
 
     override fun render() {

@@ -12,21 +12,12 @@ class EndGamePresenter(
     init {
         endGameView.endGameStatus = endGameStatus
         endGameView.init()
-        endGameView.onReturnToMenuClicked = { returnToMenu() }
-        endGameView.onRematchClicked = { rematch() }
-    }
-
-    fun returnToMenu() {
-        navigator.goBack()
-    }
-
-    fun rematch() {
-        // TODO: Implement rematch logic (likely involves navigator)
-        // Example: navigator.navigateToGame() or similar
+        endGameView.onReturnToMenuClicked = { navigator.goBack() }
+        // We need to get the current lobby ID
+        endGameView.onRematchClicked = { navigator.navigateToLobby("222222") }
     }
 
     override fun update(dt: Float) {
-        // No update logic needed for this simple screen yet
     }
 
     override fun render(sb: SpriteBatch) {

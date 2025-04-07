@@ -1,14 +1,29 @@
 package io.github.chessevolved
 
-import io.github.chessevolved.presenters.*
-import io.github.chessevolved.views.*
+import io.github.chessevolved.presenters.EndGamePresenter
+import io.github.chessevolved.presenters.GamePresenter
+import io.github.chessevolved.presenters.JoinGamePresenter
+import io.github.chessevolved.presenters.LobbyPresenter
+import io.github.chessevolved.presenters.MenuPresenter
+import io.github.chessevolved.presenters.SettingsPresenter
+import io.github.chessevolved.views.EndGameView
+import io.github.chessevolved.views.GameView
+import io.github.chessevolved.views.JoinGameView
+import io.github.chessevolved.views.LobbyView
+import io.github.chessevolved.views.MenuView
+import io.github.chessevolved.views.SettingsView
 
 class Navigator {
     private fun createMenuPresenter(): MenuPresenter = MenuPresenter(MenuView(), this)
+
     private fun createJoinGamePresenter(): JoinGamePresenter = JoinGamePresenter(JoinGameView(), this)
+
     private fun createLobbyPresenter(lobbyId: String): LobbyPresenter = LobbyPresenter(LobbyView(lobbyId), this)
+
     private fun createGamePresenter(): GamePresenter = GamePresenter(GameView(), this)
+
     private fun createSettingsPresenter(): SettingsPresenter = SettingsPresenter(SettingsView(), this)
+
     private fun createEndGamePresenter(didWin: Boolean): EndGamePresenter = EndGamePresenter(EndGameView(), didWin, this)
 
     fun navigateToMenu() {

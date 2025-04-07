@@ -3,35 +3,22 @@ package io.github.chessevolved.views
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.viewport.FitViewport
-import ktx.scene2d.scene2d
-import ktx.scene2d.table
+import com.badlogic.gdx.utils.viewport.ScreenViewport
 
 class GameView : IView {
-    private val spriteBatch = SpriteBatch()
-    private val stage = Stage(FitViewport(800f, 800f), spriteBatch)
+    private lateinit var stage: Stage
+
+    private val gameBatch = SpriteBatch()
 
     override fun init() {
-        val root =
-            scene2d.table {
-                setFillParent(true)
-                defaults().expand()
-            }
-        stage.addActor(root)
+        stage = Stage(ScreenViewport())
     }
 
-    fun beginBatch() {
-        stage.viewport.apply()
-        spriteBatch.begin()
-    }
-
-    fun endBatch() {
-        spriteBatch.end()
-        stage.draw()
-    }
+    fun getGameBatch(): SpriteBatch = gameBatch
 
     override fun render() {
         stage.act(Gdx.graphics.deltaTime)
+        stage.draw()
     }
 
     override fun resize(
@@ -42,15 +29,11 @@ class GameView : IView {
     }
 
     override fun dispose() {
-        spriteBatch.dispose()
         stage.dispose()
+        gameBatch.dispose()
     }
 
     override fun setInputProcessor() {
         Gdx.input.inputProcessor = stage
     }
-
-    fun getBatch(): SpriteBatch = spriteBatch
-
-    fun getBoardSize(): Float = minOf(stage.viewport.screenWidth, stage.viewport.screenHeight).toFloat()
 }

@@ -15,12 +15,6 @@ class JoinGamePresenter(
         joinGameView.onJoinButtonClicked = { lobbyId -> joinGame(lobbyId) }
     }
 
-    /**
-     * Attempts to join a game lobby by ID
-     *
-     * @param lobbyID String representing the lobby to join
-     * @return Boolean indicating success or failure
-     */
     private fun joinGame(lobbyId: String) {
         val success = Lobby.joinLobby(lobbyId)
 

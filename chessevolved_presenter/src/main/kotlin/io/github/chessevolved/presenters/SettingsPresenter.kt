@@ -11,11 +11,15 @@ class SettingsPresenter(
 ) : IPresenter {
     init {
         settingsView.init()
-        settingsView.onApply = { fowSetting, sizeSetting ->
+        settingsView.onApplyClicked = { fowSetting, sizeSetting ->
             onApplyPressed(fowSetting, sizeSetting)
         }
-        settingsView.onCancel = { returnToLobby() }
+        settingsView.onCancelClicked = { navigator.goBack() }
 
+        loadCurrentSettingsIntoView()
+    }
+
+    private fun loadCurrentSettingsIntoView() {
         val currentSettings = getCurrentSettings()
         settingsView.setInitialValues(
             currentSettings["FogOfWar"] as? Boolean ?: false,
@@ -23,32 +27,19 @@ class SettingsPresenter(
         )
     }
 
-    private val gameSettings = GameSettings
-
     private fun onApplyPressed(
         fowSetting: Boolean,
         sizeSetting: Int,
     ) {
-        // TODO: Add validation for settings if needed
-        gameSettings.setFOW(fowSetting)
-        gameSettings.setBoardSize(sizeSetting)
-
-        returnToLobby()
-    }
-
-    private fun returnToLobby() {
+        GameSettings.setFOW(fowSetting)
+        GameSettings.setBoardSize(sizeSetting)
         navigator.goBack()
     }
 
-    /**
-     * Retrieves the current game settings.
-     *
-     * @return Current settings as a Map.
-     */
-    fun getCurrentSettings(): Map<String, Any> =
+    private fun getCurrentSettings(): Map<String, Any> =
         mapOf(
-            "FogOfWar" to gameSettings.isFOWEnabled(),
-            "BoardSize" to gameSettings.getBoardSize(),
+            "FogOfWar" to GameSettings.isFOWEnabled(),
+            "BoardSize" to GameSettings.getBoardSize(),
         )
 
     override fun update(dt: Float) {

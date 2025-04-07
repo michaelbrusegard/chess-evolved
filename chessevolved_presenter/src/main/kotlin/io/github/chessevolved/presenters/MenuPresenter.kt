@@ -9,8 +9,8 @@ class MenuPresenter(
     private val navigator: Navigator,
 ) : IPresenter {
     init {
-        menuView.onCreateLobbyButtonClicked = { enterCreateGame() }
-        menuView.onJoinGameButtonClicked = { enterJoinGame() }
+        menuView.onCreateLobbyButtonClicked = { createLobby() }
+        menuView.onJoinGameButtonClicked = { navigator.navigateToJoinGame() }
         menuView.init()
     }
 
@@ -36,11 +36,7 @@ class MenuPresenter(
         menuView.setInputProcessor()
     }
 
-    fun enterJoinGame() {
-        navigator.navigateToJoinGame()
-    }
-
-    fun enterCreateGame() {
+    private fun createLobby() {
         // TODO: Implement actual lobby creation logic here or delegate
         val newLobbyId = "ABCDEF"
         navigator.navigateToCreateLobby(newLobbyId)

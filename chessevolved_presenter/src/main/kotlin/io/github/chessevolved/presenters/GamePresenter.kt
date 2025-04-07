@@ -1,7 +1,11 @@
 package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
@@ -19,35 +23,30 @@ class GamePresenter(
     private val pieceFactory = PieceFactory(engine)
     private val boardSquareFactory = BoardSquareFactory(engine)
 
-    private val boardSize = 8 // TODO: Get from GameSettings?
-    private val pixelSize = view.getBoardSize().toInt() / boardSize
-    private var boardScreenPosX = 0
-    private var boardScreenPosY = 0
+    private val gameCamera = OrthographicCamera()
+    private val gameViewport: Viewport = FitViewport(8f, 8f, gameCamera)
+    private val gameBatch: SpriteBatch
+
+    private var boardRenderingSystem: BoardRenderingSystem
+
+    private val boardWorldSize = 8f
 
     init {
         view.init()
+        gameBatch = view.getGameBatch()
 
-        updateBoardPosition(Gdx.graphics.width, Gdx.graphics.height)
+        gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
+        gameCamera.update()
 
-        engine.addSystem(
+        boardRenderingSystem =
             BoardRenderingSystem(
-                view.getBatch(),
-                boardSize,
-                pixelSize,
-                boardScreenPosX,
-                boardScreenPosY,
-            ),
-        )
+                gameBatch,
+                boardWorldSize.toInt(),
+            )
+        engine.addSystem(boardRenderingSystem)
+        // Add other game logic systems here
 
         setupBoard()
-    }
-
-    private fun updateBoardPosition(
-        width: Int,
-        height: Int,
-    ) {
-        boardScreenPosX = (width - (boardSize * pixelSize)) / 2
-        boardScreenPosY = (height - (boardSize * pixelSize)) / 2
     }
 
     private fun setupBoard() {
@@ -62,6 +61,13 @@ class GamePresenter(
     }
 
     override fun render(sb: SpriteBatch) {
+        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        gameViewport.apply()
+        gameBatch.projectionMatrix = gameCamera.combined
+        gameBatch.begin()
+        boardRenderingSystem.update(0f)
+        gameBatch.end()
         view.render()
     }
 
@@ -69,8 +75,8 @@ class GamePresenter(
         width: Int,
         height: Int,
     ) {
+        gameViewport.update(width, height, false)
         view.resize(width, height)
-        updateBoardPosition(width, height)
     }
 
     override fun dispose() {
