@@ -10,10 +10,13 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
+import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.singletons.ECSEngine
-import io.github.chessevolved.systems.BoardRenderingSystem
+import com.badlogic.gdx.graphics.Texture
+import io.github.chessevolved.systems.RenderingSystem
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chessevolved.views.GameView
 
 class GamePresenter(
@@ -29,9 +32,12 @@ class GamePresenter(
     private val gameViewport: Viewport = FitViewport(8f, 8f, gameCamera)
     private val gameBatch: SpriteBatch
 
-    private var boardRenderingSystem: BoardRenderingSystem
+    private var RenderingSystem: RenderingSystem
 
     private val boardWorldSize = 8f
+
+    private lateinit var blackTileRegion: TextureRegion
+    private lateinit var whiteTileRegion: TextureRegion
 
     init {
         view.init()
@@ -40,15 +46,35 @@ class GamePresenter(
         gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
         gameCamera.update()
 
-        boardRenderingSystem =
-            BoardRenderingSystem(
-                gameBatch,
-                boardWorldSize.toInt(),
-            )
-        engine.addSystem(boardRenderingSystem)
-        // Add other game logic systems here
+renderingSystem = RenderingSystem(gameBatch, gameCamera)
+
+        loadRequiredAssets()
+        assetManager.finishLoading()
+        assignLoadedRegions()
 
         setupBoard()
+    }
+
+    private fun loadRequiredAssets() {
+        assetManager.load("board/black-tile.png", Texture::class.java)
+        assetManager.load("board/white-tile.png", Texture::class.java)
+
+        // When we assets for all pieces we should comment out the code below
+        assetManager.load("pieces/black-rook.png", Texture::class.java)
+        // PlayerColor.entries.forEach { color ->
+        //     PieceType.entries.forEach { type ->
+        //         val colorStr = color.name.lowercase()
+        //         val typeStr = type.name.lowercase()
+        //         assetManager.load("pieces/${colorStr}-${typeStr}.png", Texture::class.java)
+        //     }
+        // }
+    }
+
+    private fun assignLoadedRegions() {
+        blackTileRegion =
+            TextureRegion(assetManager.get("board/black-tile.png", Texture::class.java))
+        whiteTileRegion =
+            TextureRegion(assetManager.get("board/white-tile.png", Texture::class.java))
     }
 
     private fun setupBoard() {
@@ -65,11 +91,14 @@ class GamePresenter(
     override fun render(sb: SpriteBatch) {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
         gameViewport.apply()
         gameBatch.projectionMatrix = gameCamera.combined
+
         gameBatch.begin()
-        boardRenderingSystem.update(0f)
+        renderingSystem.update(0f)
         gameBatch.end()
+
         view.render()
     }
 
@@ -85,7 +114,25 @@ class GamePresenter(
         view.dispose()
         engine.removeAllEntities()
         engine.systems.forEach { engine.removeSystem(it) }
+unloadAssets()
     }
+
+    private fun unloadAssets() {
+        if (assetManager.isLoaded("board/black-tile.png")) {
+            assetManager.unload("board/black-tile.png")
+        }
+        if (assetManager.isLoaded("board/white-tile.png")) {
+            assetManager.unload("board/white-tile.png")
+        }
+            PieceType.entries.forEach { type ->
+                val colorStr = color.name.lowercase()
+                val typeStr = type.name.lowercase()
+                val filename = "pieces/${colorStr}-${typeStr}.png"
+                if (assetManager.isLoaded(filename)) {
+                    assetManager.unload(filename)
+                }
+            }
+        }
 
     override fun setInputProcessor() {
         view.setInputProcessor()
