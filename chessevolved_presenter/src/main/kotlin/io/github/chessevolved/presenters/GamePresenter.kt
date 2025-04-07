@@ -4,19 +4,19 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
-import io.github.chessevolved.components.PieceType
+import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.singletons.ECSEngine
-import com.badlogic.gdx.graphics.Texture
 import io.github.chessevolved.systems.RenderingSystem
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chessevolved.views.GameView
 
 class GamePresenter(
@@ -26,18 +26,15 @@ class GamePresenter(
 ) : IPresenter {
     private val engine = ECSEngine
     private val pieceFactory = PieceFactory(engine, assetManager)
-    private val boardSquareFactory = BoardSquareFactory(engine)
+    private val boardSquareFactory = BoardSquareFactory(engine, assetManager)
 
     private val gameCamera = OrthographicCamera()
-    private val gameViewport: Viewport = FitViewport(8f, 8f, gameCamera)
+    private val boardWorldSize = 8
+    private val gameViewport: Viewport =
+        FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
     private val gameBatch: SpriteBatch
 
-    private var RenderingSystem: RenderingSystem
-
-    private val boardWorldSize = 8f
-
-    private lateinit var blackTileRegion: TextureRegion
-    private lateinit var whiteTileRegion: TextureRegion
+    private val renderingSystem: RenderingSystem
 
     init {
         view.init()
@@ -46,11 +43,10 @@ class GamePresenter(
         gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
         gameCamera.update()
 
-renderingSystem = RenderingSystem(gameBatch, gameCamera)
+        renderingSystem = RenderingSystem(gameBatch)
 
         loadRequiredAssets()
         assetManager.finishLoading()
-        assignLoadedRegions()
 
         setupBoard()
     }
@@ -59,25 +55,30 @@ renderingSystem = RenderingSystem(gameBatch, gameCamera)
         assetManager.load("board/black-tile.png", Texture::class.java)
         assetManager.load("board/white-tile.png", Texture::class.java)
 
-        // When we assets for all pieces we should comment out the code below
         assetManager.load("pieces/black-rook.png", Texture::class.java)
         // PlayerColor.entries.forEach { color ->
         //     PieceType.entries.forEach { type ->
-        //         val colorStr = color.name.lowercase()
-        //         val typeStr = type.name.lowercase()
-        //         assetManager.load("pieces/${colorStr}-${typeStr}.png", Texture::class.java)
+        //             val colorStr = color.name.lowercase()
+        //             val typeStr = type.name.lowercase()
+        //             val filename = "pieces/$colorStr-$typeStr.png"
+        //             assetManager.load(filename, Texture::class.java)
         //     }
         // }
     }
 
-    private fun assignLoadedRegions() {
-        blackTileRegion =
-            TextureRegion(assetManager.get("board/black-tile.png", Texture::class.java))
-        whiteTileRegion =
-            TextureRegion(assetManager.get("board/white-tile.png", Texture::class.java))
-    }
-
     private fun setupBoard() {
+        for (y in 0 until boardWorldSize) {
+            for (x in 0 until boardWorldSize) {
+                val tileColor =
+                    if ((x + y) % 2 == 0) PlayerColor.BLACK else PlayerColor.WHITE
+                boardSquareFactory.createBoardSquare(
+                    Position(x, y),
+                    WeatherEvent.NONE,
+                    tileColor,
+                )
+            }
+        }
+
         pieceFactory.createRook(
             Position(4, 4),
             PlayerColor.BLACK,
@@ -113,8 +114,7 @@ renderingSystem = RenderingSystem(gameBatch, gameCamera)
     override fun dispose() {
         view.dispose()
         engine.removeAllEntities()
-        engine.systems.forEach { engine.removeSystem(it) }
-unloadAssets()
+        unloadAssets()
     }
 
     private fun unloadAssets() {
@@ -124,15 +124,18 @@ unloadAssets()
         if (assetManager.isLoaded("board/white-tile.png")) {
             assetManager.unload("board/white-tile.png")
         }
+
+        PlayerColor.entries.forEach { color ->
             PieceType.entries.forEach { type ->
                 val colorStr = color.name.lowercase()
                 val typeStr = type.name.lowercase()
-                val filename = "pieces/${colorStr}-${typeStr}.png"
+                val filename = "pieces/$colorStr-$typeStr.png"
                 if (assetManager.isLoaded(filename)) {
                     assetManager.unload(filename)
                 }
             }
         }
+    }
 
     override fun setInputProcessor() {
         view.setInputProcessor()
