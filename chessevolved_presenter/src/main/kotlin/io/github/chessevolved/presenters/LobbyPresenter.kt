@@ -1,55 +1,25 @@
-import io.github.chessevolved.PresenterManager
-import io.github.chessevolved.presenters.IPresenter
-import io.github.chessevolved.presenters.SettingsPresenter
-import io.github.chessevolved.presenters.StatePresenter
+package io.github.chessevolved.presenters
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.views.LobbyView
 
 class LobbyPresenter(
     private val lobbyView: LobbyView,
+    private val navigator: Navigator,
 ) : IPresenter {
-    private val settingsPresenter = SettingsPresenter(SettingsView())
-
     init {
-        lobbyView.onLeaveButtonClicked = { returnToMenu() }
-        lobbyView.onStartGameButtonClicked = { startGame() }
-        lobbyView.onOpenSettingsButtonClicked = { enterSettings() }
+        lobbyView.onLeaveButtonClicked = { navigator.goBack() }
+        lobbyView.onStartGameButtonClicked = { navigator.navigateToGame() }
+        lobbyView.onOpenSettingsButtonClicked = { navigator.navigateToSettings() }
         lobbyView.init()
-    }
-
-    /**
-     * Save lobby in backend
-     *
-     * @param player1
-     * @param player2
-     * @param lobbyID
-     */
-    fun startGame(
-        // player1: String,
-        // player2: String,
-        // lobbyID: String,
-    ) {
-        // TODO: Switch player over to game.
     }
 
     fun playerJoinedLeftLobby(playerJoined: Boolean) {
         lobbyView.setSecondPlayerConnected(playerJoined)
     }
 
-    /**
-     * Change to SettingsPresenter
-     */
-    private fun enterSettings() {
-        PresenterManager.push(StatePresenter(settingsPresenter))
-    }
-
-    /**
-     * Change to MenuPresenter
-     */
-    private fun returnToMenu() {
-        PresenterManager.pop()
-    }
-
-    override fun render() {
+    override fun render(sb: SpriteBatch) {
         lobbyView.render()
     }
 
@@ -57,6 +27,7 @@ class LobbyPresenter(
         width: Int,
         height: Int,
     ) {
+        lobbyView.resize(width, height)
     }
 
     override fun dispose() {

@@ -6,6 +6,7 @@ enum class WeatherEvent {
     FOG,
     LANDSLED,
     WIND,
+    NONE,
 }
 
 class WeatherEventComponent(
