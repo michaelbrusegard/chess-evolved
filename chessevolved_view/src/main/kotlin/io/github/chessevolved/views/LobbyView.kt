@@ -1,13 +1,19 @@
 package io.github.chessevolved.views
-
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
+import ktx.scene2d.image
+import ktx.scene2d.imageButton
 import ktx.scene2d.label
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.textButton
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 
 class LobbyView(
     val lobbyCode: String,
@@ -26,7 +32,16 @@ class LobbyView(
         }
 
     override fun init() {
-        // TODO: Check if second player is already in lobby, and if so, update secondPlayerStatusText.
+        val copyButton =
+            scene2d.imageButton {
+                onClick { copyLobbyCode() }
+            }
+
+        val iconTexture = Texture(Gdx.files.internal("copy-icon.png"))
+        val iconDrawable = TextureRegionDrawable(TextureRegion(iconTexture))
+
+        copyButton.image(iconDrawable)
+
         val root =
             scene2d.table {
                 // Set size of layout parent to screen.
@@ -39,6 +54,7 @@ class LobbyView(
                 row()
 
                 label("Lobby Code: $lobbyCode")
+                add(copyButton).size(40f, 40f).padLeft(-45f)
                 row()
 
                 add(secondPlayerStatusText)
@@ -72,6 +88,11 @@ class LobbyView(
             startGameButton.onClick { }
             startGameButton.setColor(0f, 0f, 0f, 0.3f)
         }
+    }
+
+    private fun copyLobbyCode() {
+        val selection = StringSelection(lobbyCode)
+        Toolkit.getDefaultToolkit().systemClipboard.setContents(selection, null)
     }
 
     override fun render() {
