@@ -5,7 +5,10 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Image
 import io.github.chessevolved.components.AbilityComponent
+import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColor
@@ -30,10 +33,23 @@ class PieceFactory(
         return TextureRegion(texture)
     }
 
+    private fun getPieceActor(
+        position: Position,
+        stage: Stage
+    ): Image {
+        val image = Image()
+        image.setSize(1f, 1f)
+        image.setPosition(position.x.toFloat(), position.y.toFloat())
+        stage.addActor(image)
+
+        return image
+    }
+
     private fun createPiece(
         position: Position,
         pieceType: PieceType,
         playerColor: PlayerColor,
+        stage: Stage
     ): Entity =
         Entity().apply {
             add(PositionComponent(position))
@@ -41,36 +57,43 @@ class PieceFactory(
             add(PlayerColorComponent(playerColor))
             add(AbilityComponent(emptyList()))
             add(TextureRegionComponent(getPieceTextureRegion(pieceType, playerColor)))
+            add(ActorComponent(getPieceActor(position, stage)))
             engine.addEntity(this)
         }
 
     fun createPawn(
         position: Position,
         color: PlayerColor,
-    ) = createPiece(position, PieceType.PAWN, color)
+        stage: Stage
+    ) = createPiece(position, PieceType.PAWN, color, stage)
 
     fun createKnight(
         position: Position,
         color: PlayerColor,
-    ) = createPiece(position, PieceType.KNIGHT, color)
+        stage: Stage
+    ) = createPiece(position, PieceType.KNIGHT, color, stage)
 
     fun createBishop(
         position: Position,
         color: PlayerColor,
-    ) = createPiece(position, PieceType.BISHOP, color)
+        stage: Stage
+    ) = createPiece(position, PieceType.BISHOP, color, stage)
 
     fun createRook(
         position: Position,
         color: PlayerColor,
-    ) = createPiece(position, PieceType.ROOK, color)
+        stage: Stage
+    ) = createPiece(position, PieceType.ROOK, color, stage)
 
     fun createQueen(
         position: Position,
         color: PlayerColor,
-    ) = createPiece(position, PieceType.QUEEN, color)
+        stage: Stage
+    ) = createPiece(position, PieceType.QUEEN, color, stage)
 
     fun createKing(
         position: Position,
         color: PlayerColor,
-    ) = createPiece(position, PieceType.KING, color)
+        stage: Stage
+    ) = createPiece(position, PieceType.KING, color, stage)
 }

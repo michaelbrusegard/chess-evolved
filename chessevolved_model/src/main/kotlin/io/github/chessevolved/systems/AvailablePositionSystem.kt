@@ -1,9 +1,10 @@
 package io.github.chessevolved.systems
 
-class AvailablePositionSystem {
+class AvailablePositionSystem(
 
+) {
     // hmmm
-    // Must have a reference to how big the board is.
+    // Must have a reference to how big the board is. CHECK use family
     // Can get in a movementrulecomponent
     // Using the board and movementrulecompnent it calculates the move
 

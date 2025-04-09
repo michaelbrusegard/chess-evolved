@@ -5,16 +5,28 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 
+fun interface OnPieceClickedListener {
+    fun onClick(x: Int, y: Int)
+}
+
 class GameView : IView {
     private lateinit var stage: Stage
 
     private val gameBatch = SpriteBatch()
+
+    private var clickListener: OnPieceClickedListener? = null
 
     override fun init() {
         stage = Stage(ScreenViewport())
     }
 
     fun getGameBatch(): SpriteBatch = gameBatch
+
+    fun getStage(): Stage = stage
+
+    fun setOnPieceClickedListener(listener: OnPieceClickedListener) {
+        this.clickListener = listener
+    }
 
     override fun render() {
         stage.act(Gdx.graphics.deltaTime)

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
@@ -33,12 +34,14 @@ class GamePresenter(
     private val gameViewport: Viewport =
         FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
     private val gameBatch: SpriteBatch
+    private val gameStage: Stage
 
     private val renderingSystem: RenderingSystem
 
     init {
         view.init()
         gameBatch = view.getGameBatch()
+        gameStage = view.getStage()
 
         gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
         gameCamera.update()
@@ -86,6 +89,7 @@ class GamePresenter(
         pieceFactory.createRook(
             Position(4, 4),
             PlayerColor.BLACK,
+            gameStage
         )
     }
 
