@@ -16,8 +16,10 @@ class GameView : IView {
 
     private var clickListener: OnPieceClickedListener? = null
 
+    private val screenViewport = ScreenViewport()
+
     override fun init() {
-        stage = Stage(ScreenViewport())
+        stage = Stage(screenViewport)
     }
 
     fun getGameBatch(): SpriteBatch = gameBatch
@@ -29,6 +31,7 @@ class GameView : IView {
     }
 
     override fun render() {
+        stage.viewport = screenViewport
         stage.act(Gdx.graphics.deltaTime)
         stage.draw()
     }
@@ -48,4 +51,6 @@ class GameView : IView {
     override fun setInputProcessor() {
         Gdx.input.inputProcessor = stage
     }
+
+    fun getClickListener(): OnPieceClickedListener? = clickListener
 }

@@ -43,6 +43,10 @@ class GamePresenter(
         gameBatch = view.getGameBatch()
         gameStage = view.getStage()
 
+        view.setOnPieceClickedListener { x, y ->
+            handleBoardClick(Position(x, y))
+        }
+
         gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
         gameCamera.update()
 
@@ -90,7 +94,7 @@ class GamePresenter(
             Position(4, 4),
             PlayerColor.BLACK,
             gameStage
-        )
+        ) { clickedPosition -> handleBoardClick(clickedPosition)}
     }
 
     override fun render(sb: SpriteBatch) {
@@ -105,7 +109,11 @@ class GamePresenter(
         gameBatch.end()
 
         // In case we want part of the UI to be scene2d, we render the view on top
-        view.render()
+        gameStage.viewport = gameViewport
+        gameStage.act(Gdx.graphics.deltaTime)
+        gameStage.draw()
+
+        // view.render()
     }
 
     override fun resize(
@@ -144,5 +152,10 @@ class GamePresenter(
 
     override fun setInputProcessor() {
         view.setInputProcessor()
+    }
+
+    private fun handleBoardClick(pos: Position) {
+        println("Board clicked at: $pos")
+        // Highlight, select piece, move logic, etc.
     }
 }

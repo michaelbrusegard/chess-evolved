@@ -28,6 +28,7 @@ class LobbyPresenter(
             launch {
                 val lobby = getLobby()
                 lobbyUpdateHandler(lobby)
+                playerJoinedLeftLobby(true)
             }
         }
     }
