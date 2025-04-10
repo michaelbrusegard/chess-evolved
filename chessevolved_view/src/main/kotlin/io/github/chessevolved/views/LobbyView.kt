@@ -1,18 +1,24 @@
 package io.github.chessevolved.views
-
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
+import ktx.scene2d.image
+import ktx.scene2d.imageButton
 import ktx.scene2d.label
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.textButton
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 
 class LobbyView(
-    val lobbyCode: String,
+    private val lobbyCode: String,
 ) : IView {
     private lateinit var stage: Stage
     private lateinit var secondPlayerStatusLabel: Label
@@ -31,6 +37,9 @@ class LobbyView(
                 ),
             )
 
+        val copyIconTexture = Texture(Gdx.files.internal("icons/copy-icon.png"))
+        val iconDrawable = TextureRegionDrawable(TextureRegion(copyIconTexture))
+
         val root =
             scene2d.table {
                 setFillParent(true)
@@ -40,6 +49,12 @@ class LobbyView(
                 row()
 
                 label("Lobby Code: $lobbyCode") { it.padBottom(10f) }
+                imageButton {
+                    it.size(40f, 40f)
+                    it.padLeft(-41f)
+                    image(iconDrawable)
+                    onClick { copyLobbyCode() }
+                }
                 row()
 
                 secondPlayerStatusLabel =
@@ -61,7 +76,6 @@ class LobbyView(
             }
 
         stage.addActor(root)
-        setSecondPlayerConnected(true)
     }
 
     fun setSecondPlayerConnected(isConnected: Boolean) {
@@ -69,11 +83,18 @@ class LobbyView(
             secondPlayerStatusLabel.setText("Second player connected!")
             startGameButton.isDisabled = false
             startGameButton.onClick { onStartGameButtonClicked() }
+            startGameButton.color = scene2d.label("tex").color
         } else {
             secondPlayerStatusLabel.setText("Waiting for second player...")
             startGameButton.isDisabled = true
             startGameButton.clearListeners()
+            startGameButton.setColor(0f, 0f, 0f, 0.3f)
         }
+    }
+
+    private fun copyLobbyCode() {
+        val selection = StringSelection(lobbyCode)
+        Toolkit.getDefaultToolkit().systemClipboard.setContents(selection, null)
     }
 
     override fun render() {

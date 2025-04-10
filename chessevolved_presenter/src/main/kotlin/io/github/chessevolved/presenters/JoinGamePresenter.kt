@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.views.JoinGameView
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class JoinGamePresenter(
     private val joinGameView: JoinGameView,
@@ -16,12 +18,15 @@ class JoinGamePresenter(
     }
 
     private fun joinGame(lobbyId: String) {
-        val success = Lobby.joinLobby(lobbyId)
-
-        if (success) {
-            navigator.navigateToLobby(lobbyId)
-        } else {
-            joinGameView.showJoinError("Error message should be put here")
+        runBlocking {
+            launch {
+                try {
+                    Lobby.joinLobby(lobbyId)
+                    navigator.navigateToLobby(lobbyId)
+                } catch (e: Exception) {
+                    joinGameView.showJoinError(e.message ?: "Internal error.")
+                }
+            }
         }
     }
 

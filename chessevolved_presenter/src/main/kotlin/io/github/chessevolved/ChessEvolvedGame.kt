@@ -3,6 +3,7 @@ package io.github.chessevolved
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
@@ -14,6 +15,11 @@ class ChessEvolvedGame : KtxGame<KtxScreen>() {
     private lateinit var skin: Skin
     private lateinit var navigator: Navigator
     private lateinit var assetManager: AssetManager
+
+    init {
+        // Initialize lobby-handler early to avoid stutter when trying to join/create lobby for the first time after launching app.
+        SupabaseLobbyHandler
+    }
 
     override fun create() {
         KtxAsync.initiate()

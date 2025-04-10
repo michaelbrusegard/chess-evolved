@@ -1,8 +1,11 @@
 package io.github.chessevolved.presenters
-
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.singletons.Lobby
+import io.github.chessevolved.singletons.Lobby.getLobbyId
 import io.github.chessevolved.views.MenuView
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MenuPresenter(
     private val menuView: MenuView,
@@ -34,8 +37,15 @@ class MenuPresenter(
     }
 
     private fun createLobby() {
-        // TODO: Implement actual lobby creation logic here or delegate
-        val newLobbyId = "ABCDEF"
-        navigator.navigateToCreateLobby(newLobbyId)
+        runBlocking {
+            launch {
+                try {
+                    Lobby.createLobby()
+                    navigator.navigateToCreateLobby(getLobbyId() ?: throw Exception("Unexpected state when creating lobby!"))
+                } catch (e: Exception) {
+                    menuView.showCreateGameError(e.message ?: "Internal error!")
+                }
+            }
+        }
     }
 }

@@ -15,8 +15,7 @@ internal object SupabaseClient {
     private val supabase: SupabaseClient =
         createSupabaseClient(
             supabaseUrl = dotenv["SUPABASE_URL"] ?: "no_url_found",
-            // Empty string since auth is disabled
-            supabaseKey = "",
+            supabaseKey = dotenv["SUPABASE_ANON_KEY"],
         ) {
             install(Postgrest)
             install(Realtime) {

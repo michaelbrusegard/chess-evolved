@@ -15,6 +15,8 @@ class MenuView : IView {
     var onCreateLobbyButtonClicked: () -> Unit = {}
     var onJoinGameButtonClicked: () -> Unit = {}
 
+    private lateinit var toastManager: ToastManager
+
     override fun init() {
         stage =
             Stage(
@@ -46,6 +48,7 @@ class MenuView : IView {
                 textButton("Exit") { onClick { Gdx.app.exit() } }
             }
 
+        toastManager = ToastManager(stage)
         stage.addActor(root)
     }
 
@@ -67,5 +70,9 @@ class MenuView : IView {
 
     override fun setInputProcessor() {
         Gdx.input.inputProcessor = stage
+    }
+
+    fun showCreateGameError(message: String) {
+        toastManager.showError("Error: $message")
     }
 }
