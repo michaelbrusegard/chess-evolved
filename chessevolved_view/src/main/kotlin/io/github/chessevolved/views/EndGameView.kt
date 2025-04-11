@@ -2,6 +2,7 @@ package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
 import ktx.scene2d.label
@@ -9,13 +10,21 @@ import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.textButton
 
-class MenuView : IView {
+class EndGameView : IView {
     private lateinit var stage: Stage
+    private lateinit var statusLabel1: Label
+    private lateinit var statusLabel2: Label
 
-    var onCreateLobbyButtonClicked: () -> Unit = {}
-    var onJoinGameButtonClicked: () -> Unit = {}
+    var endGameStatus: Boolean = false
+        set(value) {
+            field = value
+            if (::stage.isInitialized) {
+                updateStatusLabels()
+            }
+        }
 
-    private lateinit var toastManager: ToastManager
+    var onReturnToMenuClicked: () -> Unit = {}
+    var onRematchClicked: () -> Unit = {}
 
     override fun init() {
         stage =
@@ -31,25 +40,31 @@ class MenuView : IView {
                 setFillParent(true)
                 defaults().pad(10f).center()
 
-                label("Chess Evolved!") { it.padBottom(20f) }
+                statusLabel1 = label("") { it.padBottom(5f) }
+                row()
+                statusLabel2 = label("") { it.padBottom(20f) }
                 row()
 
-                textButton("Create Lobby") {
-                    it.padBottom(5f).width(200f)
-                    onClick { onCreateLobbyButtonClicked() }
+                textButton("Return to Menu") {
+                    it.padBottom(5f)
+                    onClick { onReturnToMenuClicked() }
                 }
                 row()
-
-                textButton("Join Game") {
-                    it.width(200f)
-                    onClick { onJoinGameButtonClicked() }
-                }
-                row()
-                textButton("Exit") { onClick { Gdx.app.exit() } }
+                textButton("Request Rematch") { onClick { onRematchClicked() } }
             }
 
-        toastManager = ToastManager(stage)
         stage.addActor(root)
+        updateStatusLabels()
+    }
+
+    private fun updateStatusLabels() {
+        if (endGameStatus) {
+            statusLabel1.setText("Congratulations!")
+            statusLabel2.setText("You won!")
+        } else {
+            statusLabel1.setText("Better luck next time!")
+            statusLabel2.setText("You lost!")
+        }
     }
 
     override fun render() {
@@ -70,9 +85,5 @@ class MenuView : IView {
 
     override fun setInputProcessor() {
         Gdx.input.inputProcessor = stage
-    }
-
-    fun showCreateGameError(message: String) {
-        toastManager.showError("Error: $message")
     }
 }

@@ -6,6 +6,7 @@ plugins {
 
 apply plugin: 'java-library'
 apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 
 dependencies {
   api "com.badlogicgames.ashley:ashley:$ashleyVersion"
@@ -41,6 +42,7 @@ dependencies {
   api "io.github.libktx:ktx-vis:$ktxVersion"
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+  api "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
 
   // BEGIN SUPABASE DEPENDENCIES
   implementation platform("io.github.jan-tennert.supabase:bom:$supabaseVersion")
@@ -55,6 +57,4 @@ dependencies {
 
   // We need this to be able to retrieve .env variables. See https://github.com/cdimascio/dotenv-kotlin?tab=readme-ov-file#faq
   implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
-
-
 }

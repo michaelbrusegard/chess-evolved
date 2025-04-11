@@ -1,35 +1,29 @@
 package io.github.chessevolved.presenters
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+
 /**
  * Interface for all presenters.
  * Presenters connect models to views and contain application logic.
  */
 interface IPresenter {
     /**
-     * Updates and renders the presenter's content for the current frame.
+     * Renders the presenter's view.
      * Called on each render cycle.
      */
-    fun render()
+    fun render(sb: SpriteBatch)
 
     /**
-     * Handles screen size changes and updates the presenter accordingly.
-     *
-     * @param width The new screen width in pixels
-     * @param height The new screen height in pixels
+     * Handles screen size changes.
      */
     fun resize(
         width: Int,
         height: Int,
     )
 
-    /**
-     * Releases resources used by the presenter.
-     * Should be called when the presenter is no longer needed to prevent memory leaks.
-     */
+    /** Releases resources used by the presenter. */
     fun dispose()
 
-    /**
-     * Sets the current View as the current input processor.
-     */
+    /** Sets the presenter's view as the current input processor. */
     fun setInputProcessor()
 }

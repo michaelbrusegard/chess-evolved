@@ -1,73 +1,63 @@
 package io.github.chessevolved.presenters
 
-import SettingsView
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.chessevolved.Navigator
 import io.github.chessevolved.singletons.GameSettings
+import io.github.chessevolved.views.SettingsView
 
 class SettingsPresenter(
-    private val view: SettingsView,
+    private val settingsView: SettingsView,
+    private val navigator: Navigator,
 ) : IPresenter {
     init {
-        view.init()
-        view.onApply = { fowSetting, sizeSetting ->
+        settingsView.init()
+        settingsView.onApplyClicked = { fowSetting, sizeSetting ->
             onApplyPressed(fowSetting, sizeSetting)
         }
+        settingsView.onCancelClicked = { navigator.goBack() }
+
+        loadCurrentSettingsIntoView()
     }
 
-    // TODO: wait for implementation of ScenePresenterStateManager
-    private val gameSettings = GameSettings
-    // val presenterManager = ScenePresenterStateManager
+    private fun loadCurrentSettingsIntoView() {
+        val currentSettings = getCurrentSettings()
+        settingsView.setInitialValues(
+            currentSettings["FogOfWar"] as? Boolean ?: false,
+            currentSettings["BoardSize"] as? Int ?: 8,
+        )
+    }
 
-    /**
-     * Applies the chosen game settings and returns to lobby
-     *
-     * @param fowSetting Boolean for Fog of War
-     * @param sizeSetting Int for size of chessboard
-     */
     private fun onApplyPressed(
         fowSetting: Boolean,
         sizeSetting: Int,
     ) {
-        gameSettings.setFOW(fowSetting)
-        gameSettings.setBoardSize(sizeSetting)
-
-        returnToLobby()
+        GameSettings.setFOW(fowSetting)
+        GameSettings.setBoardSize(sizeSetting)
+        navigator.goBack()
     }
 
-    /**
-     *  Switch to LobbyPresenter
-     */
-    private fun returnToLobby() {
-        // TODO: wait for implementation of ScenePresenterStateManager
-        println("SettingsPresenter: Returning to lobby")
-    }
-
-    /**
-     * Retrieves the current game settings
-     *
-     * @return Current settings as a Map
-     */
-    fun getCurrentSettings(): Map<String, Any> =
+    private fun getCurrentSettings(): Map<String, Any> =
         mapOf(
-            "FogOfWar" to gameSettings.isFOWEnabled(),
-            "BoardSize" to gameSettings.getBoardSize(),
+            "FogOfWar" to GameSettings.isFOWEnabled(),
+            "BoardSize" to GameSettings.getBoardSize(),
         )
 
-    override fun render() {
-        view.render()
+    override fun render(sb: SpriteBatch) {
+        settingsView.render()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        view.resize(width, height)
+        settingsView.resize(width, height)
     }
 
     override fun dispose() {
-        view.dispose()
+        settingsView.dispose()
     }
 
     override fun setInputProcessor() {
-        TODO("Not yet implemented")
+        settingsView.setInputProcessor()
     }
 }

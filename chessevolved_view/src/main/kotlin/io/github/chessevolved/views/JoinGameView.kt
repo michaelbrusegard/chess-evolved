@@ -12,7 +12,7 @@ import ktx.scene2d.textButton
 import ktx.scene2d.textField
 
 class JoinGameView : IView {
-    private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
+    private lateinit var stage: Stage
     private lateinit var inputField: TextField
     private lateinit var toastManager: ToastManager
 
@@ -20,34 +20,40 @@ class JoinGameView : IView {
     var onReturnButtonClicked: () -> Unit = {}
 
     override fun init() {
+        stage =
+            Stage(
+                FitViewport(
+                    Gdx.graphics.width.toFloat(),
+                    Gdx.graphics.height.toFloat(),
+                ),
+            )
+        toastManager = ToastManager(stage)
+
         val root =
             scene2d.table {
                 setFillParent(true)
-                defaults().pad(10f)
+                defaults().pad(10f).center()
 
-                label("Join Game", "title") {
-                    it.padBottom(20f)
-                }
+                label("Join Game") { it.padBottom(20f) }
                 row()
 
                 label("Enter Lobby Code:")
                 row()
 
                 inputField =
-                    textField("") {
+                    textField {
                         it.width(125f)
-                        maxLength = 6
-                        messageText = "XXXXXX"
+                        maxLength = 5
+                        messageText = "A1B2C"
 
                         textFieldFilter =
                             TextField.TextFieldFilter { _, c ->
                                 c.isLetterOrDigit()
                             }
-
                         setTextFieldListener { field, _ ->
-                            val cursorPosition = field.cursorPosition
+                            val cursor = field.cursorPosition
                             field.text = field.text.uppercase()
-                            field.setCursorPosition(cursorPosition)
+                            field.setCursorPosition(cursor)
                         }
                     }
                 row()
@@ -55,26 +61,25 @@ class JoinGameView : IView {
                 textButton("Join Game") {
                     it.width(150f).padTop(20f)
                     onClick {
-                        val code = inputField.text
-                        if (code.length == 6) {
+                        val code = inputField.text.trim()
+                        if (code.length == 5) {
                             onJoinButtonClicked(code)
                         } else {
-                            toastManager.showError("Lobby code must be 6 characters")
+                            toastManager.showError(
+                                "Lobby code must be 5 characters",
+                            )
                         }
                     }
                 }
                 row()
 
                 textButton("Return to Menu") {
-                    it.width(200f).padTop(10f)
-                    onClick {
-                        onReturnButtonClicked()
-                    }
+                    it.width(200f)
+                    onClick { onReturnButtonClicked() }
                 }
             }
 
         stage.addActor(root)
-        toastManager = ToastManager(stage)
     }
 
     override fun render() {

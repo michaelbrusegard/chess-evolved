@@ -1,12 +1,11 @@
+package io.github.chessevolved.views
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
-import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
-import io.github.chessevolved.views.IView
-import io.github.chessevolved.views.ToastManager
 import ktx.actors.onClick
 import ktx.scene2d.checkBox
 import ktx.scene2d.label
@@ -16,86 +15,82 @@ import ktx.scene2d.textButton
 import ktx.scene2d.textField
 
 class SettingsView : IView {
-    private val stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()))
-    private lateinit var fowField: Table
+    private lateinit var stage: Stage
     private lateinit var fogOfWarCheckBox: CheckBox
-    private lateinit var boardField: Table
-    private lateinit var boardSizefield: TextField
+    private lateinit var boardSizeField: TextField
     private lateinit var toastManager: ToastManager
 
-    var onApply: (Boolean, Int) -> Unit = { _, _ -> }
+    var onApplyClicked: (Boolean, Int) -> Unit = { _, _ -> }
+    var onCancelClicked: () -> Unit = {}
 
     override fun init() {
+        stage =
+            Stage(
+                FitViewport(
+                    Gdx.graphics.width.toFloat(),
+                    Gdx.graphics.height.toFloat(),
+                ),
+            )
+        toastManager = ToastManager(stage)
+
         val root =
             scene2d.table {
                 setFillParent(true)
                 defaults().pad(10f)
 
-                label("Settings", "title") {
-                    it.padBottom(100f)
-                }
+                label("Settings") { it.colspan(2).padBottom(50f).center() }
                 row()
 
-                fowField =
-                    scene2d.table {
-                        label("Fog of War") {
-                            it.padRight(10f)
-                        }
-                        fogOfWarCheckBox =
-                            checkBox("") {
-                                onClick {
-                                    println("Fog of War enabled: ${fogOfWarCheckBox.isChecked}")
-                                }
-                            }
-                    }
-                add(fowField)
-                    .pad(10f)
+                label("Fog of War:") { it.right() }
+                fogOfWarCheckBox = checkBox("") { it.left() }
                 row()
 
-                boardField =
-                    scene2d.table {
-                        label("Board size") {
-                            it.padRight(10f)
-                        }
-                        boardSizefield =
-                            textField("8") {
-                                it.width(50f)
-                                maxLength = 2
-                                messageText = "Max 16"
-                                alignment = Align.center
-
-                                // Check that input is a number
-                                textFieldFilter = TextField.TextFieldFilter { _, c -> c.isDigit() }
-
-                                setTextFieldListener { field, _ ->
-                                    val cursorPosition = field.cursorPosition
-                                    field.text =
-                                        field.text.filter { it.isDigit() }
-                                    field.setCursorPosition(cursorPosition)
-                                }
-                            }
+                label("Board Size (8-16):") { it.right() }
+                boardSizeField =
+                    textField("8") {
+                        it.width(60f).left()
+                        maxLength = 2
+                        alignment = Align.center
+                        textFieldFilter =
+                            TextField.TextFieldFilter.DigitsOnlyFilter()
                     }
-                add(boardField).pad(10f)
                 row()
 
-                textButton("Apply and return") {
-                    it.padTop(100f)
-                    onClick {
-                        val enteredNumber = boardSizefield.text.toIntOrNull()
-
-                        if (enteredNumber != null && enteredNumber in 8..16) {
-                            onApply(fogOfWarCheckBox.isChecked, enteredNumber)
-                        } else {
-                            toastManager.showError("Board size must be between 8 and 16")
-                        }
+                table {
+                    defaults().pad(5f).width(150f)
+                    textButton("Apply") {
+                        onClick { applySettings() }
                     }
-                }
+                    textButton("Cancel") { onClick { onCancelClicked() } }
+                }.cell(colspan = 2, padTop = 50f)
             }
 
         stage.addActor(root)
-        toastManager = ToastManager(stage)
+    }
 
-        Gdx.input.inputProcessor = stage
+    private fun applySettings() {
+        val boardSizeText = boardSizeField.text
+        val boardSize = boardSizeText.toIntOrNull()
+        val isFogOfWar = fogOfWarCheckBox.isChecked
+
+        if (boardSize != null && boardSize in 8..16) {
+            onApplyClicked(isFogOfWar, boardSize)
+        } else {
+            toastManager.showError("Board size must be a number between 8 and 16")
+            boardSizeField.text = "8"
+        }
+    }
+
+    fun setInitialValues(
+        fowEnabled: Boolean,
+        boardSize: Int,
+    ) {
+        if (::fogOfWarCheckBox.isInitialized) {
+            fogOfWarCheckBox.isChecked = fowEnabled
+        }
+        if (::boardSizeField.isInitialized) {
+            boardSizeField.text = boardSize.toString()
+        }
     }
 
     override fun render() {
@@ -115,6 +110,6 @@ class SettingsView : IView {
     }
 
     override fun setInputProcessor() {
-        TODO("Not yet implemented")
+        Gdx.input.inputProcessor = stage
     }
 }
