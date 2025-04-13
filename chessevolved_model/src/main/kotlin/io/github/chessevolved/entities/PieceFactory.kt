@@ -39,7 +39,7 @@ class PieceFactory(
             add(PositionComponent(position))
             add(PieceTypeComponent(pieceType))
             add(PlayerColorComponent(playerColor))
-            add(AbilityComponent(emptyList()))
+            add(AbilityComponent(""))
             add(TextureRegionComponent(getPieceTextureRegion(pieceType, playerColor)))
             engine.addEntity(this)
         }

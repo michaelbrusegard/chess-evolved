@@ -10,11 +10,8 @@ enum class AbilityType {
     NEW_MOVEMENT,
 }
 
-class AbilityComponent(
-    var abilities: List<AbilityType>,
-) : Component
 class AbilityComponent (
-    private var ability: String
+    private var ability: String // switch to List<AbilityType> should we decide that a piece may have several abilities
 ) : Component {
     /**
      * @param ability - ability name as a string in lowercase

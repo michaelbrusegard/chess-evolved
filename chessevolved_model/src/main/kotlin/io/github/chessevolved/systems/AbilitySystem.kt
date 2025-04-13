@@ -1,9 +1,6 @@
 package io.github.chessevolved.systems
 
 import com.badlogic.gdx.graphics.Texture
-import io.github.chessevolved.components.AbilityComponent
-import io.github.chessevolved.entities.ChessPiece
-import io.github.chessevolved.singletons.Mappers
 import ktx.assets.toInternalFile
 
 class AbilitySystem(
@@ -29,17 +26,18 @@ class AbilitySystem(
             " chess rules. This effect is permanent." to "checkers"
     )
 ) {
-    /**
-     * @param ability - ability name as a string in lowercase.
-     * Call getAbilityInventory() to get valid ability names.
-     */
-    fun setAbilityToChessPiece(
-        chesspiece: ChessPiece,
-        ability: String
-    ) {
-        val abilities: AbilityComponent = Mappers.getAbilities(chesspiece)
-        abilities.setAbility(ability)
-    }
+//    /**
+//     * @param ability - ability name as a string in lowercase.
+//     * Call getAbilityInventory() to get valid ability names.
+//     */
+//    fun setAbilityToChessPiece(
+//        chesspiece: ChessPiece,
+//        ability: String
+//    ) {
+//        val abilities: AbilityComponent = Mappers.getAbilities(chesspiece)
+//        abilities.setAbility(ability)
+//    }
+//     Adding an ability to a piece is now handle in PieceFactory
 
     //TODO: each ability could possibly be its own system
     // Abilities occur after the first round. 1 round = 2 turns, 1 turn = a player turn such as
