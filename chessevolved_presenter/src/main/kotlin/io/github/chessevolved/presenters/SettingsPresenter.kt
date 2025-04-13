@@ -4,11 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.singletons.GameSettings
-import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.singletons.Lobby.setLobbySettings
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import io.github.chessevolved.views.SettingsView
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -16,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SettingsPresenter(
-    private val settingsView: SettingsView
+    private val settingsView: SettingsView,
     private val navigator: Navigator,
 ) : IPresenter {
     init {

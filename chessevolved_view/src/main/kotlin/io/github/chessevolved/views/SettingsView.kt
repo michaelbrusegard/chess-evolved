@@ -25,11 +25,8 @@ class SettingsView : IView {
     private var boardSizeSetting = 8
     private var fowSetting = false
 
-    var onApply: (Boolean, Int) -> Unit = { _, _ -> }
-
-    fun setCurrentSettings(currentSettings: Map<String, String>) {
-        gameSettings = currentSettings
-    }
+    var onApplyClicked: (Boolean, Int) -> Unit = { _, _ -> }
+    var onCancelClicked: () -> Unit = {}
 
     override fun init() {
         stage =
