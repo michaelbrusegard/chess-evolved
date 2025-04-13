@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.reflect.KFunction1
+import kotlin.io.print
 
 object SupabaseLobbyHandler {
     /**
@@ -40,8 +41,7 @@ object SupabaseLobbyHandler {
         val lobby_code: String,
         val second_player: Boolean,
         val game_started: Boolean,
-        // TODO: Turn this into a settings-type array when implemented
-        val settings: Array<String>,
+        val settings: Map<String, String>,
     )
 
     // Taken from https://stackoverflow.com/questions/46943860/idiomatic-way-to-generate-a-random-alphanumeric-string-in-kotlin
@@ -270,11 +270,12 @@ object SupabaseLobbyHandler {
         gameSettings: Map<String, String>,
     ) {
         try {
+            println("Kotlin Map: $gameSettings \n")
             supabase
                 .from(SUPABASE_LOBBY_TABLE_NAME)
                 .update(
                     {
-                        set("settings", value = Json.encodeToString(gameSettings))
+                        set("settings", value = gameSettings)
                     },
                 ) {
                     filter {

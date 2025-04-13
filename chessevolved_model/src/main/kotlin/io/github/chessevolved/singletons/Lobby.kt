@@ -3,6 +3,7 @@ package io.github.chessevolved.singletons
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.Lobby
 import kotlin.reflect.KFunction1
+import kotlin.collections.mapOf
 
 object Lobby {
     private var lobbyId: String? = null
@@ -47,8 +48,22 @@ object Lobby {
         if (!isInLobby()) {
             throw IllegalStateException("Can't update game settings when not in a lobby!")
         }
-        SupabaseLobbyHandler.updateLobbySettings(lobbyId!!, GameSettings.getGameSettings())
+        try {
+            SupabaseLobbyHandler.updateLobbySettings(lobbyId!!, GameSettings.getGameSettings())
+        } catch(e: Exception) {
+            throw Exception("Problem updating lobby settings! " + e.message)
+        }
     }
+
+    // suspend fun getLobbySettings(): Map<String, String> {
+    //     if (!isInLobby()) {
+    //         throw IllegalStateException("Can't get game settings when not in a lobby!")
+    //     }
+    //     val settingsArray = SupabaseLobbyHandler.getLobbyRow(lobbyId!!).settings
+    //     val settingsMap = mapOf(
+    //         settingsArray 
+    //     )
+    // }
 
     suspend fun getLobby(): Lobby {
         if (!isInLobby()) {
@@ -56,6 +71,7 @@ object Lobby {
         }
         try {
             val lobby = SupabaseLobbyHandler.getLobbyRow(lobbyId!!)
+            print(lobby.toString())
             return lobby
         } catch (e: Exception) {
             throw Exception("Something went wrong trying to fetch lobby: " + e.message)

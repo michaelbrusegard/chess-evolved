@@ -4,20 +4,26 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.singletons.GameSettings
+import io.github.chessevolved.singletons.Lobby
+import io.github.chessevolved.singletons.Lobby.setLobbySettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import io.github.chessevolved.views.SettingsView
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SettingsPresenter(
     private val settingsView: SettingsView
     private val navigator: Navigator,
 ) : IPresenter {
     init {
-        settingsView.setCurrentSettings(GameSettings.getGameSettings())
+        settingsView.setExistingSettings(GameSettings.getGameSettings())
         settingsView.init()
         settingsView.onApplyClicked = { fowSetting, sizeSetting ->
-            onApplyPressed(fowSetting, sizeSetting)
+            onApplyPressed(sizeSetting, fowSetting)
         }
         settingsView.onCancelClicked = { navigator.goBack() }
 
@@ -33,35 +39,33 @@ class SettingsPresenter(
     }
 
     private fun onApplyPressed(
-        fowSetting: Boolean,
         sizeSetting: Int,
+        fowSetting: Boolean,
     ) {
-        gameSettings.setFOW(fowSetting)
-        gameSettings.setBoardSize(sizeSetting)
+        val settingsMap =
+            mapOf(
+                "boardSize" to sizeSetting.toString(),
+                "fogOfWar" to fowSetting.toString(),
+            )
+        // Sets settings locally, must be done because Lobby uses local settings to update supabase
+        GameSettings.setGameSettings(settingsMap)
 
         CoroutineScope(Dispatchers.IO).launch {
-            Lobby.setLobbySettings()
+            try {
+                setLobbySettings() 
+            } catch(e: Exception) {
+                error("Error fetching lobby settings from supabase: " + e.message)
+            }
         }
-
-        returnToLobby()
-    }
-
-    /**
-     *  Switch to LobbyPresenter
-     */
-    private fun returnToLobby() {
-        PresenterManager.pop()
-    }
-
-    /**
-     * Retrieves the current game settings
-     *
-     * @return Current settings as a Map
-     */
-    fun getCurrentSettings(): Map<String, String> {
-        return GameSettings.getGameSettings()
-    }
         
+        navigator.goBack()
+    }
+
+    private fun getCurrentSettings(): Map<String, Any> =
+        mapOf(
+            "FogOfWar" to GameSettings.isFOWEnabled(),
+            "BoardSize" to GameSettings.getBoardSize(),
+        )
 
     override fun render(sb: SpriteBatch) {
         settingsView.render()

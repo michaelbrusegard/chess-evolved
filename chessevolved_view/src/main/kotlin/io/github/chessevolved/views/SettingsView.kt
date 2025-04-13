@@ -13,6 +13,8 @@ import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.textButton
 import ktx.scene2d.textField
+import kotlin.text.toIntOrNull
+import kotlin.text.toInt
 
 class SettingsView : IView {
     private lateinit var stage: Stage
@@ -20,7 +22,8 @@ class SettingsView : IView {
     private lateinit var boardSizeField: TextField
     private lateinit var toastManager: ToastManager
 
-    private var gameSettings: Map<String, String> = emptyMap()
+    private var boardSizeSetting = 8
+    private var fowSetting = false
 
     var onApply: (Boolean, Int) -> Unit = { _, _ -> }
 
@@ -83,6 +86,27 @@ class SettingsView : IView {
         } else {
             toastManager.showError("Board size must be a number between 8 and 16")
             boardSizeField.text = "8"
+        }
+    }
+
+    fun setExistingSettings(settings: Map<String, String>) {
+        for((key, setting) in settings) {
+            when (key) {
+                "FogOfWar" -> {
+                    fowSetting = setting.toBooleanStrictOrNull() ?: false
+                    fogOfWarCheckBox.isChecked = fowSetting
+                }
+                "BoardSize" -> {
+                    val size = setting.toIntOrNull()
+                    if(size != null && size in 8..16) {
+                        boardSizeSetting = size
+                        boardSizeField.text = size.toString()
+                    }
+                    else {
+                        throw IllegalStateException("Invalid board size in settings")
+                    }
+                }
+            }
         }
     }
 

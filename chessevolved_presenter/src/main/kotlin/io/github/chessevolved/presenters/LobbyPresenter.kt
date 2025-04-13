@@ -8,6 +8,7 @@ import io.github.chessevolved.singletons.Lobby.leaveLobby
 import io.github.chessevolved.singletons.Lobby.subscribeToLobbyUpdates
 import io.github.chessevolved.singletons.Lobby.unsubscribeFromLobbyUpdates
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
+import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.views.LobbyView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,9 +43,14 @@ class LobbyPresenter(
         }
     }
 
+    private fun settingsChanged(updatedSettings: Map<String, String>) {
+        GameSettings.setGameSettings(updatedSettings)
+    }
+
     private fun lobbyUpdateHandler(newLobby: SupabaseLobbyHandler.Lobby) {
         playerJoinedLeftLobby(newLobby.second_player)
         lobbyStartedCheck(newLobby.game_started)
+        settingsChanged(newLobby.settings)
     }
 
     /**
