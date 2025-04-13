@@ -2,13 +2,13 @@ package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.singletons.Lobby.getLobby
 import io.github.chessevolved.singletons.Lobby.leaveLobby
 import io.github.chessevolved.singletons.Lobby.subscribeToLobbyUpdates
 import io.github.chessevolved.singletons.Lobby.unsubscribeFromLobbyUpdates
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
-import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.views.LobbyView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

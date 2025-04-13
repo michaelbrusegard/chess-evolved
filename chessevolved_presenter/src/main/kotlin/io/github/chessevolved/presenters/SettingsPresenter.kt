@@ -1,12 +1,10 @@
 package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby.setLobbySettings
 import io.github.chessevolved.views.SettingsView
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,12 +46,12 @@ class SettingsPresenter(
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                setLobbySettings() 
-            } catch(e: Exception) {
+                setLobbySettings()
+            } catch (e: Exception) {
                 error("Error fetching lobby settings from supabase: " + e.message)
             }
         }
-        
+
         navigator.goBack()
     }
 

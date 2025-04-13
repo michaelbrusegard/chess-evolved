@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.reflect.KFunction1
-import kotlin.io.print
 
 object SupabaseLobbyHandler {
     /**

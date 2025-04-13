@@ -3,7 +3,6 @@ package io.github.chessevolved.singletons
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.Lobby
 import kotlin.reflect.KFunction1
-import kotlin.collections.mapOf
 
 object Lobby {
     private var lobbyId: String? = null
@@ -50,7 +49,7 @@ object Lobby {
         }
         try {
             SupabaseLobbyHandler.updateLobbySettings(lobbyId!!, GameSettings.getGameSettings())
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             throw Exception("Problem updating lobby settings! " + e.message)
         }
     }
@@ -61,7 +60,7 @@ object Lobby {
     //     }
     //     val settingsArray = SupabaseLobbyHandler.getLobbyRow(lobbyId!!).settings
     //     val settingsMap = mapOf(
-    //         settingsArray 
+    //         settingsArray
     //     )
     // }
 

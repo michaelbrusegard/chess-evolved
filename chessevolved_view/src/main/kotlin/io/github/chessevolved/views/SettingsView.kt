@@ -14,7 +14,6 @@ import ktx.scene2d.table
 import ktx.scene2d.textButton
 import ktx.scene2d.textField
 import kotlin.text.toIntOrNull
-import kotlin.text.toInt
 
 class SettingsView : IView {
     private lateinit var stage: Stage
@@ -87,7 +86,7 @@ class SettingsView : IView {
     }
 
     fun setExistingSettings(settings: Map<String, String>) {
-        for((key, setting) in settings) {
+        for ((key, setting) in settings) {
             when (key) {
                 "FogOfWar" -> {
                     fowSetting = setting.toBooleanStrictOrNull() ?: false
@@ -95,11 +94,10 @@ class SettingsView : IView {
                 }
                 "BoardSize" -> {
                     val size = setting.toIntOrNull()
-                    if(size != null && size in 8..16) {
+                    if (size != null && size in 8..16) {
                         boardSizeSetting = size
                         boardSizeField.text = size.toString()
-                    }
-                    else {
+                    } else {
                         throw IllegalStateException("Invalid board size in settings")
                     }
                 }

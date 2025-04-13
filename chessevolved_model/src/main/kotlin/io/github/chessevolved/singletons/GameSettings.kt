@@ -35,7 +35,7 @@ object GameSettings {
      */
     fun setGameSettings(settingsMap: Map<String, String>) {
         for ((setting, value) in settingsMap) {
-            when(setting) {
+            when (setting) {
                 "fogOfWar" -> fogOfWar = value.toBooleanStrictOrNull() ?: false
                 "boardSize" -> boardSize = value.toIntOrNull() ?: 8
             }
