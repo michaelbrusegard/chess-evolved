@@ -12,12 +12,11 @@ import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.serialization.GameStateSerializer
+import io.github.chessevolved.singletons.ComponentMappers
 import io.github.chessevolved.singletons.EntityFamilies
 
 
 class AvailablePositionSystem() {
-    private var pieces: ImmutableArray<Entity> = EntityFamilies.getPieceEntities()
-
     fun checkAvailablePositions(
     playerColor: PlayerColor,
     position: Position,
@@ -81,14 +80,12 @@ class AvailablePositionSystem() {
             val availablePositions = moves[direction]
 
             for(position in availablePositions ?: emptyList()) {
-                val piece = pieces.find { entity ->
-                    val pos = GameStateSerializer.posMap.get(entity).position
+                val piece = EntityFamilies.getPieceEntities().find { entity ->
+                    val pos = ComponentMappers.posMap.get(entity).position
                     pos == position
                 }
-
-                val pieceColor = GameStateSerializer.colorMap.get(piece).color
-
                 if (piece != null) {
+                    val pieceColor = ComponentMappers.colorMap.get(piece).color
                     if (pieceColor == playerColor) {
                         break
                     }

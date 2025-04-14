@@ -20,6 +20,7 @@ import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.serialization.GameStateSerializer
+import io.github.chessevolved.singletons.ComponentMappers
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.singletons.EntityFamilies
 import io.github.chessevolved.systems.AvailablePositionSystem
@@ -169,15 +170,14 @@ class GamePresenter(
     private fun handleBoardClick(pos: Position) {
         println("Board clicked at: $pos")
 
-        // temp getter for which piece at pos
-
         val piece = EntityFamilies.getPieceEntities().find { entity ->
-            val entityPos = GameStateSerializer.posMap.get(entity).position
+            val entityPos = ComponentMappers.posMap.get(entity).position
             entityPos == pos
         }
 
-        val pieceCol = GameStateSerializer.colorMap.get(piece).color
+        val pieceCol = ComponentMappers.colorMap.get(piece).color
+        val pieceMoves = ComponentMappers.movementMap.get(piece)
 
-        val moves = availablePositionSystem.checkAvailablePositions(pieceCol, pos, )
+        val moves = availablePositionSystem.checkAvailablePositions(pieceCol, pos, pieceMoves, boardWorldSize)
     }
 }

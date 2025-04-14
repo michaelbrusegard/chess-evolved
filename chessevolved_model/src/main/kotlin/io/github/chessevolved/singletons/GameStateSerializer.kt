@@ -11,19 +11,11 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SerializableBoardSquare
 import io.github.chessevolved.components.SerializablePiece
 import io.github.chessevolved.components.WeatherEventComponent
+import io.github.chessevolved.singletons.ComponentMappers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 object GameStateSerializer {
-    var posMap: ComponentMapper<PositionComponent> = ComponentMapper.getFor(PositionComponent::class.java)
-        private set
-    var typeMap: ComponentMapper<PieceTypeComponent> = ComponentMapper.getFor(PieceTypeComponent::class.java)
-        private set
-    var colorMap: ComponentMapper<PlayerColorComponent> = ComponentMapper.getFor(PlayerColorComponent::class.java)
-        private set
-    var weatherMap: ComponentMapper<WeatherEventComponent> = ComponentMapper.getFor(WeatherEventComponent::class.java)
-        private set
-
     // Maybe move families out of here so they can be used for getting the components in systems too
     private val pieceFamily: Family =
         Family
@@ -46,17 +38,17 @@ object GameStateSerializer {
         val pieces =
             engine.getEntitiesFor(pieceFamily).map { entity ->
                 SerializablePiece(
-                    position = posMap.get(entity).position,
-                    type = typeMap.get(entity).type,
-                    color = colorMap.get(entity).color,
+                    position = ComponentMappers.posMap.get(entity).position,
+                    type = ComponentMappers.typeMap.get(entity).type,
+                    color = ComponentMappers.colorMap.get(entity).color,
                 )
             }
 
         val boardSquares =
             engine.getEntitiesFor(boardSquareFamily).map { entity ->
                 SerializableBoardSquare(
-                    position = posMap.get(entity).position,
-                    weather = weatherMap.get(entity).event,
+                    position = ComponentMappers.posMap.get(entity).position,
+                    weather = ComponentMappers.weatherMap.get(entity).event,
                 )
             }
 
