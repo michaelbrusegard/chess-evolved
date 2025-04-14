@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.utils.ImmutableArray
 import io.github.chessevolved.components.AbilityComponent
+import io.github.chessevolved.components.MovementRuleComponent
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.PositionComponent
@@ -16,6 +17,7 @@ object EntityFamilies {
                 PositionComponent::class.java,
                 PieceTypeComponent::class.java,
                 PlayerColorComponent::class.java,
+                MovementRuleComponent::class.java,
                 AbilityComponent::class.java,
             ).get()
 

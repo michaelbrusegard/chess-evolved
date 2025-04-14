@@ -10,13 +10,19 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.components.GameState
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
+import io.github.chessevolved.components.SerializableBoardSquare
+import io.github.chessevolved.components.SerializablePiece
 import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
+import io.github.chessevolved.serialization.GameStateSerializer
 import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.singletons.EntityFamilies
+import io.github.chessevolved.systems.AvailablePositionSystem
 import io.github.chessevolved.systems.RenderingSystem
 import io.github.chessevolved.views.GameView
 
@@ -36,6 +42,9 @@ class GamePresenter(
     private val gameBatch: SpriteBatch
     private val gameStage: Stage
 
+    private val gameState: GameState
+
+    private val availablePositionSystem: AvailablePositionSystem
     private val renderingSystem: RenderingSystem
 
     init {
@@ -53,10 +62,13 @@ class GamePresenter(
         renderingSystem = RenderingSystem(gameBatch)
         engine.addSystem(renderingSystem)
 
+        gameState = GameState(ArrayList(), ArrayList())
+
         loadRequiredAssets()
         assetManager.finishLoading()
 
         setupBoard()
+        availablePositionSystem = AvailablePositionSystem()
 
         // If we do not call this the board will not be displayed
         resize(Gdx.graphics.width, Gdx.graphics.height)
@@ -156,6 +168,16 @@ class GamePresenter(
 
     private fun handleBoardClick(pos: Position) {
         println("Board clicked at: $pos")
-        // Highlight, select piece, move logic, etc.
+
+        // temp getter for which piece at pos
+
+        val piece = EntityFamilies.getPieceEntities().find { entity ->
+            val entityPos = GameStateSerializer.posMap.get(entity).position
+            entityPos == pos
+        }
+
+        val pieceCol = GameStateSerializer.colorMap.get(piece).color
+
+        val moves = availablePositionSystem.checkAvailablePositions(pieceCol, pos, )
     }
 }

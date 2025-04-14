@@ -1,59 +1,59 @@
 package io.github.chessevolved.systems
 
+import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.math.Vector2
 import io.github.chessevolved.components.BoardSizeComponent
 import io.github.chessevolved.components.GameState
 import io.github.chessevolved.components.MovementRuleComponent
 import io.github.chessevolved.components.PieceTypeComponent
+import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
+import io.github.chessevolved.serialization.GameStateSerializer
+import io.github.chessevolved.singletons.EntityFamilies
 
 
-class AvailablePositionSystem(
-    private val gameState: GameState,
-    private var moves: MutableMap<Vector2, List<Position>> = mutableMapOf<Vector2, List<Position>>(),
-    private var availableFilteredMoves: MutableList<Position> = mutableListOf<Position>()
+class AvailablePositionSystem() {
+    private var pieces: ImmutableArray<Entity> = EntityFamilies.getPieceEntities()
 
-) {//can change to chesspice. ... if together
-    fun CheckAvailablePositions(
-    pieceTypeComponent: PieceTypeComponent,
-    playerColorComponent: PlayerColorComponent,
-    positionComponent: PositionComponent,
+    fun checkAvailablePositions(
+    playerColor: PlayerColor,
+    position: Position,
     movementRuleComponent: MovementRuleComponent,
-    boardSizeComponent: BoardSizeComponent //hvorfor er ikke boradsize en singelton egt?
-    ): List<Position> {
-        FindAllTheMoves(
+    boardSize: Int
+    ) : MutableList<Position>
+    {
+        val moves = findAllTheMoves(
             movementRuleComponent,
-            positionComponent,
-            boardSizeComponent
+            position,
+            boardSize
         )
-        FindAllTheAvailableMoves(playerColorComponent)
-        return availableFilteredMoves
-        //return emptyList()
+        val availableMoves = findAllTheAvailableMoves(playerColor, moves)
+        return availableMoves
     }
 
-
-
-    fun FindAllTheMoves(
+    private fun findAllTheMoves(
         movementRuleComponent: MovementRuleComponent,
-        positionComponent: PositionComponent,
-        boardSizeComponent: BoardSizeComponent
-    )//: Map<Vector2, List<Position>>
+        position: Position,
+        boardSize: Int
+    ): MutableMap<Vector2, List<Position>>
     {
+        val moves: MutableMap<Vector2, List<Position>> = mutableMapOf()
         for (movementRule in movementRuleComponent.getMovementRules()) {
             for (direction in movementRule.directions) {
                 val availablePositionsInDirection = mutableListOf<Position>()
 
-                val maxSteps = if (movementRule.maxSteps == 0) boardSizeComponent.boardSize else movementRule.maxSteps
+                val maxSteps = if (movementRule.maxSteps == 0) boardSize else movementRule.maxSteps
 
                 for (step in 1..maxSteps) {
-                    val newX = positionComponent.position.x + (direction.x * step).toInt()
-                    val newY = positionComponent.position.y + (direction.y * step).toInt()
+                    val newX = position.x + (direction.x * step).toInt()
+                    val newY = position.y + (direction.y * step).toInt()
 
                     // Skip if outside the board
-                    if (newX < 0 || newX >= boardSizeComponent.boardSize ||
-                        newY < 0 || newY >= boardSizeComponent.boardSize) {
+                    if (newX < 0 || newX >= boardSize ||
+                        newY < 0 || newY >= boardSize) {
                         break
                     }
 
@@ -66,24 +66,30 @@ class AvailablePositionSystem(
                 }
             }
         }
-       // return moves
+
+        return moves
     }
 
 
-    fun FindAllTheAvailableMoves(
-        playerColorComponent: PlayerColorComponent,
-    ){
-        //val filteredMoves = mutableMapOf<Vector2, List<Position>>()
-
+    private fun findAllTheAvailableMoves(
+        playerColor: PlayerColor,
+        moves: MutableMap<Vector2, List<Position>>
+    ) :MutableList<Position>
+    {
+        val availableFilteredMoves: MutableList<Position> = mutableListOf()
         for(direction in moves.keys) {
             val availablePositions = moves[direction]
-            //val availableFilteredMoves = mutableListOf<Position>()
 
             for(position in availablePositions ?: emptyList()) {
-                val piece = gameState.pieces.find { it.position == position }
+                val piece = pieces.find { entity ->
+                    val pos = GameStateSerializer.posMap.get(entity).position
+                    pos == position
+                }
+
+                val pieceColor = GameStateSerializer.colorMap.get(piece).color
 
                 if (piece != null) {
-                    if (piece.color == playerColorComponent.color) {
+                    if (pieceColor == playerColor) {
                         break
                     }
                     else {
@@ -94,37 +100,7 @@ class AvailablePositionSystem(
                 } else availableFilteredMoves.add(position)
 
             }
-
-            /*if (availableFilteredMoves.isNotEmpty()) {
-                filteredMoves[direction] = availableFilteredMoves
-            }*/
-
         }
-        //moves = filteredMoves
+        return availableFilteredMoves
     }
-
-
-
-    //finn alle mulige posisjoner
-    //finn alle brikke via gamestate som eksisterer på diss posisjonene
-    //finn dem med samme farge og fjern posisjonen og de som er bak om det er
-    //så motsatt farge, fjern de bak den om det er
-    // returner
-
-
-        // Get the piece that was clicked
-        // Get the movement rule component
-        // Get the board size
-        // Calculate the available positions
-        // Return the available positions
-
-
-    // hmmm
-    // Must have a reference to how big the board is. CHECK use family
-    // Can get in a movementrulecomponent
-    // Using the board and movementrulecompnent it calculates the move
-
-    // Click on piece.
-    // View sends information to presenter on which tile was clicked x og y.
-    // Presenter tells AvailablePositionSystem that piece "#" was clicked and gives x and y and movementrulecomponent.
 }

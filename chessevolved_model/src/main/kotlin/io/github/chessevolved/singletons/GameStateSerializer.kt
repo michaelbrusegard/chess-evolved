@@ -15,14 +15,14 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 object GameStateSerializer {
-    private val posMap: ComponentMapper<PositionComponent> =
-        ComponentMapper.getFor(PositionComponent::class.java)
-    private val typeMap: ComponentMapper<PieceTypeComponent> =
-        ComponentMapper.getFor(PieceTypeComponent::class.java)
-    private val colorMap: ComponentMapper<PlayerColorComponent> =
-        ComponentMapper.getFor(PlayerColorComponent::class.java)
-    private val weatherMap: ComponentMapper<WeatherEventComponent> =
-        ComponentMapper.getFor(WeatherEventComponent::class.java)
+    var posMap: ComponentMapper<PositionComponent> = ComponentMapper.getFor(PositionComponent::class.java)
+        private set
+    var typeMap: ComponentMapper<PieceTypeComponent> = ComponentMapper.getFor(PieceTypeComponent::class.java)
+        private set
+    var colorMap: ComponentMapper<PlayerColorComponent> = ComponentMapper.getFor(PlayerColorComponent::class.java)
+        private set
+    var weatherMap: ComponentMapper<WeatherEventComponent> = ComponentMapper.getFor(WeatherEventComponent::class.java)
+        private set
 
     // Maybe move families out of here so they can be used for getting the components in systems too
     private val pieceFamily: Family =
