@@ -33,7 +33,7 @@ class PieceFactory(
     ): TextureRegion {
         val colorStr = playerColor.name.lowercase()
         val typeStr = pieceType.name.lowercase()
-        val filename = "pieces/$colorStr-$typeStr.png"
+        val filename = "pieces/$typeStr-$colorStr.png"
 
         val texture = assetManager.get(filename, Texture::class.java)
         return TextureRegion(texture)
@@ -80,6 +80,7 @@ class PieceFactory(
         }
 
     fun createPawn(
+        isPlayerOne: Boolean,
         position: Position,
         color: PlayerColor,
         stage: Stage,
@@ -88,7 +89,7 @@ class PieceFactory(
     {
         val movementRuleComponent = MovementRuleComponent()
         val normalDirections: ArrayList<Vector2> = arrayListOf(
-            vec2(0f, 1f)
+            vec2(0f, if(isPlayerOne) 1f else -1f)
         )
         // Todo add killing directions
 

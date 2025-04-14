@@ -24,6 +24,7 @@ import io.github.chessevolved.serialization.GameStateSerializer
 import io.github.chessevolved.singletons.ComponentMappers
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.singletons.EntityFamilies
+import io.github.chessevolved.singletons.PlayerGameplayManager
 import io.github.chessevolved.systems.AvailablePositionSystem
 import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
@@ -35,11 +36,14 @@ class GamePresenter(
     private val assetManager: AssetManager,
 ) : IPresenter {
     private val engine = ECSEngine
+
     private val pieceFactory = PieceFactory(engine, assetManager)
     private val boardSquareFactory = BoardSquareFactory(engine, assetManager)
 
+    private val playerGameplayManager: PlayerGameplayManager
+
     private val gameCamera = OrthographicCamera()
-    private val boardWorldSize = 8
+    private val boardWorldSize = 10
     private val gameViewport: Viewport =
         FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
     private val gameBatch: SpriteBatch
@@ -62,6 +66,8 @@ class GamePresenter(
         gameBatch = view.getGameBatch()
         gameStage = view.getStage()
 
+        playerGameplayManager = PlayerGameplayManager
+
         view.setOnPieceClickedListener { x, y ->
             handlePieceClick(Position(x, y))
         }
@@ -82,6 +88,7 @@ class GamePresenter(
         assetManager.finishLoading()
 
         setupBoard()
+
         availablePositionSystem = AvailablePositionSystem()
         movementSystem = MovementSystem()
 
@@ -93,7 +100,14 @@ class GamePresenter(
         assetManager.load("board/black-tile.png", Texture::class.java)
         assetManager.load("board/white-tile.png", Texture::class.java)
 
-        assetManager.load("pieces/black-rook.png", Texture::class.java)
+        assetManager.load("pieces/rook-black.png", Texture::class.java)
+        assetManager.load("pieces/rook-white.png", Texture::class.java)
+        assetManager.load("pieces/pawn-white.png", Texture::class.java)
+        assetManager.load("pieces/pawn-black.png", Texture::class.java)
+        assetManager.load("pieces/bishop-white.png", Texture::class.java)
+        assetManager.load("pieces/bishop-black.png", Texture::class.java)
+        assetManager.load("pieces/knight-white.png", Texture::class.java)
+        assetManager.load("pieces/knight-black.png", Texture::class.java)
         // PlayerColor.entries.forEach { color ->
         //     PieceType.entries.forEach { type ->
         //             val colorStr = color.name.lowercase()
@@ -113,22 +127,29 @@ class GamePresenter(
                     Position(x, y),
                     WeatherEvent.NONE,
                     tileColor,
-                    gameStage
-                ) { clickedPosition -> handleBoardClick(clickedPosition)}
+                    gameStage,
+                ) {clickedPosition -> handleBoardClick(clickedPosition)}
             }
         }
 
-        pieceFactory.createRook(
-            Position(4, 4),
-            PlayerColor.BLACK,
-            gameStage
-        ) { clickedPosition -> handlePieceClick(clickedPosition)}
+        val startX: Int = (boardWorldSize / 2) - 4
+        for (i in startX until startX+8) {
+            val pieceP1 = pieceFactory.createPawn(
+                true,
+                Position(i, 1),
+                PlayerColor.WHITE,
+                gameStage
+            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+            playerGameplayManager.player1AddPiece(pieceP1)
 
-        pieceFactory.createRook(
-            Position(2, 6),
-            PlayerColor.BLACK,
-            gameStage
-        ) { clickedPosition -> handlePieceClick(clickedPosition)}
+            val pieceP2 = pieceFactory.createPawn(
+                false,
+                Position(i, boardWorldSize-2),
+                PlayerColor.BLACK,
+                gameStage
+            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+            playerGameplayManager.player2AddPiece(pieceP2)
+        }
     }
 
     override fun render(sb: SpriteBatch) {
@@ -176,7 +197,7 @@ class GamePresenter(
             PieceType.entries.forEach { type ->
                 val colorStr = color.name.lowercase()
                 val typeStr = type.name.lowercase()
-                val filename = "pieces/$colorStr-$typeStr.png"
+                val filename = "pieces/$typeStr-$colorStr.png"
                 if (assetManager.isLoaded(filename)) {
                     assetManager.unload(filename)
                 }
