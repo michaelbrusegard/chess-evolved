@@ -23,5 +23,4 @@ object ComponentMappers {
     var textureMap = ComponentMapper.getFor(TextureRegionComponent::class.java)
         private set
     var actorMap = ComponentMapper.getFor(ActorComponent::class.java)
-
 }

@@ -15,12 +15,9 @@ import io.github.chessevolved.components.GameState
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
-import io.github.chessevolved.components.SerializableBoardSquare
-import io.github.chessevolved.components.SerializablePiece
 import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
-import io.github.chessevolved.serialization.GameStateSerializer
 import io.github.chessevolved.singletons.ComponentMappers
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.singletons.EntityFamilies
@@ -148,7 +145,7 @@ class GamePresenter(
                     WeatherEvent.NONE,
                     tileColor,
                     gameStage,
-                ) {clickedPosition -> handleBoardClick(clickedPosition)}
+                ) { clickedPosition -> handleBoardClick(clickedPosition) }
             }
         }
 
@@ -159,8 +156,8 @@ class GamePresenter(
                     true,
                     Position(startPos, 1),
                     PlayerColor.WHITE,
-                    gameStage
-                ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                    gameStage,
+                ) { clickedPosition -> handlePieceClick(clickedPosition) },
             )
 
             playerGameplayManager.player2AddPiece(
@@ -168,8 +165,8 @@ class GamePresenter(
                     false,
                     Position(startPos, boardWorldSize - 2),
                     PlayerColor.BLACK,
-                    gameStage
-                ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                    gameStage,
+                ) { clickedPosition -> handlePieceClick(clickedPosition) },
             )
 
             when (startPos) {
@@ -180,15 +177,15 @@ class GamePresenter(
                                 Position(startX + j, 0),
                                 PlayerColor.WHITE,
                                 gameStage,
-                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                            ) { clickedPosition -> handlePieceClick(clickedPosition) },
                         )
 
                         playerGameplayManager.player2AddPiece(
                             pieceFactory.createRook(
                                 Position(startX + j, boardWorldSize - 1),
                                 PlayerColor.BLACK,
-                                gameStage
-                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                                gameStage,
+                            ) { clickedPosition -> handlePieceClick(clickedPosition) },
                         )
                     }
                 }
@@ -198,16 +195,16 @@ class GamePresenter(
                             pieceFactory.createKnight(
                                 Position(startX + j, 0),
                                 PlayerColor.WHITE,
-                                gameStage
-                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                                gameStage,
+                            ) { clickedPosition -> handlePieceClick(clickedPosition) },
                         )
 
                         playerGameplayManager.player2AddPiece(
                             pieceFactory.createKnight(
                                 Position(startX + j, boardWorldSize - 1),
                                 PlayerColor.BLACK,
-                                gameStage
-                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                                gameStage,
+                            ) { clickedPosition -> handlePieceClick(clickedPosition) },
                         )
                     }
                 }
@@ -217,33 +214,28 @@ class GamePresenter(
                             pieceFactory.createBishop(
                                 Position(startX + j, 0),
                                 PlayerColor.WHITE,
-                                gameStage
-                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                                gameStage,
+                            ) { clickedPosition -> handlePieceClick(clickedPosition) },
                         )
 
                         playerGameplayManager.player2AddPiece(
                             pieceFactory.createBishop(
                                 Position(startX + j, boardWorldSize - 1),
                                 PlayerColor.BLACK,
-                                gameStage
-                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                                gameStage,
+                            ) { clickedPosition -> handlePieceClick(clickedPosition) },
                         )
                     }
                 }
                 startX + 3 -> {
-
                 }
                 startX + 4 -> {
-
                 }
                 startX + 5 -> {
-
                 }
                 startX + 6 -> {
-
                 }
                 startX + 7 -> {
-
                 }
                 else -> {}
             }
@@ -316,14 +308,14 @@ class GamePresenter(
             pieceIsSelected = true
             pieceSelectedPos = pos
 
-            selectedPiece = EntityFamilies.getPieceEntities().find { entity ->
-                val entityPos = ComponentMappers.posMap.get(entity).position
-                entityPos == pos
-            }
+            selectedPiece =
+                EntityFamilies.getPieceEntities().find { entity ->
+                    val entityPos = ComponentMappers.posMap.get(entity).position
+                    entityPos == pos
+                }
 
             val piecePositionComponent = ComponentMappers.posMap.get(selectedPiece)
             println(piecePositionComponent.position)
-
 
             val pieceCol = ComponentMappers.colorMap.get(selectedPiece).color
             val pieceMoves = ComponentMappers.movementMap.get(selectedPiece)

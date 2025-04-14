@@ -1,6 +1,5 @@
 package io.github.chessevolved.serialization
 
-import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
 import io.github.chessevolved.components.AbilityComponent

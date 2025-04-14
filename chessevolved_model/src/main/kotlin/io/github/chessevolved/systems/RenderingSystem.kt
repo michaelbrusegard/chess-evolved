@@ -16,7 +16,6 @@ class RenderingSystem(
 ) : IteratingSystem(
         Family.all(PositionComponent::class.java, TextureRegionComponent::class.java).get(),
     ) {
-
     override fun processEntity(
         entity: Entity,
         deltaTime: Float,
@@ -42,7 +41,7 @@ class RenderingSystem(
 
     fun defaultBoardSquaresState() {
         // Should make alle the board squares normal color // i.e not highlighted
-        val boardSquares = EntityFamilies.getBoardSquareEntities();
+        val boardSquares = EntityFamilies.getBoardSquareEntities()
 
         for (entity in boardSquares) {
             val texture = ComponentMappers.textureMap.get(entity)
@@ -50,14 +49,13 @@ class RenderingSystem(
         }
     }
 
-    fun changeBoardsForPositions(
-        boardPositions: MutableList<Position>
-    ) {
+    fun changeBoardsForPositions(boardPositions: MutableList<Position>) {
         val positions = boardPositions.toSet()
-        val validBoardSquares = EntityFamilies.getBoardSquareEntities().filter { entity ->
-            val pos = ComponentMappers.posMap.get(entity).position
-            positions.contains(pos)
-        };
+        val validBoardSquares =
+            EntityFamilies.getBoardSquareEntities().filter { entity ->
+                val pos = ComponentMappers.posMap.get(entity).position
+                positions.contains(pos)
+            }
 
         validBoardSquares.map { boardSquare ->
             ComponentMappers.textureMap.get(boardSquare).isSelected = true

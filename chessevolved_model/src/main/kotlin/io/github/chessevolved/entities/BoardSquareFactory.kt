@@ -32,16 +32,17 @@ class BoardSquareFactory(
     private fun getBoardActor(
         position: Position,
         stage: Stage,
-        onClick: (Position) -> Unit
+        onClick: (Position) -> Unit,
     ): Image {
-        val image = Image().apply {
-            setSize(1f, 1f)
-            setPosition(position.x.toFloat(), position.y.toFloat())
+        val image =
+            Image().apply {
+                setSize(1f, 1f)
+                setPosition(position.x.toFloat(), position.y.toFloat())
 
-            onClick {
-                onClick(position)
+                onClick {
+                    onClick(position)
+                }
             }
-        }
         stage.addActor(image)
 
         return image
@@ -52,7 +53,7 @@ class BoardSquareFactory(
         weatherEvent: WeatherEvent,
         playerColor: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit
+        onClick: (Position) -> Unit,
     ): Entity =
         Entity().apply {
             add(PositionComponent(position))

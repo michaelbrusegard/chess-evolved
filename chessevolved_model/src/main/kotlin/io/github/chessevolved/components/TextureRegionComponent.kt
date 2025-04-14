@@ -16,5 +16,4 @@ class TextureRegionComponent(
 
     // For board only mostly
     var isSelected = false
-
 }

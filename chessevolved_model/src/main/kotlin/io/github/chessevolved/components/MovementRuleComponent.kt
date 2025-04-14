@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Vector2
 data class MovementRule(
     val moveName: String,
     val directions: ArrayList<Vector2>,
-    val maxSteps: Int, // 0 is infinite
+    val maxSteps: Int,
     val canJump: Boolean,
     val isDefaultMovement: Boolean,
     val isKill: Boolean,
@@ -40,15 +40,23 @@ class MovementRuleComponent() : Component {
      * @param isDefaultMovement Boolean if movementRule is for movement. *Implicit, but necessary*
      * @param isKill Boolean if movementRule is for eliminating pieces.
      */
-    fun addMovementRule(moveName: String, directions: ArrayList<Vector2>, maxSteps: Int, canJump: Boolean, isDefaultMovement: Boolean, isKill: Boolean) {
-        var movementRule = MovementRule(
-            moveName = moveName,
-            directions = directions,
-            maxSteps = maxSteps,
-            canJump = canJump,
-            isDefaultMovement = isDefaultMovement,
-            isKill = isKill
-        )
+    fun addMovementRule(
+        moveName: String,
+        directions: ArrayList<Vector2>,
+        maxSteps: Int,
+        canJump: Boolean,
+        isDefaultMovement: Boolean,
+        isKill: Boolean,
+    ) {
+        var movementRule =
+            MovementRule(
+                moveName = moveName,
+                directions = directions,
+                maxSteps = maxSteps,
+                canJump = canJump,
+                isDefaultMovement = isDefaultMovement,
+                isKill = isKill,
+            )
 
         moves.add(movementRule)
     }
@@ -58,11 +66,11 @@ class MovementRuleComponent() : Component {
      * @param moveName The moveName to consider removing.
      */
     fun removeMovementRule(moveName: String) {
-        var filteredMoves = moves.stream().filter {move -> move.moveName == moveName}.toArray()
-        if (filteredMoves.isEmpty()){
+        var filteredMoves = moves.stream().filter { move -> move.moveName == moveName }.toArray()
+        if (filteredMoves.isEmpty()) {
             throw IllegalArgumentException("Move list does not have moveName: $moveName")
         }
 
-        moves.removeIf { move -> move.moveName == moveName}
+        moves.removeIf { move -> move.moveName == moveName }
     }
 }

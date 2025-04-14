@@ -8,7 +8,7 @@ class MovementSystem {
     fun movePieceToPos(
         piece: Entity?,
         position: Position,
-        availableMoves: MutableList<Position>
+        availableMoves: MutableList<Position>,
     ) {
         if (piece == null) {
             throw NullPointerException("Piece is null")
@@ -16,7 +16,7 @@ class MovementSystem {
 
         val availableMovesSet = availableMoves.toSet()
 
-        if(!availableMovesSet.contains(position)) {
+        if (!availableMovesSet.contains(position)) {
             throw IllegalArgumentException("Position is not available")
         }
 

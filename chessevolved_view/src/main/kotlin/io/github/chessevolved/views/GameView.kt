@@ -1,9 +1,7 @@
 package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.viewport.Viewport
 
 fun interface OnPieceClickedListener {
     fun onClick(
@@ -13,13 +11,17 @@ fun interface OnPieceClickedListener {
 }
 
 fun interface OnBoardClickedListener {
-    fun onClick(x: Int, y: Int)
+    fun onClick(
+        x: Int,
+        y: Int,
+    )
 }
 
 class GameView : IView {
     private lateinit var stage: Stage
 
     private val gameBatch = SpriteBatch()
+
     /**
      * Click listener for when a chess-piece has been clicked on.
      */
