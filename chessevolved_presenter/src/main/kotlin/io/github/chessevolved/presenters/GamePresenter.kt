@@ -179,5 +179,6 @@ class GamePresenter(
         val pieceMoves = ComponentMappers.movementMap.get(piece)
 
         val moves = availablePositionSystem.checkAvailablePositions(pieceCol, pos, pieceMoves, boardWorldSize)
+        renderingSystem.changeBoardsForPositions(moves)
     }
 }
