@@ -1,5 +1,6 @@
 package io.github.chessevolved.presenters
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.GL20
@@ -48,13 +49,19 @@ class GamePresenter(
     private val availablePositionSystem: AvailablePositionSystem
     private val renderingSystem: RenderingSystem
 
+    // Flags
+    private var pieceIsSelected: Boolean = false
+    private var pieceSelectedPos: Position = Position(0, 0)
+    private var selectedPiece: Entity? = null
+    private var selectedPieceAvailablePositions: MutableList<Position> = ArrayList()
+
     init {
         view.init()
         gameBatch = view.getGameBatch()
         gameStage = view.getStage()
 
         view.setOnPieceClickedListener { x, y ->
-            handleBoardClick(Position(x, y))
+            handlePieceClick(Position(x, y))
         }
 
         gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
@@ -107,7 +114,13 @@ class GamePresenter(
             Position(4, 4),
             PlayerColor.BLACK,
             gameStage
-        ) { clickedPosition -> handleBoardClick(clickedPosition)}
+        ) { clickedPosition -> handlePieceClick(clickedPosition)}
+
+        pieceFactory.createRook(
+            Position(2, 6),
+            PlayerColor.BLACK,
+            gameStage
+        ) { clickedPosition -> handlePieceClick(clickedPosition)}
     }
 
     override fun render(sb: SpriteBatch) {
@@ -167,18 +180,30 @@ class GamePresenter(
         view.setInputProcessor()
     }
 
-    private fun handleBoardClick(pos: Position) {
-        println("Board clicked at: $pos")
+    private fun handlePieceClick(pos: Position) {
+        if (pieceIsSelected && pieceSelectedPos == pos) {
+            renderingSystem.defaultBoardSquaresState()
+            pieceIsSelected = false
+        } else {
+            renderingSystem.defaultBoardSquaresState()
+            pieceIsSelected = true
+            pieceSelectedPos = pos
 
-        val piece = EntityFamilies.getPieceEntities().find { entity ->
-            val entityPos = ComponentMappers.posMap.get(entity).position
-            entityPos == pos
+            selectedPiece = EntityFamilies.getPieceEntities().find { entity ->
+                val entityPos = ComponentMappers.posMap.get(entity).position
+                entityPos == pos
+            }
+
+            val pieceCol = ComponentMappers.colorMap.get(selectedPiece).color
+            val pieceMoves = ComponentMappers.movementMap.get(selectedPiece)
+
+            selectedPieceAvailablePositions = availablePositionSystem.checkAvailablePositions(pieceCol, pos, pieceMoves, boardWorldSize)
+
+            renderingSystem.changeBoardsForPositions(selectedPieceAvailablePositions)
         }
+    }
 
-        val pieceCol = ComponentMappers.colorMap.get(piece).color
-        val pieceMoves = ComponentMappers.movementMap.get(piece)
+    private fun handleBoardClick(pos: Position) {
 
-        val moves = availablePositionSystem.checkAvailablePositions(pieceCol, pos, pieceMoves, boardWorldSize)
-        renderingSystem.changeBoardsForPositions(moves)
     }
 }

@@ -21,8 +21,8 @@ class RenderingSystem(
         entity: Entity,
         deltaTime: Float,
     ) {
-        val position = ComponentMappers.positionMapper.get(entity)
-        val texture = ComponentMappers.textureMapper.get(entity)
+        val position = ComponentMappers.posMap.get(entity)
+        val texture = ComponentMappers.textureMap.get(entity)
 
         if (position != null && texture != null) {
             texture.region?.let { region ->
@@ -45,7 +45,7 @@ class RenderingSystem(
         val boardSquares = EntityFamilies.getBoardSquareEntities();
 
         for (entity in boardSquares) {
-            val texture = ComponentMappers.textureMapper.get(entity)
+            val texture = ComponentMappers.textureMap.get(entity)
             texture.isSelected = false
         }
     }
@@ -60,7 +60,7 @@ class RenderingSystem(
         };
 
         validBoardSquares.map { boardSquare ->
-            ComponentMappers.textureMapper.get(boardSquare).isSelected = true
+            ComponentMappers.textureMap.get(boardSquare).isSelected = true
         }
     }
 }

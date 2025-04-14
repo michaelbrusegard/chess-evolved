@@ -1,6 +1,7 @@
 package io.github.chessevolved.singletons
 
 import com.badlogic.ashley.core.ComponentMapper
+import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.MovementRuleComponent
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
@@ -19,8 +20,8 @@ object ComponentMappers {
         private set
     var movementMap: ComponentMapper<MovementRuleComponent> = ComponentMapper.getFor(MovementRuleComponent::class.java)
         private set
-    var positionMapper = ComponentMapper.getFor(PositionComponent::class.java)
+    var textureMap = ComponentMapper.getFor(TextureRegionComponent::class.java)
         private set
-    var textureMapper = ComponentMapper.getFor(TextureRegionComponent::class.java)
-        private set
+    var actorMap = ComponentMapper.getFor(ActorComponent::class.java)
+
 }
