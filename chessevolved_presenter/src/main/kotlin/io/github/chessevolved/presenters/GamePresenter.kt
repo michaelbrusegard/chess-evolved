@@ -43,7 +43,7 @@ class GamePresenter(
     private val playerGameplayManager: PlayerGameplayManager
 
     private val gameCamera = OrthographicCamera()
-    private val boardWorldSize = 10
+    private val boardWorldSize = 8
     private val gameViewport: Viewport =
         FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
     private val gameBatch: SpriteBatch
@@ -133,22 +133,100 @@ class GamePresenter(
         }
 
         val startX: Int = (boardWorldSize / 2) - 4
-        for (i in startX until startX+8) {
-            val pieceP1 = pieceFactory.createPawn(
-                true,
-                Position(i, 1),
-                PlayerColor.WHITE,
-                gameStage
-            ) {clickedPosition -> handlePieceClick(clickedPosition)}
-            playerGameplayManager.player1AddPiece(pieceP1)
+        for (startPos in startX until startX + 8) {
+            playerGameplayManager.player1AddPiece(
+                pieceFactory.createPawn(
+                    true,
+                    Position(startPos, 1),
+                    PlayerColor.WHITE,
+                    gameStage
+                ) {clickedPosition -> handlePieceClick(clickedPosition)}
+            )
 
-            val pieceP2 = pieceFactory.createPawn(
-                false,
-                Position(i, boardWorldSize-2),
-                PlayerColor.BLACK,
-                gameStage
-            ) {clickedPosition -> handlePieceClick(clickedPosition)}
-            playerGameplayManager.player2AddPiece(pieceP2)
+            playerGameplayManager.player2AddPiece(
+                pieceFactory.createPawn(
+                    false,
+                    Position(startPos, boardWorldSize - 2),
+                    PlayerColor.BLACK,
+                    gameStage
+                ) {clickedPosition -> handlePieceClick(clickedPosition)}
+            )
+
+            when (startPos) {
+                startX -> {
+                    for (j in listOf(0, 7)) {
+                        playerGameplayManager.player1AddPiece(
+                            pieceFactory.createRook(
+                                Position(startX + j, 0),
+                                PlayerColor.WHITE,
+                                gameStage,
+                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                        )
+
+                        playerGameplayManager.player2AddPiece(
+                            pieceFactory.createRook(
+                                Position(startX + j, boardWorldSize - 1),
+                                PlayerColor.BLACK,
+                                gameStage
+                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                        )
+                    }
+                }
+                startX + 1 -> {
+                    for (j in listOf(1, 6)) {
+                        playerGameplayManager.player1AddPiece(
+                            pieceFactory.createKnight(
+                                Position(startX + j, 0),
+                                PlayerColor.WHITE,
+                                gameStage
+                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                        )
+
+                        playerGameplayManager.player2AddPiece(
+                            pieceFactory.createKnight(
+                                Position(startX + j, boardWorldSize - 1),
+                                PlayerColor.BLACK,
+                                gameStage
+                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                        )
+                    }
+                }
+                startX + 2 -> {
+                    for (j in listOf(2, 5)) {
+                        playerGameplayManager.player1AddPiece(
+                            pieceFactory.createBishop(
+                                Position(startX + j, 0),
+                                PlayerColor.WHITE,
+                                gameStage
+                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                        )
+
+                        playerGameplayManager.player2AddPiece(
+                            pieceFactory.createBishop(
+                                Position(startX + j, boardWorldSize - 1),
+                                PlayerColor.BLACK,
+                                gameStage
+                            ) {clickedPosition -> handlePieceClick(clickedPosition)}
+                        )
+                    }
+                }
+                startX + 3 -> {
+
+                }
+                startX + 4 -> {
+
+                }
+                startX + 5 -> {
+
+                }
+                startX + 6 -> {
+
+                }
+                startX + 7 -> {
+
+                }
+                else -> {}
+            }
         }
     }
 
