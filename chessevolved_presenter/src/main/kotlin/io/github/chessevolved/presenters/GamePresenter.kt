@@ -25,6 +25,7 @@ import io.github.chessevolved.singletons.ComponentMappers
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.singletons.EntityFamilies
 import io.github.chessevolved.systems.AvailablePositionSystem
+import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
 import io.github.chessevolved.views.GameView
 
@@ -46,6 +47,7 @@ class GamePresenter(
 
     private val gameState: GameState
 
+    private val movementSystem: MovementSystem
     private val availablePositionSystem: AvailablePositionSystem
     private val renderingSystem: RenderingSystem
 
@@ -64,6 +66,10 @@ class GamePresenter(
             handlePieceClick(Position(x, y))
         }
 
+        view.setOnBoardClickedListener { x, y ->
+            handleBoardClick((Position(x, y)))
+        }
+
         gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
         gameCamera.update()
 
@@ -77,6 +83,7 @@ class GamePresenter(
 
         setupBoard()
         availablePositionSystem = AvailablePositionSystem()
+        movementSystem = MovementSystem()
 
         // If we do not call this the board will not be displayed
         resize(Gdx.graphics.width, Gdx.graphics.height)
@@ -106,7 +113,8 @@ class GamePresenter(
                     Position(x, y),
                     WeatherEvent.NONE,
                     tileColor,
-                )
+                    gameStage
+                ) { clickedPosition -> handleBoardClick(clickedPosition)}
             }
         }
 
@@ -181,6 +189,7 @@ class GamePresenter(
     }
 
     private fun handlePieceClick(pos: Position) {
+        // println("PiecePos, x: " + pos.x + ", y: " + pos.y)
         if (pieceIsSelected && pieceSelectedPos == pos) {
             renderingSystem.defaultBoardSquaresState()
             pieceIsSelected = false
@@ -194,6 +203,10 @@ class GamePresenter(
                 entityPos == pos
             }
 
+            val piecePositionComponent = ComponentMappers.posMap.get(selectedPiece)
+            println(piecePositionComponent.position)
+
+
             val pieceCol = ComponentMappers.colorMap.get(selectedPiece).color
             val pieceMoves = ComponentMappers.movementMap.get(selectedPiece)
 
@@ -204,6 +217,14 @@ class GamePresenter(
     }
 
     private fun handleBoardClick(pos: Position) {
+        // println("BoardPos, x: " + pos.x + ", y: " + pos.y)
 
+        if (pieceIsSelected) {
+            if (selectedPieceAvailablePositions.isNotEmpty()) {
+                movementSystem.movePieceToPos(selectedPiece, pos, selectedPieceAvailablePositions)
+                pieceIsSelected = false
+                renderingSystem.defaultBoardSquaresState()
+            }
+        }
     }
 }

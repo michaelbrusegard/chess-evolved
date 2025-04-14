@@ -18,7 +18,9 @@ import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.TextureRegionComponent
+import io.github.chessevolved.singletons.ComponentMappers
 import ktx.actors.onClick
+import ktx.ashley.get
 import ktx.math.vec2
 
 class PieceFactory(
@@ -38,16 +40,16 @@ class PieceFactory(
     }
 
     private fun getPieceActor(
-        position: Position,
+        positionProvider: () -> Position,
         stage: Stage,
         onClick: (Position) -> Unit
     ): Image {
         val image = Image().apply {
             setSize(1f, 1f)
-            setPosition(position.x.toFloat(), position.y.toFloat())
+            setPosition(positionProvider().x.toFloat(), positionProvider().y.toFloat())
 
             onClick {
-                onClick(position)
+                onClick(positionProvider())
             }
         }
         stage.addActor(image)
@@ -70,7 +72,10 @@ class PieceFactory(
             add(movementRuleComponent)
             add(AbilityComponent(emptyList()))
             add(TextureRegionComponent(getPieceTextureRegion(pieceType, playerColor)))
-            add(ActorComponent(getPieceActor(position, stage, onClick)))
+            add(ActorComponent(getPieceActor(
+                positionProvider = { ComponentMappers.posMap.get(this).position},
+                stage,
+                onClick)))
             engine.addEntity(this)
         }
 

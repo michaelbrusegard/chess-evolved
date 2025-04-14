@@ -9,12 +9,18 @@ fun interface OnPieceClickedListener {
     fun onClick(x: Int, y: Int)
 }
 
+fun interface OnBoardClickedListener {
+    fun onClick(x: Int, y: Int)
+}
+
 class GameView : IView {
     private lateinit var stage: Stage
 
     private val gameBatch = SpriteBatch()
 
     private var clickListener: OnPieceClickedListener? = null
+
+    private var boardClickListener: OnBoardClickedListener? = null
 
     private val screenViewport = ScreenViewport()
 
@@ -28,6 +34,10 @@ class GameView : IView {
 
     fun setOnPieceClickedListener(listener: OnPieceClickedListener) {
         this.clickListener = listener
+    }
+
+    fun setOnBoardClickedListener(listener: OnBoardClickedListener) {
+        this.boardClickListener = listener
     }
 
     override fun render() {
@@ -51,6 +61,4 @@ class GameView : IView {
     override fun setInputProcessor() {
         Gdx.input.inputProcessor = stage
     }
-
-    fun getClickListener(): OnPieceClickedListener? = clickListener
 }
