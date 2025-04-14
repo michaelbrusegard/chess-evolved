@@ -28,10 +28,10 @@ import io.github.chessevolved.singletons.PlayerGameplayManager
 import io.github.chessevolved.systems.AvailablePositionSystem
 import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
+import io.github.chessevolved.views.GameUIView
 import io.github.chessevolved.views.GameView
 
 class GamePresenter(
-    private val view: GameView,
     private val navigator: Navigator,
     private val assetManager: AssetManager,
 ) : IPresenter {
@@ -44,10 +44,13 @@ class GamePresenter(
 
     private val gameCamera = OrthographicCamera()
     private val boardWorldSize = 8
+
     private val gameViewport: Viewport =
         FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
-    private val gameBatch: SpriteBatch
-    private val gameStage: Stage
+    private lateinit var gameUIView: GameUIView
+    private lateinit var gameBoardView: GameView
+    private val gameBatch: SpriteBatch = SpriteBatch()
+    private lateinit var gameStage: Stage
 
     private val gameState: GameState
 
@@ -116,6 +119,23 @@ class GamePresenter(
         //             assetManager.load(filename, Texture::class.java)
         //     }
         // }
+    }
+
+    private fun setupGameView() {
+        gameUIView = GameUIView(gameViewport, gameCamera)
+        gameUIView.init()
+
+        gameBoardView = GameView(gameUIView.getStage(), gameViewport)
+        gameBoardView.init()
+
+        gameStage = gameBoardView.getStage()
+
+        gameBoardView.setOnPieceClickedListener { x, y ->
+            handleBoardClick(Position(x, y))
+        }
+
+        gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
+        gameCamera.update()
     }
 
     private fun setupBoard() {
@@ -241,12 +261,8 @@ class GamePresenter(
         engine.update(Gdx.graphics.deltaTime)
         gameBatch.end()
 
-        // In case we want part of the UI to be scene2d, we render the view on top
-        gameStage.viewport = gameViewport
-        gameStage.act(Gdx.graphics.deltaTime)
-        gameStage.draw()
-
-        // view.render()
+        gameBoardView.render()
+        gameUIView.render()
     }
 
     override fun resize(
@@ -254,11 +270,14 @@ class GamePresenter(
         height: Int,
     ) {
         gameViewport.update(width, height, false)
-        view.resize(width, height)
+        gameBoardView.resize(width, height)
+        // TODO: Do some resize logic for GameUIView as well.
     }
 
     override fun dispose() {
-        view.dispose()
+        gameBoardView.dispose()
+        gameUIView.dispose()
+        gameBatch.dispose()
         engine.removeAllEntities()
         unloadAssets()
     }
@@ -284,7 +303,7 @@ class GamePresenter(
     }
 
     override fun setInputProcessor() {
-        view.setInputProcessor()
+        gameBoardView.setInputProcessor()
     }
 
     private fun handlePieceClick(pos: Position) {

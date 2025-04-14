@@ -1,12 +1,15 @@
 package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 
 fun interface OnPieceClickedListener {
-    fun onClick(x: Int, y: Int)
+    fun onClick(
+        x: Int,
+        y: Int,
+    )
 }
 
 fun interface OnBoardClickedListener {
@@ -17,7 +20,9 @@ class GameView : IView {
     private lateinit var stage: Stage
 
     private val gameBatch = SpriteBatch()
-
+    /**
+     * Click listener for when a chess-piece has been clicked on.
+     */
     private var clickListener: OnPieceClickedListener? = null
 
     private var boardClickListener: OnBoardClickedListener? = null
@@ -25,12 +30,12 @@ class GameView : IView {
     private val screenViewport = ScreenViewport()
 
     override fun init() {
-        stage = Stage(screenViewport)
+        gameStage = Stage(gameViewport)
+        inputMultiplexer.addProcessor(gameStage)
+        inputMultiplexer.addProcessor(uiStage)
     }
 
-    fun getGameBatch(): SpriteBatch = gameBatch
-
-    fun getStage(): Stage = stage
+    fun getStage(): Stage = gameStage
 
     fun setOnPieceClickedListener(listener: OnPieceClickedListener) {
         this.clickListener = listener
@@ -41,24 +46,22 @@ class GameView : IView {
     }
 
     override fun render() {
-        stage.viewport = screenViewport
-        stage.act(Gdx.graphics.deltaTime)
-        stage.draw()
+        gameStage.act(Gdx.graphics.deltaTime)
+        gameStage.draw()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        stage.viewport.update(width, height, true)
+        gameStage.viewport.update(width, height, true)
     }
 
     override fun dispose() {
-        stage.dispose()
-        gameBatch.dispose()
+        gameStage.dispose()
     }
 
     override fun setInputProcessor() {
-        Gdx.input.inputProcessor = stage
+        Gdx.input.inputProcessor = inputMultiplexer
     }
 }
