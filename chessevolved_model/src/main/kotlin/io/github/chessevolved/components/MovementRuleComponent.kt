@@ -16,8 +16,7 @@ class MovementRuleComponent() : Component {
      * @param directions A list containing all directions this piece can move relative to itself.
      * @param maxSteps How many steps it can take for this move, 0 is infinite
      * @param canJump If it can ignore pieces that are in its path.
-     * @param isDefaultMovement If this move is for normal movement. Purpose is if it can be combined with kill.
-     * @param isKill if this move is for killing purposes only.
+     * @param moveType Enum for which type of movement it is.
      */
     data class MovementPattern(
         val moveName: String,
@@ -43,14 +42,6 @@ class MovementRuleComponent() : Component {
         return patterns.toList()
     }
 
-    /**
-     * Adds a movement rule to the components movementRule list.
-     * @param directions ArrayList of all possible directions defined relative.
-     * @param maxSteps Int Maximum amount of steps this piece can move with this rule. 0 is infinite.
-     * @param canJump Boolean if movementRule can jump over other pieces in its path.
-     * @param isDefaultMovement Boolean if movementRule is for movement. *Implicit, but necessary*
-     * @param isKill Boolean if movementRule is for eliminating pieces.
-     */
     fun addPattern(pattern: MovementPattern) {
         patterns.add(pattern)
     }

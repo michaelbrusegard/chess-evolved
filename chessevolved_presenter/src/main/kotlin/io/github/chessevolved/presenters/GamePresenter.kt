@@ -23,7 +23,7 @@ import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.singletons.EntityFamilies
 import io.github.chessevolved.singletons.PlayerGameplayManager
 import io.github.chessevolved.systems.AvailablePositionSystem
-import io.github.chessevolved.systems.MovementSystem
+import io.github.chessevolved.systems.MoveValidator
 import io.github.chessevolved.systems.RenderingSystem
 import io.github.chessevolved.views.GameUIView
 import io.github.chessevolved.views.GameView
@@ -51,7 +51,7 @@ class GamePresenter(
 
     private val gameState: GameState
 
-    private val movementSystem: MovementSystem
+    private val movementSystem: MoveValidator
     private val availablePositionSystem: AvailablePositionSystem
     private val renderingSystem: RenderingSystem
 
@@ -77,7 +77,7 @@ class GamePresenter(
         setupBoard()
 
         availablePositionSystem = AvailablePositionSystem()
-        movementSystem = MovementSystem()
+        movementSystem = MoveValidator()
 
         // If we do not call this the board will not be displayed
         resize(Gdx.graphics.width, Gdx.graphics.height)

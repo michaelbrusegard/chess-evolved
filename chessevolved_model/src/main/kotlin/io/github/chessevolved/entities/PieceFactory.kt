@@ -20,28 +20,26 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.singletons.ComponentMappers
 import ktx.actors.onClick
-import ktx.ashley.get
-import ktx.math.vec2
 
 class PieceFactory(
     private val engine: Engine,
     private val assetManager: AssetManager,
 ) {
     private val DiagonalDirections = listOf(
-        vec2(1f, 1f), vec2(1f, -1f),
-        vec2(-1f, 1f), vec2(-1f, -1f)
+        Vector2(1f, 1f), Vector2(1f, -1f),
+        Vector2(-1f, 1f), Vector2(-1f, -1f)
     )
 
     private val StraightDirections = listOf(
-        vec2(0f, 1f), vec2(0f, -1f),
-        vec2(1f, 0f), vec2(-1f, 0f)
+        Vector2(0f, 1f), Vector2(0f, -1f),
+        Vector2(1f, 0f), Vector2(-1f, 0f)
     )
 
     private val KnightDirections = listOf(
-        vec2(1f, 2f), vec2(-1f, 2f),
-        vec2(1f, -2f), vec2(-1f, -2f),
-        vec2(2f, 1f), vec2(2f, -1f),
-        vec2(-2f, 1f), vec2(-2f, -1f)
+        Vector2(1f, 2f), Vector2(-1f, 2f),
+        Vector2(1f, -2f), Vector2(-1f, -2f),
+        Vector2(2f, 1f), Vector2(2f, -1f),
+        Vector2(-2f, 1f), Vector2(-2f, -1f)
     )
 
     private fun getPieceTextureRegion(
@@ -112,7 +110,7 @@ class PieceFactory(
             addPattern(
                 MovementRuleComponent.MovementPattern(
                     moveName = "pawnMove",
-                    directions = if (isPlayerOne) listOf(vec2(0f, 1f)) else listOf(vec2(0f, -1f)),
+                    directions = if (isPlayerOne) listOf(Vector2(0f, 1f)) else listOf(Vector2(0f, -1f)),
                     maxSteps = 1,
                     moveType = MovementRuleComponent.MoveType.MOVE_ONLY
             ))
@@ -120,7 +118,7 @@ class PieceFactory(
             addPattern(
                 MovementRuleComponent.MovementPattern(
                     moveName = "pawnCapture",
-                    directions = if (isPlayerOne) listOf(vec2(1f, 1f), vec2(-1f, 1f)) else listOf(vec2(1f, -1f), vec2(-1f, -1f)),
+                    directions = if (isPlayerOne) listOf(Vector2(1f, 1f), Vector2(-1f, 1f)) else listOf(Vector2(1f, -1f), Vector2(-1f, -1f)),
                     maxSteps = 1,
                     moveType = MovementRuleComponent.MoveType.CAPTURE_ONLY
                 )
