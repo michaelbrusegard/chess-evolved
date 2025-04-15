@@ -7,9 +7,10 @@ import com.badlogic.gdx.graphics.Color
 import io.github.chessevolved.components.CaneBeCapturedComponent
 import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.MovementRuleComponent
+import io.github.chessevolved.components.PlayerColorComponent
+import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.serialization.GameStateSerializer
-import io.github.chessevolved.singletons.ComponentMappers
 import io.github.chessevolved.singletons.ECSEngine
 
 class SelectionEntityListener(private val boardSize: Int) : EntityListener {
@@ -24,8 +25,8 @@ class SelectionEntityListener(private val boardSize: Int) : EntityListener {
 
         val availablePositions =
             moveValidator.checkAvailablePositions(
-                ComponentMappers.colorMap.get(entity).color,
-                ComponentMappers.posMap.get(entity).position,
+                PlayerColorComponent.mapper.get(entity).color,
+                PositionComponent.mapper.get(entity).position,
                 MovementRuleComponent.mapper.get(entity),
                 boardSize,
             )
@@ -33,7 +34,7 @@ class SelectionEntityListener(private val boardSize: Int) : EntityListener {
         val availablePositionsSet = availablePositions.toSet()
 
         for (boardSquare in GameStateSerializer.getBoardSquareEntities()) {
-            if (availablePositionsSet.contains(ComponentMappers.posMap.get(boardSquare).position)) {
+            if (availablePositionsSet.contains(PositionComponent.mapper.get(boardSquare).position)) {
                 boardSquare.add(HighlightComponent(Color(0.5f, 0.5f, 0.5f, 1f)))
             }
         }

@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.TextureRegionComponent
-import io.github.chessevolved.singletons.ComponentMappers
 
 class RenderingSystem(
     private val batch: SpriteBatch,
@@ -19,8 +18,8 @@ class RenderingSystem(
         entity: Entity,
         deltaTime: Float,
     ) {
-        val position = ComponentMappers.posMap.get(entity)
-        val texture = ComponentMappers.textureMap.get(entity)
+        val position = PositionComponent.mapper.get(entity)
+        val texture = TextureRegionComponent.mapper.get(entity)
         val highlight = HighlightComponent.mapper.get(entity)
 
         if (position != null && texture != null) {

@@ -18,12 +18,12 @@ import io.github.chessevolved.components.MovementIntentComponent
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
+import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.serialization.GameStateSerializer
-import io.github.chessevolved.singletons.ComponentMappers
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.systems.CaptureSystem
 import io.github.chessevolved.systems.MovementSystem
@@ -279,7 +279,7 @@ class GamePresenter(
 
         val piece =
             GameStateSerializer.getPieceEntities().find { entity ->
-                val position = ComponentMappers.posMap.get(entity).position
+                val position = PositionComponent.mapper.get(entity).position
                 position == pos
             }
 

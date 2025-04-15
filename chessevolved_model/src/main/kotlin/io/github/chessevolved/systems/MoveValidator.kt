@@ -4,9 +4,10 @@ import com.badlogic.gdx.math.Vector2
 import io.github.chessevolved.components.CaneBeCapturedComponent
 import io.github.chessevolved.components.MovementRuleComponent
 import io.github.chessevolved.components.PlayerColor
+import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.Position
+import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.serialization.GameStateSerializer
-import io.github.chessevolved.singletons.ComponentMappers
 
 class MoveValidator {
     fun checkAvailablePositions(
@@ -64,12 +65,12 @@ class MoveValidator {
             // Check if there's a piece at the new position
             val piece =
                 GameStateSerializer.getPieceEntities().find { entity ->
-                    val pos = ComponentMappers.posMap.get(entity).position
+                    val pos = PositionComponent.mapper.get(entity).position
                     pos == newPosition
                 }
 
             if (piece != null) {
-                val pieceColor = ComponentMappers.colorMap.get(piece).color
+                val pieceColor = PlayerColorComponent.mapper.get(piece).color
 
                 // If same color piece, we cannot move here or beyond
                 if (pieceColor == playerColor) {

@@ -12,7 +12,6 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SerializableBoardSquare
 import io.github.chessevolved.components.SerializablePiece
 import io.github.chessevolved.components.WeatherEventComponent
-import io.github.chessevolved.singletons.ComponentMappers
 import io.github.chessevolved.singletons.ECSEngine
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -56,17 +55,17 @@ object GameStateSerializer {
         val pieces =
             engine.getEntitiesFor(pieceFamily).map { entity ->
                 SerializablePiece(
-                    position = ComponentMappers.posMap.get(entity).position,
-                    type = ComponentMappers.typeMap.get(entity).type,
-                    color = ComponentMappers.colorMap.get(entity).color,
+                    position = PositionComponent.mapper.get(entity).position,
+                    type = PieceTypeComponent.mapper.get(entity).type,
+                    color = PlayerColorComponent.mapper.get(entity).color,
                 )
             }
 
         val boardSquares =
             engine.getEntitiesFor(boardSquareFamily).map { entity ->
                 SerializableBoardSquare(
-                    position = ComponentMappers.posMap.get(entity).position,
-                    weather = ComponentMappers.weatherMap.get(entity).event,
+                    position = PositionComponent.mapper.get(entity).position,
+                    weather = WeatherEventComponent.mapper.get(entity).event,
                 )
             }
 

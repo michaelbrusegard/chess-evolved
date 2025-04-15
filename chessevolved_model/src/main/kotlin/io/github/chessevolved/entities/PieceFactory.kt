@@ -18,7 +18,6 @@ import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.TextureRegionComponent
-import io.github.chessevolved.singletons.ComponentMappers
 import ktx.actors.onClick
 
 class PieceFactory(
@@ -101,7 +100,7 @@ class PieceFactory(
             add(
                 ActorComponent(
                     getPieceActor(
-                        positionProvider = { ComponentMappers.posMap.get(this).position },
+                        positionProvider = { PositionComponent.mapper.get(this).position },
                         stage,
                         onClick,
                     ),
@@ -118,8 +117,8 @@ class PieceFactory(
         onClick: (Position) -> Unit,
     ) = createPiece(position, PieceType.PAWN, color, stage, onClick).apply {
         getComponent(MovementRuleComponent::class.java).apply {
-            var pawnDirections: List<Vector2>
-            var pawnCaptureDirections: List<Vector2>
+            val pawnDirections: List<Vector2>
+            val pawnCaptureDirections: List<Vector2>
             if (isPlayerOne) {
                 pawnDirections = listOf(Vector2(0f, 1f))
                 pawnCaptureDirections = listOf(Vector2(1f, 1f), Vector2(-1f, 1f))
