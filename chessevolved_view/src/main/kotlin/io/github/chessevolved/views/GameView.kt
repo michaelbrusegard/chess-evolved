@@ -6,32 +6,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.Viewport
 
-fun interface OnPieceClickedListener {
-    fun onClick(
-        x: Int,
-        y: Int,
-    )
-}
-
-fun interface OnBoardClickedListener {
-    fun onClick(
-        x: Int,
-        y: Int,
-    )
-}
-
 class GameView(
     private val uiStage: Stage,
     private val gameViewport: Viewport
 ) : IView {
     private lateinit var gameStage: Stage
-
-    /**
-     * Click listener for when a chess-piece has been clicked on.
-     */
-    private var clickListener: OnPieceClickedListener? = null
-
-    private var boardClickListener: OnBoardClickedListener? = null
 
     private val inputMultiplexer = InputMultiplexer()
 
@@ -42,14 +21,6 @@ class GameView(
     }
 
     fun getStage(): Stage = gameStage
-
-    fun setOnPieceClickedListener(listener: OnPieceClickedListener) {
-        this.clickListener = listener
-    }
-
-    fun setOnBoardClickedListener(listener: OnBoardClickedListener) {
-        this.boardClickListener = listener
-    }
 
     override fun render() {
         gameStage.act(Gdx.graphics.deltaTime)

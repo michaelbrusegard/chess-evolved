@@ -113,10 +113,6 @@ class GamePresenter(
 
         gameStage = gameBoardView.getStage()
 
-        gameBoardView.setOnPieceClickedListener { x, y ->
-            handleBoardClick(Position(x, y))
-        }
-
         gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
         gameCamera.update()
     }
