@@ -3,6 +3,7 @@ package io.github.chessevolved.entities
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
@@ -10,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.ActorComponent
+import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.MovementRuleComponent
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PieceTypeComponent
@@ -97,6 +99,7 @@ class PieceFactory(
             add(MovementRuleComponent())
             add(AbilityComponent(emptyList()))
             add(TextureRegionComponent(getPieceTextureRegion(pieceType, playerColor)))
+            add(HighlightComponent(Color.WHITE))
             add(
                 ActorComponent(
                     getPieceActor(

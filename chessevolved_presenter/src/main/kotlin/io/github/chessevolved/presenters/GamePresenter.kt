@@ -13,9 +13,9 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.CaneBeCapturedComponent
 import io.github.chessevolved.components.CapturedComponent
-import io.github.chessevolved.components.GameState
 import io.github.chessevolved.components.MovementIntentComponent
 import io.github.chessevolved.components.PieceType
+import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
@@ -51,8 +51,6 @@ class GamePresenter(
     private val gameBatch: SpriteBatch = SpriteBatch()
     private lateinit var gameStage: Stage
 
-    private val gameState: GameState
-
     private val movementSystem: MovementSystem
     private val renderingSystem: RenderingSystem
     private val selectionListener: SelectionEntityListener
@@ -72,8 +70,6 @@ class GamePresenter(
 
         captureSystem = CaptureSystem()
         engine.addSystem(captureSystem)
-
-        gameState = GameState(ArrayList(), ArrayList())
 
         loadRequiredAssets()
         assetManager.finishLoading()
@@ -278,7 +274,7 @@ class GamePresenter(
         println("PiecePos, x: " + pos.x + ", y: " + pos.y)
 
         val piece =
-            GameStateSerializer.getPieceEntities().find { entity ->
+            engine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
                 val position = PositionComponent.mapper.get(entity).position
                 position == pos
             }
@@ -292,7 +288,7 @@ class GamePresenter(
             } else if (canBeCapturedComponent != null) {
                 piece.add(CapturedComponent())
             } else {
-                GameStateSerializer.getPieceEntities().find { entity ->
+                engine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
                     entity.getComponent(SelectionComponent::class.java) != null
                 }?.remove(SelectionComponent::class.java)
                 piece.add(SelectionComponent())
@@ -302,7 +298,7 @@ class GamePresenter(
 
     private fun handleBoardClick(pos: Position) {
         println("BoardPos, x: " + pos.x + ", y: " + pos.y)
-        GameStateSerializer.getPieceEntities().find { entity ->
+        engine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
             entity.getComponent(SelectionComponent::class.java) != null
         }?.add(MovementIntentComponent(pos))
     }

@@ -7,16 +7,24 @@ import com.badlogic.gdx.graphics.Color
 import io.github.chessevolved.components.CaneBeCapturedComponent
 import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.MovementRuleComponent
+import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.ValidMovesComponent
-import io.github.chessevolved.serialization.GameStateSerializer
+import io.github.chessevolved.components.WeatherEventComponent
 import io.github.chessevolved.singletons.ECSEngine
 
 class SelectionEntityListener(private val boardSize: Int) : EntityListener {
     private val moveValidator = MoveValidator()
 
     private val capturableFamily = Family.all(CaneBeCapturedComponent::class.java).get()
+    private val boardSquareFamily =
+        Family
+            .all(
+                PositionComponent::class.java,
+                WeatherEventComponent::class.java,
+            ).exclude(PieceTypeComponent::class.java)
+            .get()
 
     override fun entityAdded(entity: Entity?) {
         for (piece in ECSEngine.getEntitiesFor(capturableFamily)) {
@@ -33,9 +41,9 @@ class SelectionEntityListener(private val boardSize: Int) : EntityListener {
 
         val availablePositionsSet = availablePositions.toSet()
 
-        for (boardSquare in GameStateSerializer.getBoardSquareEntities()) {
+        for (boardSquare in ECSEngine.getEntitiesFor(boardSquareFamily)) {
             if (availablePositionsSet.contains(PositionComponent.mapper.get(boardSquare).position)) {
-                boardSquare.add(HighlightComponent(Color(0.5f, 0.5f, 0.5f, 1f)))
+                HighlightComponent.mapper.get(boardSquare).color = Color(0.5f, 0.5f, 0.5f, 1f)
             }
         }
 
@@ -45,8 +53,8 @@ class SelectionEntityListener(private val boardSize: Int) : EntityListener {
     override fun entityRemoved(entity: Entity?) {
         entity?.remove(ValidMovesComponent::class.java)
 
-        for (boardSquare in GameStateSerializer.getBoardSquareEntities()) {
-            boardSquare.remove(HighlightComponent::class.java)
+        for (boardSquare in ECSEngine.getEntitiesFor(boardSquareFamily)){
+            HighlightComponent.mapper.get(boardSquare).color = Color.WHITE
         }
     }
 }

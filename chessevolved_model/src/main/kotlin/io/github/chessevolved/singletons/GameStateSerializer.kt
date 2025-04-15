@@ -35,22 +35,6 @@ object GameStateSerializer {
             ).exclude(PieceTypeComponent::class.java)
             .get()
 
-    /**
-     * Getter for the family of piece entities.
-     * @return ImmutableArray of piece entities.
-     */
-    fun getPieceEntities(): ImmutableArray<Entity> {
-        return ECSEngine.getEntitiesFor(pieceFamily)
-    }
-
-    /**
-     * Getter for the family of boardSquare entities.
-     * @return ImmutableArray of boardSquare entities.
-     */
-    fun getBoardSquareEntities(): ImmutableArray<Entity> {
-        return ECSEngine.getEntitiesFor(boardSquareFamily)
-    }
-
     fun serializeToJson(engine: Engine): String {
         val pieces =
             engine.getEntitiesFor(pieceFamily).map { entity ->

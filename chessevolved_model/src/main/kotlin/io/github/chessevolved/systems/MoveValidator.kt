@@ -1,13 +1,15 @@
 package io.github.chessevolved.systems
 
+import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.math.Vector2
 import io.github.chessevolved.components.CaneBeCapturedComponent
 import io.github.chessevolved.components.MovementRuleComponent
+import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
-import io.github.chessevolved.serialization.GameStateSerializer
+import io.github.chessevolved.singletons.ECSEngine
 
 class MoveValidator {
     fun checkAvailablePositions(
@@ -64,7 +66,7 @@ class MoveValidator {
 
             // Check if there's a piece at the new position
             val piece =
-                GameStateSerializer.getPieceEntities().find { entity ->
+                ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
                     val pos = PositionComponent.mapper.get(entity).position
                     pos == newPosition
                 }

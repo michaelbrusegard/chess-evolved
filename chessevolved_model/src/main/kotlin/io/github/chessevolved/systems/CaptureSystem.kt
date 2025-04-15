@@ -5,9 +5,9 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import io.github.chessevolved.components.CapturedComponent
 import io.github.chessevolved.components.MovementIntentComponent
+import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
-import io.github.chessevolved.serialization.GameStateSerializer
 import io.github.chessevolved.singletons.ECSEngine
 
 class CaptureSystem : IteratingSystem(
@@ -21,7 +21,7 @@ class CaptureSystem : IteratingSystem(
 
         // Trigger the movementSystem to move the entity that captured.
         // TODO: do ability logic here for when a piece is captured.
-        GameStateSerializer.getPieceEntities().find { entity ->
+        ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
             entity.getComponent(SelectionComponent::class.java) != null
         }?.add(MovementIntentComponent(capturedPosition))
 

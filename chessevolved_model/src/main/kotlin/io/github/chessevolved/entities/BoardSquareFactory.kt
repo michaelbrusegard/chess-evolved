@@ -3,11 +3,13 @@ package io.github.chessevolved.entities
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import io.github.chessevolved.components.ActorComponent
+import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.Position
@@ -60,6 +62,7 @@ class BoardSquareFactory(
             add(WeatherEventComponent(weatherEvent))
             add(PlayerColorComponent(playerColor))
             add(TextureRegionComponent(getBoardSquareTextureRegion(playerColor)))
+            add(HighlightComponent(Color.WHITE))
             add(ActorComponent(getBoardActor(position, stage, onClick)))
             engine.addEntity(this)
         }

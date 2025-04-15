@@ -12,7 +12,7 @@ import io.github.chessevolved.components.TextureRegionComponent
 class RenderingSystem(
     private val batch: SpriteBatch,
 ) : IteratingSystem(
-        Family.all(PositionComponent::class.java, TextureRegionComponent::class.java).get(),
+        Family.all(PositionComponent::class.java, TextureRegionComponent::class.java, HighlightComponent::class.java).get(),
     ) {
     override fun processEntity(
         entity: Entity,
@@ -24,9 +24,7 @@ class RenderingSystem(
 
         if (position != null && texture != null) {
             texture.region?.let { region ->
-                if (highlight != null) {
-                    batch.color = highlight.color
-                }
+                batch.color = highlight.color
 
                 batch.draw(
                     region,
