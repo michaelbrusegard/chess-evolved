@@ -81,22 +81,14 @@ class GamePresenter(
         assetManager.load("board/black-tile.png", Texture::class.java)
         assetManager.load("board/white-tile.png", Texture::class.java)
 
-        assetManager.load("pieces/rook-black.png", Texture::class.java)
-        assetManager.load("pieces/rook-white.png", Texture::class.java)
-        assetManager.load("pieces/pawn-white.png", Texture::class.java)
-        assetManager.load("pieces/pawn-black.png", Texture::class.java)
-        assetManager.load("pieces/bishop-white.png", Texture::class.java)
-        assetManager.load("pieces/bishop-black.png", Texture::class.java)
-        assetManager.load("pieces/knight-white.png", Texture::class.java)
-        assetManager.load("pieces/knight-black.png", Texture::class.java)
-        // PlayerColor.entries.forEach { color ->
-        //     PieceType.entries.forEach { type ->
-        //             val colorStr = color.name.lowercase()
-        //             val typeStr = type.name.lowercase()
-        //             val filename = "pieces/$colorStr-$typeStr.png"
-        //             assetManager.load(filename, Texture::class.java)
-        //     }
-        // }
+         PlayerColor.entries.forEach { color ->
+             PieceType.entries.forEach { type ->
+                     val colorStr = color.name.lowercase()
+                     val typeStr = type.name.lowercase()
+                     val filename = "pieces/$typeStr-$colorStr.png"
+                     assetManager.load(filename, Texture::class.java)
+             }
+         }
     }
 
     private fun setupGameView() {
@@ -189,8 +181,30 @@ class GamePresenter(
                     }
                 }
                 startX + 3 -> {
+                    pieceFactory.createQueen(
+                        Position(startPos, 0),
+                        PlayerColor.WHITE,
+                        gameStage
+                    ) { clickedPosition -> handlePieceClick(clickedPosition) }
+
+                    pieceFactory.createQueen(
+                        Position(startPos, boardWorldSize - 1),
+                        PlayerColor.BLACK,
+                        gameStage
+                    ) { clickedPosition -> handlePieceClick(clickedPosition) }
                 }
                 startX + 4 -> {
+                    pieceFactory.createKing(
+                        Position(startPos, 0),
+                        PlayerColor.WHITE,
+                        gameStage
+                    ) { clickedPosition -> handlePieceClick(clickedPosition) }
+
+                    pieceFactory.createKing(
+                        Position(startPos, boardWorldSize - 1),
+                        PlayerColor.BLACK,
+                        gameStage
+                    ) { clickedPosition -> handlePieceClick(clickedPosition) }
                 }
                 else -> {}
             }
