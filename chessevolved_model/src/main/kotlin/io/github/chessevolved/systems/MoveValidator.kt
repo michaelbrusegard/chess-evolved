@@ -5,32 +5,10 @@ import com.badlogic.gdx.math.Vector2
 import io.github.chessevolved.components.MovementRuleComponent
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
+import io.github.chessevolved.serialization.GameStateSerializer
 import io.github.chessevolved.singletons.ComponentMappers
-import io.github.chessevolved.singletons.EntityFamilies
 
 class MoveValidator {
-    fun movePieceToPos(
-        piece: Entity?,
-        position: Position,
-        availableMoves: MutableList<Position>,
-    ) {
-        if (piece == null) {
-            throw NullPointerException("Piece is null")
-        }
-
-        val availableMovesSet = availableMoves.toSet()
-
-        if (!availableMovesSet.contains(position)) {
-            throw IllegalArgumentException("Position is not available")
-        }
-
-        val piecePositionComponent = ComponentMappers.posMap.get(piece)
-        val actorComponent = ComponentMappers.actorMap.get(piece)
-
-        piecePositionComponent.position = position
-        actorComponent.actor.setPosition(position.x.toFloat(), position.y.toFloat())
-    }
-
     fun checkAvailablePositions(
         playerColor: PlayerColor,
         position: Position,
@@ -80,8 +58,11 @@ class MoveValidator {
 
 
             if (!movementPattern.canJump) {
-                for (y in position.y..newY) {
-                    for (x in position.x..newX) {
+                val rangeY = if (position.y <= newY) position.y..newY else position.y downTo newY
+                val rangeX = if (position.x <= newX) position.x..newX else position.x downTo newX
+
+                for (y in rangeY) {
+                    for (x in rangeX) {
                         validatePosition(Position(x, y), playerColor, availablePositionsInDirection)
                     }
                 }
@@ -99,7 +80,7 @@ class MoveValidator {
         positionList: MutableList<Position>
     ) {
         val piece =
-            EntityFamilies.getPieceEntities().find { entity ->
+            GameStateSerializer.getPieceEntities().find { entity ->
                 val pos = ComponentMappers.posMap.get(entity).position
                 pos == position
             }

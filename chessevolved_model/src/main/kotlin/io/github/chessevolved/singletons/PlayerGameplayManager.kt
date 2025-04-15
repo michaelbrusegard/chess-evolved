@@ -7,7 +7,6 @@ object PlayerGameplayManager {
     private val player2Pieces: MutableList<Entity> = ArrayList()
 
     fun player1AddPiece(piece: Entity) {
-        println("p1: $piece")
         if (piece == null) {
             throw NullPointerException("Piece is null")
         }
@@ -15,7 +14,6 @@ object PlayerGameplayManager {
     }
 
     fun player2AddPiece(piece: Entity) {
-        println("p2: $piece")
         if (piece == null) {
             throw NullPointerException("Piece is null")
         }

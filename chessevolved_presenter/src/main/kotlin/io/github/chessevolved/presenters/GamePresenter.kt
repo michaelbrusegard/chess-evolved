@@ -1,6 +1,6 @@
 package io.github.chessevolved.presenters
 
-import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.GL20
@@ -12,19 +12,21 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.GameState
+import io.github.chessevolved.components.MovementIntentComponent
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
+import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
+import io.github.chessevolved.serialization.GameStateSerializer
 import io.github.chessevolved.singletons.ComponentMappers
 import io.github.chessevolved.singletons.ECSEngine
-import io.github.chessevolved.singletons.EntityFamilies
 import io.github.chessevolved.singletons.PlayerGameplayManager
-import io.github.chessevolved.systems.AvailablePositionSystem
-import io.github.chessevolved.systems.MoveValidator
+import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
+import io.github.chessevolved.systems.SelectionEntityListener
 import io.github.chessevolved.views.GameUIView
 import io.github.chessevolved.views.GameView
 
@@ -51,15 +53,9 @@ class GamePresenter(
 
     private val gameState: GameState
 
-    private val movementSystem: MoveValidator
-    private val availablePositionSystem: AvailablePositionSystem
+    private val movementSystem: MovementSystem
     private val renderingSystem: RenderingSystem
-
-    // Flags
-    private var pieceIsSelected: Boolean = false
-    private var pieceSelectedPos: Position = Position(0, 0)
-    private var selectedPiece: Entity? = null
-    private var selectedPieceAvailablePositions: MutableList<Position> = ArrayList()
+    private val selectionListener: SelectionEntityListener
 
     init {
         setupGameView()
@@ -69,15 +65,18 @@ class GamePresenter(
         renderingSystem = RenderingSystem(gameBatch)
         engine.addSystem(renderingSystem)
 
+        movementSystem = MovementSystem()
+        engine.addSystem(movementSystem)
+
+        selectionListener = SelectionEntityListener(boardWorldSize)
+        engine.addEntityListener(Family.all(SelectionComponent::class.java).get(), selectionListener)
+
         gameState = GameState(ArrayList(), ArrayList())
 
         loadRequiredAssets()
         assetManager.finishLoading()
 
         setupBoard()
-
-        availablePositionSystem = AvailablePositionSystem()
-        movementSystem = MoveValidator()
 
         // If we do not call this the board will not be displayed
         resize(Gdx.graphics.width, Gdx.graphics.height)
@@ -286,42 +285,31 @@ class GamePresenter(
     }
 
     private fun handlePieceClick(pos: Position) {
-        // println("PiecePos, x: " + pos.x + ", y: " + pos.y)
-        if (pieceIsSelected && pieceSelectedPos == pos) {
-            renderingSystem.defaultBoardSquaresState()
-            pieceIsSelected = false
-        } else {
-            renderingSystem.defaultBoardSquaresState()
-            pieceIsSelected = true
-            pieceSelectedPos = pos
+        println("PiecePos, x: " + pos.x + ", y: " + pos.y)
 
-            selectedPiece =
-                EntityFamilies.getPieceEntities().find { entity ->
-                    val entityPos = ComponentMappers.posMap.get(entity).position
-                    entityPos == pos
-                }
+        val piece = GameStateSerializer.getPieceEntities().find { entity ->
+            val position = ComponentMappers.posMap.get(entity).position
+            position == pos
+        }
 
-            val piecePositionComponent = ComponentMappers.posMap.get(selectedPiece)
-            println(piecePositionComponent.position)
+        if (piece != null) {
+            val selectionComponent = piece.getComponent(SelectionComponent::class.java)
 
-            val pieceCol = ComponentMappers.colorMap.get(selectedPiece).color
-            val pieceMoves = ComponentMappers.movementMap.get(selectedPiece)
-
-            selectedPieceAvailablePositions = availablePositionSystem.checkAvailablePositions(pieceCol, pos, pieceMoves, boardWorldSize)
-
-            renderingSystem.changeBoardsForPositions(selectedPieceAvailablePositions)
+            if (selectionComponent != null) {
+                piece.remove(SelectionComponent::class.java)
+            } else {
+                GameStateSerializer.getPieceEntities().find { entity ->
+                    entity.getComponent(SelectionComponent::class.java) != null
+                }?.remove(SelectionComponent::class.java)
+                piece.add(SelectionComponent())
+            }
         }
     }
 
     private fun handleBoardClick(pos: Position) {
-        // println("BoardPos, x: " + pos.x + ", y: " + pos.y)
-
-        if (pieceIsSelected) {
-            if (selectedPieceAvailablePositions.isNotEmpty()) {
-                movementSystem.movePieceToPos(selectedPiece, pos, selectedPieceAvailablePositions)
-                pieceIsSelected = false
-                renderingSystem.defaultBoardSquaresState()
-            }
-        }
+        println("BoardPos, x: " + pos.x + ", y: " + pos.y)
+        GameStateSerializer.getPieceEntities().find { entity ->
+            entity.getComponent(SelectionComponent::class.java) != null
+        }?.add(MovementIntentComponent(pos))
     }
 }

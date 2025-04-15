@@ -13,7 +13,4 @@ class TextureRegionComponent(
     override fun reset() {
         region = null
     }
-
-    // For board only mostly
-    var isSelected = false
 }

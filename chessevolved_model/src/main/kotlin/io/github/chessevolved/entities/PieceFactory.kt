@@ -107,10 +107,20 @@ class PieceFactory(
         onClick: (Position) -> Unit,
     ) = createPiece(position, PieceType.PAWN, color, stage, onClick).apply {
         getComponent(MovementRuleComponent::class.java).apply {
+            var pawnDirections : List<Vector2>
+            var pawnCaptureDirections : List<Vector2>
+            if (isPlayerOne) {
+                pawnDirections = listOf(Vector2(0f, 1f))
+                pawnCaptureDirections = listOf(Vector2(1f, 1f), Vector2(-1f, 1f))
+            } else {
+                pawnDirections = listOf(Vector2(0f, -1f))
+                pawnCaptureDirections = listOf(Vector2(1f, -1f), Vector2(-1f, -1f))
+            }
+
             addPattern(
                 MovementRuleComponent.MovementPattern(
                     moveName = "pawnMove",
-                    directions = if (isPlayerOne) listOf(Vector2(0f, 1f)) else listOf(Vector2(0f, -1f)),
+                    directions = pawnDirections,
                     maxSteps = 1,
                     moveType = MovementRuleComponent.MoveType.MOVE_ONLY
             ))
@@ -118,7 +128,7 @@ class PieceFactory(
             addPattern(
                 MovementRuleComponent.MovementPattern(
                     moveName = "pawnCapture",
-                    directions = if (isPlayerOne) listOf(Vector2(1f, 1f), Vector2(-1f, 1f)) else listOf(Vector2(1f, -1f), Vector2(-1f, -1f)),
+                    directions = pawnCaptureDirections,
                     maxSteps = 1,
                     moveType = MovementRuleComponent.MoveType.CAPTURE_ONLY
                 )

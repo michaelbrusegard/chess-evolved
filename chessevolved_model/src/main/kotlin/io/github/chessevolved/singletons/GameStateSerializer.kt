@@ -1,7 +1,9 @@
 package io.github.chessevolved.serialization
 
 import com.badlogic.ashley.core.Engine
+import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
+import com.badlogic.ashley.utils.ImmutableArray
 import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.GameState
 import io.github.chessevolved.components.PieceTypeComponent
@@ -11,6 +13,7 @@ import io.github.chessevolved.components.SerializableBoardSquare
 import io.github.chessevolved.components.SerializablePiece
 import io.github.chessevolved.components.WeatherEventComponent
 import io.github.chessevolved.singletons.ComponentMappers
+import io.github.chessevolved.singletons.ECSEngine
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -32,6 +35,22 @@ object GameStateSerializer {
                 WeatherEventComponent::class.java,
             ).exclude(PieceTypeComponent::class.java)
             .get()
+
+    /**
+     * Getter for the family of piece entities.
+     * @return ImmutableArray of piece entities.
+     */
+    fun getPieceEntities(): ImmutableArray<Entity> {
+        return ECSEngine.getEntitiesFor(pieceFamily)
+    }
+
+    /**
+     * Getter for the family of boardSquare entities.
+     * @return ImmutableArray of boardSquare entities.
+     */
+    fun getBoardSquareEntities(): ImmutableArray<Entity> {
+        return ECSEngine.getEntitiesFor(boardSquareFamily)
+    }
 
     fun serializeToJson(engine: Engine): String {
         val pieces =
