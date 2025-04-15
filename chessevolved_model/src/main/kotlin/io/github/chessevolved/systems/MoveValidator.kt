@@ -51,53 +51,53 @@ class MoveValidator {
             val newX = position.x + (direction.x * step).toInt()
             val newY = position.y + (direction.y * step).toInt()
 
+            // Check if position is outside the board
             if (newX < 0 || newX >= boardSize ||
                 newY < 0 || newY >= boardSize) {
                 break
             }
 
+            val newPosition = Position(newX, newY)
 
-            if (!movementPattern.canJump) {
-                val rangeY = if (position.y <= newY) position.y..newY else position.y downTo newY
-                val rangeX = if (position.x <= newX) position.x..newX else position.x downTo newX
+            // Check if there's a piece at the new position
+            val piece = GameStateSerializer.getPieceEntities().find { entity ->
+                val pos = ComponentMappers.posMap.get(entity).position
+                pos == newPosition
+            }
 
-                for (y in rangeY) {
-                    for (x in rangeX) {
-                        validatePosition(Position(x, y), playerColor, availablePositionsInDirection)
+            if (piece != null) {
+                val pieceColor = ComponentMappers.colorMap.get(piece).color
+
+                // If same color piece, we cannot move here or beyond
+                if (pieceColor == playerColor) {
+                    break
+                } else {
+                    // Found an opponent's piece - can capture but not move beyond
+                    when (movementPattern.moveType) {
+                        MovementRuleComponent.MoveType.NORMAL,
+                        MovementRuleComponent.MoveType.CAPTURE_ONLY -> {
+                            availablePositionsInDirection.add(newPosition)
+                        }
+                        else -> {} // For MOVE_ONLY, don't add capture positions
+                    }
+
+                    // If we can't jump, we need to stop after finding a piece
+                    if (!movementPattern.canJump) {
+                        break
                     }
                 }
             } else {
-                validatePosition(Position(newX, newY), playerColor, availablePositionsInDirection)
+                // Empty position
+                when (movementPattern.moveType) {
+                    MovementRuleComponent.MoveType.NORMAL,
+                    MovementRuleComponent.MoveType.MOVE_ONLY -> {
+                        availablePositionsInDirection.add(newPosition)
+                    }
+                    else -> {} // For CAPTURE_ONLY, don't add empty positions
+                }
             }
         }
 
         return availablePositionsInDirection
-    }
-
-    private fun validatePosition(
-        position: Position,
-        playerColor: PlayerColor,
-        positionList: MutableList<Position>
-    ) {
-        val piece =
-            GameStateSerializer.getPieceEntities().find { entity ->
-                val pos = ComponentMappers.posMap.get(entity).position
-                pos == position
-            }
-
-        if (piece != null) {
-            val pieceColor = ComponentMappers.colorMap.get(piece).color
-            if (pieceColor == playerColor) {
-                return
-            } else {
-                // Only case here is that the piece is of opposite color.
-                // Perhaps add red square TODO
-                positionList.add(position)
-                return
-            }
-        } else {
-            positionList.add(position)
-            return
-        }
     }
 }
