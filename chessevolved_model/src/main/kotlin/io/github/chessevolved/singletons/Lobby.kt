@@ -38,6 +38,7 @@ object Lobby {
         }
         try {
             SupabaseLobbyHandler.leaveLobby(lobbyId!!)
+            this.lobbyId = null
         } catch (e: Exception) {
             throw e
         }
@@ -67,9 +68,9 @@ object Lobby {
             throw IllegalStateException("Can't start game when not in a lobby!")
         }
         try {
-            SupabaseLobbyHandler.startGame(lobbyId!!, GameSettings.getGameSettings())
+            SupabaseLobbyHandler.startGame(lobbyId!!)
         } catch (e: Exception) {
-            // TODO: Elevate exception with appropriate message
+            throw e
         }
     }
 
