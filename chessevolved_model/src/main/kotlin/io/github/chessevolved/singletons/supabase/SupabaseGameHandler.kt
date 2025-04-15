@@ -123,7 +123,7 @@ object SupabaseGameHandler {
      * Method to set want_rematch in game-row to true.
      * @param lobbyCode
      */
-    private suspend fun requestRematch(lobbyCode: String) {
+    suspend fun requestRematch(lobbyCode: String) {
         try {
             supabase
                 .from(SUPABASE_GAME_TABLE_NAME)

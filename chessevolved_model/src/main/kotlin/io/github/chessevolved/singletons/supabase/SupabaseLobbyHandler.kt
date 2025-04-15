@@ -217,29 +217,16 @@ object SupabaseLobbyHandler {
     }
 
     /**
-     * Class used to create a new row in game table.
-     */
-    @Serializable
-    private class InsertGame(
-        val lobby_code: String,
-        val settings: Map<String, String>,
-    )
-
-    /**
      * Method to set the "game_started"-column for the lobby table to true in supabase.
      * Also creates a row in the game table on supabase.
      * @param lobbyCode which is the code of the lobby to start the game for.
-     * @param gameSettings which are the game-settings to use for this game.
      */
-    suspend fun startGame(
-        lobbyCode: String,
-        gameSettings: Map<String, String>,
-    ) {
+    suspend fun startGame(lobbyCode: String) {
         try {
             supabase
                 .from("games")
                 .insert(
-                    InsertGame(lobby_code = lobbyCode, settings = gameSettings),
+                    mapOf("lobby_code" to lobbyCode),
                 )
 
             supabase
