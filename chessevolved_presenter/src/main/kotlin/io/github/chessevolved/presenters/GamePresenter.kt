@@ -280,16 +280,15 @@ class GamePresenter(
 
         if (piece != null) {
             val selectionComponent = piece.getComponent(SelectionComponent::class.java)
+            val selectedPiece = engine.getEntitiesFor(Family.all(SelectionComponent::class.java).get()).firstOrNull()
             val canBeCapturedComponent = piece.getComponent(CaneBeCapturedComponent::class.java)
 
             if (selectionComponent != null) {
                 piece.remove(SelectionComponent::class.java)
-            } else if (canBeCapturedComponent != null) {
+            } else if (selectedPiece != null && canBeCapturedComponent != null) {
                 piece.add(CapturedComponent())
             } else {
-                engine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
-                    entity.getComponent(SelectionComponent::class.java) != null
-                }?.remove(SelectionComponent::class.java)
+                selectedPiece?.remove(SelectionComponent::class.java)
                 piece.add(SelectionComponent())
             }
         }

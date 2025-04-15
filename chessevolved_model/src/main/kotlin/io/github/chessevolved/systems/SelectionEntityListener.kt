@@ -13,6 +13,7 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.components.WeatherEventComponent
 import io.github.chessevolved.singletons.ECSEngine
+import ktx.ashley.get
 
 class SelectionEntityListener(private val boardSize: Int) : EntityListener {
     private val moveValidator = MoveValidator()
@@ -52,6 +53,10 @@ class SelectionEntityListener(private val boardSize: Int) : EntityListener {
 
     override fun entityRemoved(entity: Entity?) {
         entity?.remove(ValidMovesComponent::class.java)
+
+        for (piece in ECSEngine.getEntitiesFor(capturableFamily)) {
+            piece.remove(CaneBeCapturedComponent::class.java)
+        }
 
         for (boardSquare in ECSEngine.getEntitiesFor(boardSquareFamily)) {
             HighlightComponent.mapper.get(boardSquare).color = Color.WHITE

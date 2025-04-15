@@ -3,6 +3,7 @@ package io.github.chessevolved.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import io.github.chessevolved.components.CaneBeCapturedComponent
 import io.github.chessevolved.components.CapturedComponent
 import io.github.chessevolved.components.MovementIntentComponent
 import io.github.chessevolved.components.PieceTypeComponent
@@ -21,9 +22,13 @@ class CaptureSystem : IteratingSystem(
 
         // Trigger the movementSystem to move the entity that captured.
         // TODO: do ability logic here for when a piece is captured.
-        ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
-            entity.getComponent(SelectionComponent::class.java) != null
+        ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { piece ->
+            piece.getComponent(SelectionComponent::class.java) != null
         }?.add(MovementIntentComponent(capturedPosition))
+
+        ECSEngine.getEntitiesFor(Family.all(CaneBeCapturedComponent::class.java).get()).map { piece ->
+            piece.remove(CaneBeCapturedComponent::class.java)
+        }
 
         ECSEngine.removeEntity(entity)
     }
