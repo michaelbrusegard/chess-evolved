@@ -27,6 +27,11 @@ class PieceFactory(
     private val engine: Engine,
     private val assetManager: AssetManager,
 ) {
+    private val DiagonalDirections = listOf(
+        vec2(1f, 1f), vec2(1f, -1f),
+        vec2(-1f, 1f), vec2(-1f, -1f)
+    )
+
     private fun getPieceTextureRegion(
         pieceType: PieceType,
         playerColor: PlayerColor,
