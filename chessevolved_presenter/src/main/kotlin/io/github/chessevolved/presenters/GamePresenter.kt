@@ -62,22 +62,9 @@ class GamePresenter(
     private var selectedPieceAvailablePositions: MutableList<Position> = ArrayList()
 
     init {
-        view.init()
-        gameBatch = view.getGameBatch()
-        gameStage = view.getStage()
+        setupGameView()
 
         playerGameplayManager = PlayerGameplayManager
-
-        view.setOnPieceClickedListener { x, y ->
-            handlePieceClick(Position(x, y))
-        }
-
-        view.setOnBoardClickedListener { x, y ->
-            handleBoardClick((Position(x, y)))
-        }
-
-        gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
-        gameCamera.update()
 
         renderingSystem = RenderingSystem(gameBatch)
         engine.addSystem(renderingSystem)
