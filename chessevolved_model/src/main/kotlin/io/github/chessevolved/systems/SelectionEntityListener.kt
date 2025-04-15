@@ -9,17 +9,17 @@ import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.serialization.GameStateSerializer
 import io.github.chessevolved.singletons.ComponentMappers
 
-class SelectionEntityListener(private val boardSize: Int) : EntityListener
-{
+class SelectionEntityListener(private val boardSize: Int) : EntityListener {
     private val moveValidator = MoveValidator()
 
     override fun entityAdded(entity: Entity?) {
-        val availablePositions = moveValidator.checkAvailablePositions(
-            ComponentMappers.colorMap.get(entity).color,
-            ComponentMappers.posMap.get(entity).position,
-            MovementRuleComponent.mapper.get(entity),
-            boardSize
-        )
+        val availablePositions =
+            moveValidator.checkAvailablePositions(
+                ComponentMappers.colorMap.get(entity).color,
+                ComponentMappers.posMap.get(entity).position,
+                MovementRuleComponent.mapper.get(entity),
+                boardSize,
+            )
 
         val availablePositionsSet = availablePositions.toSet()
 
@@ -33,6 +33,8 @@ class SelectionEntityListener(private val boardSize: Int) : EntityListener
     }
 
     override fun entityRemoved(entity: Entity?) {
+        entity?.remove(ValidMovesComponent::class.java)
+
         for (boardSquare in GameStateSerializer.getBoardSquareEntities()) {
             boardSquare.remove(HighlightComponent::class.java)
         }

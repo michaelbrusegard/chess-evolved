@@ -1,6 +1,5 @@
 package io.github.chessevolved.systems
 
-import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.math.Vector2
 import io.github.chessevolved.components.MovementRuleComponent
 import io.github.chessevolved.components.PlayerColor
@@ -19,13 +18,14 @@ class MoveValidator {
 
         for (movementPattern in movementRuleComponent.getMovementRules()) {
             for (direction in movementPattern.directions) {
-                val availablePositionsInDirection = validateDirection(
-                    movementPattern,
-                    boardSize,
-                    position,
-                    direction,
-                    playerColor
-                )
+                val availablePositionsInDirection =
+                    validateDirection(
+                        movementPattern,
+                        boardSize,
+                        position,
+                        direction,
+                        playerColor,
+                    )
 
                 if (availablePositionsInDirection.isNotEmpty()) {
                     availableMoves += availablePositionsInDirection
@@ -41,8 +41,8 @@ class MoveValidator {
         boardSize: Int,
         position: Position,
         direction: Vector2,
-        playerColor: PlayerColor
-    ) : MutableList<Position> {
+        playerColor: PlayerColor,
+    ): MutableList<Position> {
         val availablePositionsInDirection: MutableList<Position> = ArrayList()
 
         val maxSteps = if (movementPattern.maxSteps == 0) boardSize else movementPattern.maxSteps
@@ -53,17 +53,19 @@ class MoveValidator {
 
             // Check if position is outside the board
             if (newX < 0 || newX >= boardSize ||
-                newY < 0 || newY >= boardSize) {
+                newY < 0 || newY >= boardSize
+            ) {
                 break
             }
 
             val newPosition = Position(newX, newY)
 
             // Check if there's a piece at the new position
-            val piece = GameStateSerializer.getPieceEntities().find { entity ->
-                val pos = ComponentMappers.posMap.get(entity).position
-                pos == newPosition
-            }
+            val piece =
+                GameStateSerializer.getPieceEntities().find { entity ->
+                    val pos = ComponentMappers.posMap.get(entity).position
+                    pos == newPosition
+                }
 
             if (piece != null) {
                 val pieceColor = ComponentMappers.colorMap.get(piece).color
@@ -75,7 +77,8 @@ class MoveValidator {
                     // Found an opponent's piece - can capture but not move beyond
                     when (movementPattern.moveType) {
                         MovementRuleComponent.MoveType.NORMAL,
-                        MovementRuleComponent.MoveType.CAPTURE_ONLY -> {
+                        MovementRuleComponent.MoveType.CAPTURE_ONLY,
+                        -> {
                             availablePositionsInDirection.add(newPosition)
                         }
                         else -> {} // For MOVE_ONLY, don't add capture positions
@@ -90,7 +93,8 @@ class MoveValidator {
                 // Empty position
                 when (movementPattern.moveType) {
                     MovementRuleComponent.MoveType.NORMAL,
-                    MovementRuleComponent.MoveType.MOVE_ONLY -> {
+                    MovementRuleComponent.MoveType.MOVE_ONLY,
+                    -> {
                         availablePositionsInDirection.add(newPosition)
                     }
                     else -> {} // For CAPTURE_ONLY, don't add empty positions

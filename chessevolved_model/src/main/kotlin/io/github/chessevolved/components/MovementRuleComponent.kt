@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2
 class MovementRuleComponent() : Component {
     companion object {
         val mapper: ComponentMapper<MovementRuleComponent> =
-                ComponentMapper.getFor(MovementRuleComponent::class.java)
+            ComponentMapper.getFor(MovementRuleComponent::class.java)
     }
 
     /**
@@ -23,13 +23,13 @@ class MovementRuleComponent() : Component {
         val directions: List<Vector2>,
         val maxSteps: Int = 0,
         val canJump: Boolean = false,
-        val moveType: MoveType = MoveType.NORMAL
+        val moveType: MoveType = MoveType.NORMAL,
     )
 
     enum class MoveType {
         NORMAL, // Both capture and move
         MOVE_ONLY, // Move only
-        CAPTURE_ONLY // Capture only
+        CAPTURE_ONLY, // Capture only
     }
 
     private val patterns = mutableListOf<MovementPattern>()

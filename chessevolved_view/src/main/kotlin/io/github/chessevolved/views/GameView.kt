@@ -2,13 +2,12 @@ package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.Viewport
 
 class GameView(
     private val uiStage: Stage,
-    private val gameViewport: Viewport
+    private val gameViewport: Viewport,
 ) : IView {
     private lateinit var gameStage: Stage
 

@@ -256,10 +256,11 @@ class GamePresenter(
     private fun handlePieceClick(pos: Position) {
         println("PiecePos, x: " + pos.x + ", y: " + pos.y)
 
-        val piece = GameStateSerializer.getPieceEntities().find { entity ->
-            val position = ComponentMappers.posMap.get(entity).position
-            position == pos
-        }
+        val piece =
+            GameStateSerializer.getPieceEntities().find { entity ->
+                val position = ComponentMappers.posMap.get(entity).position
+                position == pos
+            }
 
         if (piece != null) {
             val selectionComponent = piece.getComponent(SelectionComponent::class.java)
