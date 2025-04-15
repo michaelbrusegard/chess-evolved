@@ -16,8 +16,14 @@ import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.singletons.Game
+
+import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
+import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.systems.RenderingSystem
 import io.github.chessevolved.views.GameView
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class GamePresenter(
     private val view: GameView,
@@ -35,8 +41,15 @@ class GamePresenter(
     private val gameBatch: SpriteBatch
 
     private val renderingSystem: RenderingSystem
+    private var navigatingToEndGame = false
 
     init {
+        runBlocking {
+            launch {
+                // Crash app if not in lobby. App should never be in a state where it is in a game without being in a lobby first.
+                Game.joinGame(Lobby.getLobbyId() ?: throw IllegalStateException("Can't join a game if not in a lobby first!"))
+            }
+        }
         view.init()
         gameBatch = view.getGameBatch()
 
@@ -89,6 +102,11 @@ class GamePresenter(
         )
     }
 
+    private fun goToGameOverScreen(didWin: Boolean) {
+        navigatingToEndGame = true
+        navigator.navigateToEndGame(didWin)
+    }
+
     override fun render(sb: SpriteBatch) {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -102,6 +120,9 @@ class GamePresenter(
 
         // In case we want part of the UI to be scene2d, we render the view on top
         view.render()
+
+        // Test for rematch TODO: Remove this after testing.
+        goToGameOverScreen(false)
     }
 
     override fun resize(
@@ -116,6 +137,19 @@ class GamePresenter(
         view.dispose()
         engine.removeAllEntities()
         unloadAssets()
+        unsubscribeFromGameUpdates(this.toString())
+        if (Game.isInGame() && !navigatingToEndGame) {
+            runBlocking {
+                launch {
+                    try {
+                        Game.leaveGame()
+                        Lobby.leaveLobby()
+                    } catch (e: Exception) {
+                        error("Non fatal error: Problem with calling leaveGame(). Error: " + e.message)
+                    }
+                }
+            }
+        }
     }
 
     private fun unloadAssets() {

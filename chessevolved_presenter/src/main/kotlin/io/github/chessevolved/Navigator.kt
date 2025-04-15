@@ -69,6 +69,16 @@ class Navigator(
         }
     }
 
+    /**
+     * Special function to navigate back to an old lobby.
+     */
+    fun navigateToRematch() {
+        while (PresenterManager.getCurrent() !is LobbyPresenter) {
+            PresenterManager.pop()
+        }
+        // We are now back at old LobbyPresenter. TODO: Notify LobbyPresenter that this is a rematch-lobby.
+    }
+
     fun goBack() {
         if (!PresenterManager.isEmpty()) {
             PresenterManager.pop()

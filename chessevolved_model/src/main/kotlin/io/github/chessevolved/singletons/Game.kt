@@ -6,7 +6,7 @@ import kotlin.reflect.KFunction1
 object Game {
     private var lobbyCode: String? = null
     private var subscribers = mutableMapOf<String, KFunction1<SupabaseGameHandler.Game, Unit>>()
-    private var wantsRematch = false
+    private var hasAskedForRematch = false
 
     suspend fun joinGame(gameId: String) {
         try {
@@ -22,8 +22,9 @@ object Game {
             throw IllegalStateException("Can't leave game if not in a game.")
         }
         try {
-            wantsRematch = false
+            hasAskedForRematch = false
             SupabaseGameHandler.leaveGame(lobbyCode!!)
+            this.lobbyCode = null
         } catch (e: Exception) {
             throw Exception("Problem with leaving game: " + e.message)
         }
@@ -34,14 +35,14 @@ object Game {
             throw IllegalStateException("Can't ask for rematch if not in a game!")
         }
         try {
-            wantsRematch = true
+            hasAskedForRematch = true
             SupabaseGameHandler.requestRematch(lobbyCode!!)
         } catch (e: Exception) {
             throw Exception("Problem with asking for rematch: " + e.message)
         }
     }
 
-    fun getWantsRematch(): Boolean = wantsRematch
+    fun getWantsRematch(): Boolean = hasAskedForRematch
 
     fun getGameId(): String? = lobbyCode
 

@@ -27,6 +27,7 @@ object Lobby {
         try {
             val lobbyId = SupabaseLobbyHandler.createLobby(::onLobbyRowUpdate)
             this.lobbyId = lobbyId
+            println("Lobby: Creating lobby with ID: $lobbyId...")
         } catch (e: Exception) {
             throw Exception("Problem when creating lobby! " + e.message)
         }

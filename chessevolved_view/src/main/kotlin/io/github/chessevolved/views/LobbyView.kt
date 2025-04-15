@@ -23,6 +23,7 @@ class LobbyView(
     private lateinit var stage: Stage
     private lateinit var secondPlayerStatusLabel: Label
     private lateinit var startGameButton: TextButton
+    private lateinit var toastManager: ToastManager
 
     var onLeaveButtonClicked: () -> Unit = {}
     var onOpenSettingsButtonClicked: () -> Unit = {}
@@ -36,6 +37,7 @@ class LobbyView(
                     Gdx.graphics.height.toFloat(),
                 ),
             )
+        toastManager = ToastManager(stage)
 
         val copyIconTexture = Texture(Gdx.files.internal("icons/copy-icon.png"))
         val iconDrawable = TextureRegionDrawable(TextureRegion(copyIconTexture))
@@ -115,5 +117,9 @@ class LobbyView(
 
     override fun setInputProcessor() {
         Gdx.input.inputProcessor = stage
+    }
+
+    fun showError(message: String) {
+        toastManager.showError(message)
     }
 }
