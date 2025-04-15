@@ -294,4 +294,23 @@ object SupabaseLobbyHandler {
         }
         return response[0]
     }
+
+    suspend fun setupRematchLobby(lobbyCode: String) {
+        try {
+            supabase
+                .from("lobbies")
+                .update(
+                    {
+                        set("game_started", value = false)
+                        set("second_player", value = false)
+                    },
+                ) {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
+                }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
 }

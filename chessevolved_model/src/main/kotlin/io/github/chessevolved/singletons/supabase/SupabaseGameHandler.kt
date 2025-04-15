@@ -125,19 +125,30 @@ object SupabaseGameHandler {
      */
     suspend fun requestRematch(lobbyCode: String) {
         try {
+            val response =
+                supabase
+                    .from(SUPABASE_GAME_TABLE_NAME)
+                    .select {
+                        filter {
+                            eq("lobby_code", lobbyCode)
+                        }
+                    }.decodeList<Game>()
+
+            if (response.isEmpty()) throw IllegalStateException("Illegal state when requesting rematch. Game does not exist.")
+
             supabase
                 .from(SUPABASE_GAME_TABLE_NAME)
                 .update(
                     {
-                        set("want_rematch", value = true)
+                        // This line ensures that the value of want_rematch is the opposite of what it previously were. This way we get the ack-behaviour.
+                        set("want_rematch", value = !response[0].want_rematch)
                     },
                 ) {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
                 }
-        } catch (e: PostgrestRestException) {
-            // Error with supabase when setting disconnected to true on game row.
+        } catch (e: Exception) {
             throw e
         }
     }

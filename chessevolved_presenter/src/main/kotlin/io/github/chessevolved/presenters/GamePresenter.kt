@@ -17,7 +17,6 @@ import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.singletons.Game
-
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.systems.RenderingSystem
@@ -122,6 +121,7 @@ class GamePresenter(
         view.render()
 
         // Test for rematch TODO: Remove this after testing.
+        println("Going to end")
         goToGameOverScreen(false)
     }
 

@@ -1,6 +1,7 @@
 package io.github.chessevolved.singletons
 
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
+import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import kotlin.reflect.KFunction1
 
 object Game {
@@ -31,12 +32,13 @@ object Game {
     }
 
     suspend fun askForRematch() {
-        if (!isInGame()) {
-            throw IllegalStateException("Can't ask for rematch if not in a game!")
+        if (!isInGame() && !hasAskedForRematch) {
+            throw IllegalStateException("Can't ask for rematch if not in a game or have already asked for rematch!")
         }
         try {
             hasAskedForRematch = true
             SupabaseGameHandler.requestRematch(lobbyCode!!)
+            SupabaseLobbyHandler.setupRematchLobby(lobbyCode!!)
         } catch (e: Exception) {
             throw Exception("Problem with asking for rematch: " + e.message)
         }

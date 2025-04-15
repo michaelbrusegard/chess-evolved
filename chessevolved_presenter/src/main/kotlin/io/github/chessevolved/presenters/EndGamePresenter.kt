@@ -1,5 +1,6 @@
 package io.github.chessevolved.presenters
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.singletons.Game
@@ -23,6 +24,8 @@ class EndGamePresenter(
     }
 
     private fun requestRematch() {
+        endGameView.disableRematchButton()
+        endGameView.updateRematchText("Rematch request sent...")
         runBlocking {
             launch {
                 Game.askForRematch()
@@ -62,14 +65,21 @@ class EndGamePresenter(
 
     fun onGameRowUpdate(gameRow: SupabaseGameHandler.Game) {
         if (gameRow.want_rematch) {
-            if (Game.getWantsRematch()) {
-                // TODO: Navigate back to rematch-lobby and tell the other player that they too want a rematch. Could do this by setting wants-rematch back to false.
-            } else {
-                // TODO: Update text that the other player wants rematch.
+            if (!Game.getWantsRematch()) {
+                endGameView.updateRematchText("The other player requests a rematch.")
             }
         }
+
+        // If want_rematch gets set back to false, it's an ACK from the other player, accepting the rematch.
+        if (!gameRow.want_rematch && Game.getWantsRematch()) {
+            Gdx.app.postRunnable {
+                navigator.navigateToLobby(Game.getGameId()!!)
+            }
+        }
+
         if (gameRow.player_disconnected) {
-            // TODO: Disable rematch button.
+            endGameView.disableRematchButton()
+            endGameView.updateRematchText("Other player has left...")
         }
     }
 }
