@@ -163,7 +163,7 @@ Thumbs.db
 *#*#
 /.kotlin/
 /assets/assets.txt
-.env
+env
 
 ## Special cases:
 
