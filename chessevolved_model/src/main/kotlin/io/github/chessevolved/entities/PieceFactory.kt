@@ -25,7 +25,7 @@ class PieceFactory(
     private val engine: Engine,
     private val assetManager: AssetManager,
 ) {
-    private val DiagonalDirections =
+    private val diagonalDirections =
         listOf(
             Vector2(1f, 1f),
             Vector2(1f, -1f),
@@ -33,7 +33,7 @@ class PieceFactory(
             Vector2(-1f, -1f),
         )
 
-    private val StraightDirections =
+    private val straightDirections =
         listOf(
             Vector2(0f, 1f),
             Vector2(0f, -1f),
@@ -41,7 +41,7 @@ class PieceFactory(
             Vector2(-1f, 0f),
         )
 
-    private val KnightDirections =
+    private val knightDirections =
         listOf(
             Vector2(1f, 2f),
             Vector2(-1f, 2f),
@@ -159,7 +159,7 @@ class PieceFactory(
                 addPattern(
                     MovementRuleComponent.MovementPattern(
                         moveName = "knightNormal",
-                        directions = KnightDirections,
+                        directions = knightDirections,
                         maxSteps = 1,
                         canJump = true,
                     ),
@@ -178,7 +178,7 @@ class PieceFactory(
                 addPattern(
                     MovementRuleComponent.MovementPattern(
                         moveName = "bishopNormal",
-                        directions = DiagonalDirections,
+                        directions = diagonalDirections,
                     ),
                 )
             }
@@ -195,7 +195,7 @@ class PieceFactory(
                 addPattern(
                     MovementRuleComponent.MovementPattern(
                         moveName = "rookNormal",
-                        directions = StraightDirections,
+                        directions = straightDirections,
                     ),
                 )
             }
@@ -212,7 +212,7 @@ class PieceFactory(
                 addPattern(
                     MovementRuleComponent.MovementPattern(
                         moveName = "queenNormal",
-                        directions = StraightDirections + DiagonalDirections,
+                        directions = straightDirections + diagonalDirections,
                     ),
                 )
             }
@@ -229,7 +229,7 @@ class PieceFactory(
                 addPattern(
                     MovementRuleComponent.MovementPattern(
                         moveName = "kingNormal",
-                        directions = StraightDirections + DiagonalDirections,
+                        directions = straightDirections + diagonalDirections,
                         maxSteps = 1,
                     ),
                 )
