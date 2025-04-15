@@ -23,7 +23,6 @@ import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
-import io.github.chessevolved.serialization.GameStateSerializer
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.systems.CaptureSystem
 import io.github.chessevolved.systems.MovementSystem

@@ -53,7 +53,7 @@ class SelectionEntityListener(private val boardSize: Int) : EntityListener {
     override fun entityRemoved(entity: Entity?) {
         entity?.remove(ValidMovesComponent::class.java)
 
-        for (boardSquare in ECSEngine.getEntitiesFor(boardSquareFamily)){
+        for (boardSquare in ECSEngine.getEntitiesFor(boardSquareFamily)) {
             HighlightComponent.mapper.get(boardSquare).color = Color.WHITE
         }
     }

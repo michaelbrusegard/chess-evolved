@@ -1,9 +1,7 @@
 package io.github.chessevolved.serialization
 
 import com.badlogic.ashley.core.Engine
-import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
-import com.badlogic.ashley.utils.ImmutableArray
 import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.GameState
 import io.github.chessevolved.components.PieceTypeComponent
@@ -12,7 +10,6 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SerializableBoardSquare
 import io.github.chessevolved.components.SerializablePiece
 import io.github.chessevolved.components.WeatherEventComponent
-import io.github.chessevolved.singletons.ECSEngine
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
