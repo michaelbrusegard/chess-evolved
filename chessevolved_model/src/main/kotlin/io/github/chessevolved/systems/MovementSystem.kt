@@ -19,6 +19,7 @@ class MovementSystem : IteratingSystem(
         entity: Entity?,
         deltaTime: Float,
     ) {
+        println("Triggered")
         val availableMoveSet = ValidMovesComponent.mapper.get(entity).validMoves.toSet()
         val targetPosition = MovementIntentComponent.mapper.get(entity).targetPosition
 

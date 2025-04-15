@@ -1,6 +1,7 @@
 package io.github.chessevolved.systems
 
 import com.badlogic.gdx.math.Vector2
+import io.github.chessevolved.components.CaneBeCapturedComponent
 import io.github.chessevolved.components.MovementRuleComponent
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
@@ -79,6 +80,7 @@ class MoveValidator {
                         MovementRuleComponent.MoveType.NORMAL,
                         MovementRuleComponent.MoveType.CAPTURE_ONLY,
                         -> {
+                            piece.add(CaneBeCapturedComponent())
                             availablePositionsInDirection.add(newPosition)
                         }
                         else -> {} // For MOVE_ONLY, don't add capture positions

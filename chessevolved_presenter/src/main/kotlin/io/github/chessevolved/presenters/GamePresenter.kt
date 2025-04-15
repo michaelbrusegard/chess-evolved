@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.components.CaneBeCapturedComponent
+import io.github.chessevolved.components.CapturedComponent
 import io.github.chessevolved.components.GameState
 import io.github.chessevolved.components.MovementIntentComponent
 import io.github.chessevolved.components.PieceType
@@ -23,6 +25,7 @@ import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.serialization.GameStateSerializer
 import io.github.chessevolved.singletons.ComponentMappers
 import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.systems.CaptureSystem
 import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
 import io.github.chessevolved.systems.SelectionEntityListener
@@ -53,6 +56,7 @@ class GamePresenter(
     private val movementSystem: MovementSystem
     private val renderingSystem: RenderingSystem
     private val selectionListener: SelectionEntityListener
+    private val captureSystem: CaptureSystem
 
     init {
         setupGameView()
@@ -65,6 +69,9 @@ class GamePresenter(
 
         selectionListener = SelectionEntityListener(boardWorldSize)
         engine.addEntityListener(Family.all(SelectionComponent::class.java).get(), selectionListener)
+
+        captureSystem = CaptureSystem()
+        engine.addSystem(captureSystem)
 
         gameState = GameState(ArrayList(), ArrayList())
 
@@ -81,14 +88,14 @@ class GamePresenter(
         assetManager.load("board/black-tile.png", Texture::class.java)
         assetManager.load("board/white-tile.png", Texture::class.java)
 
-         PlayerColor.entries.forEach { color ->
-             PieceType.entries.forEach { type ->
-                     val colorStr = color.name.lowercase()
-                     val typeStr = type.name.lowercase()
-                     val filename = "pieces/$typeStr-$colorStr.png"
-                     assetManager.load(filename, Texture::class.java)
-             }
-         }
+        PlayerColor.entries.forEach { color ->
+            PieceType.entries.forEach { type ->
+                val colorStr = color.name.lowercase()
+                val typeStr = type.name.lowercase()
+                val filename = "pieces/$typeStr-$colorStr.png"
+                assetManager.load(filename, Texture::class.java)
+            }
+        }
     }
 
     private fun setupGameView() {
@@ -184,26 +191,26 @@ class GamePresenter(
                     pieceFactory.createQueen(
                         Position(startPos, 0),
                         PlayerColor.WHITE,
-                        gameStage
+                        gameStage,
                     ) { clickedPosition -> handlePieceClick(clickedPosition) }
 
                     pieceFactory.createQueen(
                         Position(startPos, boardWorldSize - 1),
                         PlayerColor.BLACK,
-                        gameStage
+                        gameStage,
                     ) { clickedPosition -> handlePieceClick(clickedPosition) }
                 }
                 startX + 4 -> {
                     pieceFactory.createKing(
                         Position(startPos, 0),
                         PlayerColor.WHITE,
-                        gameStage
+                        gameStage,
                     ) { clickedPosition -> handlePieceClick(clickedPosition) }
 
                     pieceFactory.createKing(
                         Position(startPos, boardWorldSize - 1),
                         PlayerColor.BLACK,
-                        gameStage
+                        gameStage,
                     ) { clickedPosition -> handlePieceClick(clickedPosition) }
                 }
                 else -> {}
@@ -278,9 +285,12 @@ class GamePresenter(
 
         if (piece != null) {
             val selectionComponent = piece.getComponent(SelectionComponent::class.java)
+            val canBeCapturedComponent = piece.getComponent(CaneBeCapturedComponent::class.java)
 
             if (selectionComponent != null) {
                 piece.remove(SelectionComponent::class.java)
+            } else if (canBeCapturedComponent != null) {
+                piece.add(CapturedComponent())
             } else {
                 GameStateSerializer.getPieceEntities().find { entity ->
                     entity.getComponent(SelectionComponent::class.java) != null
