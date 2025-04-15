@@ -32,6 +32,18 @@ class PieceFactory(
         vec2(-1f, 1f), vec2(-1f, -1f)
     )
 
+    private val StraightDirections = listOf(
+        vec2(0f, 1f), vec2(0f, -1f),
+        vec2(1f, 0f), vec2(-1f, 0f)
+    )
+
+    private val KnightDirections = listOf(
+        vec2(1f, 2f), vec2(-1f, 2f),
+        vec2(1f, -2f), vec2(-1f, -2f),
+        vec2(2f, 1f), vec2(2f, -1f),
+        vec2(-2f, 1f), vec2(-2f, -1f)
+    )
+
     private fun getPieceTextureRegion(
         pieceType: PieceType,
         playerColor: PlayerColor,
@@ -67,7 +79,6 @@ class PieceFactory(
         position: Position,
         pieceType: PieceType,
         playerColor: PlayerColor,
-        movementRuleComponent: MovementRuleComponent,
         stage: Stage,
         onClick: (Position) -> Unit,
     ): Entity =
@@ -75,7 +86,7 @@ class PieceFactory(
             add(PositionComponent(position))
             add(PieceTypeComponent(pieceType))
             add(PlayerColorComponent(playerColor))
-            add(movementRuleComponent)
+            add(MovementRuleComponent())
             add(AbilityComponent(emptyList()))
             add(TextureRegionComponent(getPieceTextureRegion(pieceType, playerColor)))
             add(
@@ -96,24 +107,25 @@ class PieceFactory(
         color: PlayerColor,
         stage: Stage,
         onClick: (Position) -> Unit,
-    ): Entity {
-        val movementRuleComponent = MovementRuleComponent()
-        val normalDirections: ArrayList<Vector2> =
-            arrayListOf(
-                vec2(0f, if (isPlayerOne) 1f else -1f),
+    ) = createPiece(position, PieceType.PAWN, color, stage, onClick).apply {
+        getComponent(MovementRuleComponent::class.java).apply {
+            addPattern(
+                MovementRuleComponent.MovementPattern(
+                    moveName = "pawnMove",
+                    directions = if (isPlayerOne) listOf(vec2(0f, 1f)) else listOf(vec2(0f, -1f)),
+                    maxSteps = 1,
+                    moveType = MovementRuleComponent.MoveType.MOVE_ONLY
+            ))
+
+            addPattern(
+                MovementRuleComponent.MovementPattern(
+                    moveName = "pawnCapture",
+                    directions = if (isPlayerOne) listOf(vec2(1f, 1f), vec2(-1f, 1f)) else listOf(vec2(1f, -1f), vec2(-1f, -1f)),
+                    maxSteps = 1,
+                    moveType = MovementRuleComponent.MoveType.CAPTURE_ONLY
+                )
             )
-        // Todo add killing directions
-
-        movementRuleComponent.addMovementRule(
-            "pawnNormal",
-            normalDirections,
-            1,
-            false,
-            true,
-            false,
-        )
-
-        return createPiece(position, PieceType.PAWN, color, movementRuleComponent, stage, onClick)
+        }
     }
 
     fun createKnight(
@@ -121,30 +133,15 @@ class PieceFactory(
         color: PlayerColor,
         stage: Stage,
         onClick: (Position) -> Unit,
-    ): Entity {
-        val movementRuleComponent = MovementRuleComponent()
-        val normalDirections: ArrayList<Vector2> =
-            arrayListOf(
-                vec2(1f, 2f),
-                vec2(-1f, 2f),
-                vec2(1f, -2f),
-                vec2(-1f, -2f),
-                vec2(2f, 1f),
-                vec2(2f, -1f),
-                vec2(-2f, 1f),
-                vec2(-2f, -1f),
-            )
-
-        movementRuleComponent.addMovementRule(
-            "knightNormal",
-            normalDirections,
-            1,
-            true,
-            true,
-            true,
-        )
-
-        return createPiece(position, PieceType.KNIGHT, color, movementRuleComponent, stage, onClick)
+    ): Entity = createPiece(position, PieceType.KNIGHT, color, stage, onClick).apply {
+        getComponent(MovementRuleComponent::class.java).apply {
+            addPattern(MovementRuleComponent.MovementPattern(
+                moveName = "knightNormal",
+                directions = KnightDirections,
+                maxSteps = 1,
+                canJump = true
+            ))
+        }
     }
 
     fun createBishop(
@@ -152,26 +149,13 @@ class PieceFactory(
         color: PlayerColor,
         stage: Stage,
         onClick: (Position) -> Unit,
-    ): Entity {
-        val movementRuleComponent = MovementRuleComponent()
-        val normalDirections: ArrayList<Vector2> =
-            arrayListOf(
-                vec2(1f, 1f),
-                vec2(-1f, 1f),
-                vec2(1f, -1f),
-                vec2(-1f, -1f),
-            )
-
-        movementRuleComponent.addMovementRule(
-            "bishopNormal",
-            normalDirections,
-            0,
-            false,
-            true,
-            true,
-        )
-
-        return createPiece(position, PieceType.BISHOP, color, movementRuleComponent, stage, onClick)
+    ): Entity = createPiece(position, PieceType.BISHOP, color, stage, onClick).apply {
+        getComponent(MovementRuleComponent::class.java).apply {
+            addPattern(MovementRuleComponent.MovementPattern(
+                moveName = "bishopNormal",
+                directions = DiagonalDirections
+            ))
+        }
     }
 
     fun createRook(
@@ -179,26 +163,13 @@ class PieceFactory(
         color: PlayerColor,
         stage: Stage,
         onClick: (Position) -> Unit,
-    ): Entity {
-        val movementRuleComponent = MovementRuleComponent()
-        val normalDirections: ArrayList<Vector2> =
-            arrayListOf(
-                vec2(0f, 1f),
-                vec2(0f, -1f),
-                vec2(1f, 0f),
-                vec2(-1f, 0f),
-            )
-
-        movementRuleComponent.addMovementRule(
-            "rookNormal",
-            normalDirections,
-            0,
-            false,
-            true,
-            true,
-        )
-
-        return createPiece(position, PieceType.ROOK, color, movementRuleComponent, stage, onClick)
+    ): Entity = createPiece(position, PieceType.ROOK, color, stage, onClick).apply {
+        getComponent(MovementRuleComponent::class.java).apply {
+            addPattern(MovementRuleComponent.MovementPattern(
+                moveName = "rookNormal",
+                directions = StraightDirections
+            ))
+        }
     }
 
     fun createQueen(
@@ -206,32 +177,13 @@ class PieceFactory(
         color: PlayerColor,
         stage: Stage,
         onClick: (Position) -> Unit,
-    ): Entity {
-        val movementRuleComponent = MovementRuleComponent()
-        val normalDirections: ArrayList<Vector2> =
-            arrayListOf(
-                // Rook type movement
-                vec2(0f, 1f),
-                vec2(0f, -1f),
-                vec2(1f, 0f),
-                vec2(-1f, 0f),
-                // Bishop type movement
-                vec2(1f, 1f),
-                vec2(-1f, 1f),
-                vec2(1f, -1f),
-                vec2(-1f, -1f),
-            )
-
-        movementRuleComponent.addMovementRule(
-            "queenNormal",
-            normalDirections,
-            0,
-            false,
-            true,
-            true,
-        )
-
-        return createPiece(position, PieceType.QUEEN, color, movementRuleComponent, stage, onClick)
+    ): Entity = createPiece(position, PieceType.QUEEN, color, stage, onClick).apply {
+        getComponent(MovementRuleComponent::class.java).apply {
+            addPattern(MovementRuleComponent.MovementPattern(
+                moveName = "queenNormal",
+                directions = StraightDirections + DiagonalDirections
+            ))
+        }
     }
 
     fun createKing(
@@ -239,31 +191,13 @@ class PieceFactory(
         color: PlayerColor,
         stage: Stage,
         onClick: (Position) -> Unit,
-    ): Entity {
-        val movementRuleComponent = MovementRuleComponent()
-        val normalDirections: ArrayList<Vector2> =
-            arrayListOf(
-                // Rook type movement
-                vec2(0f, 1f),
-                vec2(0f, -1f),
-                vec2(1f, 0f),
-                vec2(-1f, 0f),
-                // Bishop type movement
-                vec2(1f, 1f),
-                vec2(-1f, 1f),
-                vec2(1f, -1f),
-                vec2(-1f, -1f),
-            )
-
-        movementRuleComponent.addMovementRule(
-            "queenNormal",
-            normalDirections,
-            1,
-            false,
-            true,
-            true,
-        )
-
-        return createPiece(position, PieceType.KING, color, movementRuleComponent, stage, onClick)
+    ): Entity = createPiece(position, PieceType.KING, color, stage, onClick).apply {
+        getComponent(MovementRuleComponent::class.java).apply {
+            addPattern(MovementRuleComponent.MovementPattern(
+                moveName = "kingNormal",
+                directions = StraightDirections + DiagonalDirections,
+                maxSteps = 1
+            ))
+        }
     }
 }
