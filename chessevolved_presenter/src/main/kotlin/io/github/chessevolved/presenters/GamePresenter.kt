@@ -11,20 +11,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
-import io.github.chessevolved.components.CaneBeCapturedComponent
-import io.github.chessevolved.components.CapturedComponent
-import io.github.chessevolved.components.MovementIntentComponent
 import io.github.chessevolved.components.PieceType
-import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
-import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.systems.CaptureSystem
+import io.github.chessevolved.systems.InputService
+import io.github.chessevolved.systems.InputSystem
 import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
 import io.github.chessevolved.systems.SelectionEntityListener
@@ -54,6 +51,8 @@ class GamePresenter(
     private val renderingSystem: RenderingSystem
     private val selectionListener: SelectionEntityListener
     private val captureSystem: CaptureSystem
+    private val inputSystem: InputSystem
+    private val inputService: InputService = InputService()
 
     init {
         setupGameView()
@@ -69,6 +68,9 @@ class GamePresenter(
 
         captureSystem = CaptureSystem()
         engine.addSystem(captureSystem)
+
+        inputSystem = InputSystem()
+        engine.addSystem(inputSystem)
 
         loadRequiredAssets()
         assetManager.finishLoading()
@@ -116,7 +118,7 @@ class GamePresenter(
                     WeatherEvent.NONE,
                     tileColor,
                     gameStage,
-                ) { clickedPosition -> handleBoardClick(clickedPosition) }
+                ) { clickedPosition -> inputService.clickBoardSquareAtPosition(clickedPosition) }
             }
         }
 
@@ -127,14 +129,14 @@ class GamePresenter(
                 Position(startPos, 1),
                 PlayerColor.WHITE,
                 gameStage,
-            ) { clickedPosition -> handlePieceClick(clickedPosition) }
+            ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
 
             pieceFactory.createPawn(
                 false,
                 Position(startPos, boardWorldSize - 2),
                 PlayerColor.BLACK,
                 gameStage,
-            ) { clickedPosition -> handlePieceClick(clickedPosition) }
+            ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
 
             when (startPos) {
                 startX -> {
@@ -143,13 +145,13 @@ class GamePresenter(
                             Position(startX + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
-                        ) { clickedPosition -> handlePieceClick(clickedPosition) }
+                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
 
                         pieceFactory.createRook(
                             Position(startX + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
-                        ) { clickedPosition -> handlePieceClick(clickedPosition) }
+                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
                     }
                 }
                 startX + 1 -> {
@@ -158,13 +160,13 @@ class GamePresenter(
                             Position(startX + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
-                        ) { clickedPosition -> handlePieceClick(clickedPosition) }
+                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
 
                         pieceFactory.createKnight(
                             Position(startX + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
-                        ) { clickedPosition -> handlePieceClick(clickedPosition) }
+                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
                     }
                 }
                 startX + 2 -> {
@@ -173,13 +175,13 @@ class GamePresenter(
                             Position(startX + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
-                        ) { clickedPosition -> handlePieceClick(clickedPosition) }
+                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
 
                         pieceFactory.createBishop(
                             Position(startX + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
-                        ) { clickedPosition -> handlePieceClick(clickedPosition) }
+                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
                     }
                 }
                 startX + 3 -> {
@@ -187,26 +189,26 @@ class GamePresenter(
                         Position(startPos, 0),
                         PlayerColor.WHITE,
                         gameStage,
-                    ) { clickedPosition -> handlePieceClick(clickedPosition) }
+                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
 
                     pieceFactory.createQueen(
                         Position(startPos, boardWorldSize - 1),
                         PlayerColor.BLACK,
                         gameStage,
-                    ) { clickedPosition -> handlePieceClick(clickedPosition) }
+                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
                 }
                 startX + 4 -> {
                     pieceFactory.createKing(
                         Position(startPos, 0),
                         PlayerColor.WHITE,
                         gameStage,
-                    ) { clickedPosition -> handlePieceClick(clickedPosition) }
+                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
 
                     pieceFactory.createKing(
                         Position(startPos, boardWorldSize - 1),
                         PlayerColor.BLACK,
                         gameStage,
-                    ) { clickedPosition -> handlePieceClick(clickedPosition) }
+                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
                 }
                 else -> {}
             }
@@ -267,37 +269,5 @@ class GamePresenter(
 
     override fun setInputProcessor() {
         gameBoardView.setInputProcessor()
-    }
-
-    private fun handlePieceClick(pos: Position) {
-        println("PiecePos, x: " + pos.x + ", y: " + pos.y)
-
-        val piece =
-            engine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
-                val position = PositionComponent.mapper.get(entity).position
-                position == pos
-            }
-
-        if (piece != null) {
-            val selectionComponent = piece.getComponent(SelectionComponent::class.java)
-            val selectedPiece = engine.getEntitiesFor(Family.all(SelectionComponent::class.java).get()).firstOrNull()
-            val canBeCapturedComponent = piece.getComponent(CaneBeCapturedComponent::class.java)
-
-            if (selectionComponent != null) {
-                piece.remove(SelectionComponent::class.java)
-            } else if (selectedPiece != null && canBeCapturedComponent != null) {
-                piece.add(CapturedComponent())
-            } else {
-                selectedPiece?.remove(SelectionComponent::class.java)
-                piece.add(SelectionComponent())
-            }
-        }
-    }
-
-    private fun handleBoardClick(pos: Position) {
-        println("BoardPos, x: " + pos.x + ", y: " + pos.y)
-        engine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
-            entity.getComponent(SelectionComponent::class.java) != null
-        }?.add(MovementIntentComponent(pos))
     }
 }
