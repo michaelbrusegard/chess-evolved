@@ -84,6 +84,7 @@ class LobbyView(
         if (isConnected) {
             secondPlayerStatusLabel.setText("Second player connected!")
             startGameButton.isDisabled = false
+            startGameButton.clearListeners()
             startGameButton.onClick { onStartGameButtonClicked() }
             startGameButton.color = scene2d.label("tex").color
         } else {

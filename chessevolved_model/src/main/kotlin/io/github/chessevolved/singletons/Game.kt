@@ -37,8 +37,8 @@ object Game {
         }
         try {
             hasAskedForRematch = true
-            SupabaseGameHandler.requestRematch(lobbyCode!!)
             SupabaseLobbyHandler.setupRematchLobby(lobbyCode!!)
+            SupabaseGameHandler.requestRematch(lobbyCode!!)
         } catch (e: Exception) {
             throw Exception("Problem with asking for rematch: " + e.message)
         }

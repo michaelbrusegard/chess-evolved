@@ -34,8 +34,6 @@ class LobbyPresenter(
                 lobbyUpdateHandler(lobby)
             }
         }
-        // TODO: Remove this after testing rematch functionality.
-        playerJoinedLeftLobby(true)
     }
 
     private fun playerJoinedLeftLobby(playerJoined: Boolean) {
@@ -58,7 +56,6 @@ class LobbyPresenter(
     }
 
     private fun onStartGameButtonClicked() {
-        // This gets called twice for no reason when start game is clicked. Not sure why, but made a quick-fix for this.
         if (lobbyStarted) return
         runBlocking {
             launch {

@@ -23,6 +23,33 @@ object Lobby {
         }
     }
 
+    suspend fun joinRematchLobbyAsHost() {
+        println("Lobby: Joining rematch-lobby with ID: $lobbyId...")
+        if (!isInLobby()) {
+            throw Exception("Can't rematch when not in a lobby!")
+        }
+        try {
+            SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
+            SupabaseLobbyHandler.joinLobbyNoUpdateSecondPlayer(lobbyId!!, ::onLobbyRowUpdate)
+        } catch (e: Exception) {
+            println(e.message)
+            error(e)
+            // throw e
+        }
+    }
+
+    suspend fun joinRematchLobbyNonHost() {
+        if (!isInLobby()) {
+            throw Exception("Can't rematch when not in a lobby!")
+        }
+        try {
+            SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
+            SupabaseLobbyHandler.joinLobby(lobbyId!!, ::onLobbyRowUpdate)
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
     suspend fun createLobby() {
         try {
             val lobbyId = SupabaseLobbyHandler.createLobby(::onLobbyRowUpdate)
@@ -40,6 +67,18 @@ object Lobby {
         try {
             SupabaseLobbyHandler.leaveLobby(lobbyId!!)
             this.lobbyId = null
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    suspend fun leaveLobbyWithoutUpdating() {
+        if (!isInLobby()) {
+            throw Exception("Can't leave lobby when not in a lobby!")
+        }
+        try {
+            SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
+            lobbyId = null
         } catch (e: Exception) {
             throw e
         }

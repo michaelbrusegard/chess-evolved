@@ -127,6 +127,34 @@ object SupabaseLobbyHandler {
     }
 
     /**
+     * Method that joins and subscribes to row-level lobby updates without
+     * updating second_player column to true.
+     * @param lobbyCode identifying the lobby
+     * @param onEventListener as the method to be called upon row-updates
+     */
+    suspend fun joinLobbyNoUpdateSecondPlayer(
+        lobbyCode: String,
+        onEventListener: KFunction1<Lobby, Unit>,
+    ) {
+        val response =
+            supabase
+                .from(SUPABASE_LOBBY_TABLE_NAME)
+                .select {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
+                }.decodeList<Lobby>()
+
+        if (response.isEmpty()) {
+            throw Exception("Lobby does not exist.")
+        }
+        if (response[0].second_player) {
+            throw Exception("Lobby is full!")
+        }
+        addLobbyListener(lobbyCode, onEventListener) // Throws illegalStateException upon already joined lobby
+    }
+
+    /**
      * Method to leave a lobby, marking the row in supabase as not having a second player anymore,
      * or straight up deleting the row if the second player column is already false.
      * Also unsubscribes from the channel that listens to row-level-changes.
@@ -178,6 +206,16 @@ object SupabaseLobbyHandler {
             }
         }
 
+        SupabaseChannelManager.unsubscribeFromChannel("lobby_$lobbyCode")
+    }
+
+    /**
+     * Method to leave a lobby without updating the row. Useful for when you want to unsubscribe from row updates.
+     * Typically used in rematches where a lobby will be reused.
+     * @param lobbyCode identifying the lobby
+     * @throws Exception if trying to leave nonexistent channel
+     */
+    suspend fun leaveLobbyNoUpdateSecondPlayer(lobbyCode: String) {
         SupabaseChannelManager.unsubscribeFromChannel("lobby_$lobbyCode")
     }
 
