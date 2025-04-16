@@ -119,10 +119,6 @@ class GamePresenter(
 
         // In case we want part of the UI to be scene2d, we render the view on top
         view.render()
-
-        // Test for rematch TODO: Remove this after testing.
-        println("Going to end")
-        goToGameOverScreen(false)
     }
 
     override fun resize(
