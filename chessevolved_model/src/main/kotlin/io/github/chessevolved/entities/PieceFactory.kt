@@ -157,8 +157,8 @@ class PieceFactory(
                     directions = pawnStartDirections,
                     maxSteps = 1,
                     isFirstMove = true,
-                    moveType = MovementRuleComponent.MoveType.MOVE_ONLY
-                )
+                    moveType = MovementRuleComponent.MoveType.MOVE_ONLY,
+                ),
             )
         }
     }
