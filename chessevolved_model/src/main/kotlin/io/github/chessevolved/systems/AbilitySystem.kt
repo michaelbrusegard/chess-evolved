@@ -115,9 +115,9 @@ class AbilitySystem(
         return abilityDescriptionInventory[ability]
     }
 
-    fun getAbilityTexture(
+    fun getAbilityIcon(
         ability: String
     ): Texture {
-        return Texture(("abilities/$ability.png").toInternalFile())
+        return Texture(("abilities/$ability" + "_icon.png").toInternalFile())
     }
 }
