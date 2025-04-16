@@ -1,4 +1,4 @@
-package io.github.chessevolved_shared
+package io.github.chessevolved.shared
 
 data class SettingsDTO(
     val fogOfWar: Boolean,

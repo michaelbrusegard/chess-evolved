@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
-import io.github.chessevolved_shared.SettingsDTO
+import io.github.chessevolved.shared.SettingsDTO
 import ktx.actors.onClick
 import ktx.scene2d.checkBox
 import ktx.scene2d.label

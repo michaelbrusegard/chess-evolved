@@ -2,10 +2,10 @@ package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.shared.SettingsDTO
 import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby.setLobbySettings
 import io.github.chessevolved.views.SettingsView
-import io.github.chessevolved_shared.SettingsDTO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

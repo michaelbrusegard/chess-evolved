@@ -1,6 +1,6 @@
 package io.github.chessevolved.singletons
 
-import io.github.chessevolved_shared.SettingsDTO
+import io.github.chessevolved.shared.SettingsDTO
 
 object GameSettings {
     private var fogOfWar: Boolean = false

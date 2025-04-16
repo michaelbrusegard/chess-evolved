@@ -1,7 +1,7 @@
 package io.github.chessevolved.singletons.supabase
 
+import io.github.chessevolved.shared.SettingsDTO
 import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
-import io.github.chessevolved_shared.SettingsDTO
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
