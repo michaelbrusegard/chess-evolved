@@ -13,8 +13,8 @@ import ktx.scene2d.textButton
 
 class EndGameView : IView {
     private lateinit var stage: Stage
-    private lateinit var statusLabel1: Label
-    private lateinit var statusLabel2: Label
+    private lateinit var winInformationLabelTop: Label
+    private lateinit var winInformationLabelBottom: Label
     private lateinit var rematchLabel: Label
     private lateinit var rematchButton: TextButton
 
@@ -46,9 +46,9 @@ class EndGameView : IView {
                     label("Waiting for rematch request...") { it.padBottom(10f) }
 
                 row()
-                statusLabel1 = label("") { it.padBottom(5f) }
+                winInformationLabelTop = label("") { it.padBottom(5f) }
                 row()
-                statusLabel2 = label("") { it.padBottom(20f) }
+                winInformationLabelBottom = label("") { it.padBottom(20f) }
                 row()
 
                 textButton("Return to Menu") {
@@ -65,11 +65,11 @@ class EndGameView : IView {
 
     private fun updateStatusLabels() {
         if (endGameStatus) {
-            statusLabel1.setText("Congratulations!")
-            statusLabel2.setText("You won!")
+            winInformationLabelTop.setText("Congratulations!")
+            winInformationLabelBottom.setText("You won!")
         } else {
-            statusLabel1.setText("Better luck next time!")
-            statusLabel2.setText("You lost!")
+            winInformationLabelTop.setText("Better luck next time!")
+            winInformationLabelBottom.setText("You lost!")
         }
     }
 
