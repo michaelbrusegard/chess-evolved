@@ -122,12 +122,15 @@ class PieceFactory(
         getComponent(MovementRuleComponent::class.java).apply {
             val pawnDirections: List<Vector2>
             val pawnCaptureDirections: List<Vector2>
+            val pawnStartDirections: List<Vector2>
             if (isPlayerOne) {
                 pawnDirections = listOf(Vector2(0f, 1f))
                 pawnCaptureDirections = listOf(Vector2(1f, 1f), Vector2(-1f, 1f))
+                pawnStartDirections = listOf(Vector2(0f, 2f))
             } else {
                 pawnDirections = listOf(Vector2(0f, -1f))
                 pawnCaptureDirections = listOf(Vector2(1f, -1f), Vector2(-1f, -1f))
+                pawnStartDirections = listOf(Vector2(0f, -2f))
             }
 
             addPattern(
@@ -146,6 +149,16 @@ class PieceFactory(
                     maxSteps = 1,
                     moveType = MovementRuleComponent.MoveType.CAPTURE_ONLY,
                 ),
+            )
+
+            addPattern(
+                MovementRuleComponent.MovementPattern(
+                    moveName = "pawnStart",
+                    directions = pawnStartDirections,
+                    maxSteps = 1,
+                    isFirstMove = true,
+                    moveType = MovementRuleComponent.MoveType.MOVE_ONLY
+                )
             )
         }
     }
