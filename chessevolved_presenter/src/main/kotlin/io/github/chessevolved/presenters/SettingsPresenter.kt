@@ -9,15 +9,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+import io.github.chessevolved_shared.SettingsDTO
+
 class SettingsPresenter(
     private val settingsView: SettingsView,
     private val navigator: Navigator,
 ) : IPresenter {
+
     init {
-        settingsView.setExistingSettings(GameSettings.getGameSettings())
         settingsView.init()
-        settingsView.onApplyClicked = { fowSetting, sizeSetting ->
-            onApplyPressed(sizeSetting, fowSetting)
+        settingsView.setExistingSettings(
+            SettingsDTO(
+                fogOfWar = GameSettings.isFOWEnabled(),
+                boardSize = GameSettings.getBoardSize()
+            )
+        )
+        settingsView.onApplyClicked = { settingsDTO ->
+            onApplyPressed(settingsDTO)
         }
         settingsView.onCancelClicked = { navigator.goBack() }
 
@@ -25,24 +33,18 @@ class SettingsPresenter(
     }
 
     private fun loadCurrentSettingsIntoView() {
-        val currentSettings = getCurrentSettings()
-        settingsView.setInitialValues(
-            currentSettings["FogOfWar"] as? Boolean ?: false,
-            currentSettings["BoardSize"] as? Int ?: 8,
+        val currentSettings = SettingsDTO(
+            fogOfWar = GameSettings.isFOWEnabled(),
+            boardSize = GameSettings.getBoardSize()
         )
+        settingsView.setInitialValues(currentSettings)
     }
 
     private fun onApplyPressed(
-        sizeSetting: Int,
-        fowSetting: Boolean,
+        settings: SettingsDTO
     ) {
-        val settingsMap =
-            mapOf(
-                "boardSize" to sizeSetting.toString(),
-                "fogOfWar" to fowSetting.toString(),
-            )
         // Sets settings locally, must be done because Lobby uses local settings to update supabase
-        GameSettings.setGameSettings(settingsMap)
+        GameSettings.setGameSettings(settings)
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

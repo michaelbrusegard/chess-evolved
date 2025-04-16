@@ -14,6 +14,7 @@ import ktx.scene2d.table
 import ktx.scene2d.textButton
 import ktx.scene2d.textField
 import kotlin.text.toIntOrNull
+import io.github.chessevolved_shared.SettingsDTO
 
 class SettingsView : IView {
     private lateinit var stage: Stage
@@ -24,7 +25,7 @@ class SettingsView : IView {
     private var boardSizeSetting = 8
     private var fowSetting = false
 
-    var onApplyClicked: (Boolean, Int) -> Unit = { _, _ -> }
+    var onApplyClicked: (SettingsDTO) -> Unit = {}
     var onCancelClicked: () -> Unit = {}
 
     override fun init() {
@@ -73,47 +74,38 @@ class SettingsView : IView {
     }
 
     private fun applySettings() {
-        val boardSizeText = boardSizeField.text
-        val boardSize = boardSizeText.toIntOrNull()
+        val boardSize = boardSizeField.text.toIntOrNull()
         val isFogOfWar = fogOfWarCheckBox.isChecked
-
+    
         if (boardSize != null && boardSize in 8..16) {
-            onApplyClicked(isFogOfWar, boardSize)
+            val settings = SettingsDTO(fogOfWar = isFogOfWar, boardSize = boardSize)
+            onApplyClicked(settings)
         } else {
             toastManager.showError("Board size must be a number between 8 and 16")
             boardSizeField.text = "8"
         }
     }
 
-    fun setExistingSettings(settings: Map<String, String>) {
-        for ((key, setting) in settings) {
-            when (key) {
-                "FogOfWar" -> {
-                    fowSetting = setting.toBooleanStrictOrNull() ?: false
-                    fogOfWarCheckBox.isChecked = fowSetting
-                }
-                "BoardSize" -> {
-                    val size = setting.toIntOrNull()
-                    if (size != null && size in 8..16) {
-                        boardSizeSetting = size
-                        boardSizeField.text = size.toString()
-                    } else {
-                        throw IllegalStateException("Invalid board size in settings")
-                    }
-                }
-            }
+    fun setExistingSettings(settings: SettingsDTO) {
+        fowSetting = settings.fogOfWar
+        fogOfWarCheckBox.isChecked = fowSetting
+    
+        if (settings.boardSize in 8..16) {
+            boardSizeSetting = settings.boardSize
+            boardSizeField.text = boardSizeSetting.toString()
+        } else {
+            throw IllegalStateException("Invalid board size in settings")
         }
-    }
+    }    
 
     fun setInitialValues(
-        fowEnabled: Boolean,
-        boardSize: Int,
+        initialSettings: SettingsDTO
     ) {
         if (::fogOfWarCheckBox.isInitialized) {
-            fogOfWarCheckBox.isChecked = fowEnabled
+            fogOfWarCheckBox.isChecked = initialSettings.fogOfWar
         }
         if (::boardSizeField.isInitialized) {
-            boardSizeField.text = boardSize.toString()
+            boardSizeField.text = initialSettings.boardSize.toString()
         }
     }
 

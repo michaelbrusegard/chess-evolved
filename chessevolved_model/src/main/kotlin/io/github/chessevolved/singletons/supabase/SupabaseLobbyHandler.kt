@@ -1,11 +1,13 @@
 package io.github.chessevolved.singletons.supabase
 
 import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
+import io.github.chessevolved.singletons.GameSettings
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.postgresChangeFlow
+import io.github.chessevolved_shared.SettingsDTO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -69,6 +71,7 @@ object SupabaseLobbyHandler {
         for (attempts in 1..3) {
             try {
                 supabase.from(SUPABASE_LOBBY_TABLE_NAME).insert(mapOf("lobby_code" to lobbyCode))
+                
                 addLobbyListener(lobbyCode, onEventListener)
                 return lobbyCode
             } catch (e: PostgrestRestException) {
@@ -232,13 +235,18 @@ object SupabaseLobbyHandler {
      */
     suspend fun startGame(
         lobbyCode: String,
-        gameSettings: Map<String, String>,
+        gameSettings: SettingsDTO,
     ) {
         try {
+            val settingsMap = mapOf(
+                "boardSize" to gameSettings.boardSize.toString(),
+                "fogOfWar" to gameSettings.fogOfWar.toString()
+            )
+
             supabase
                 .from("games")
                 .insert(
-                    InsertGame(lobby_code = lobbyCode, settings = gameSettings),
+                    InsertGame(lobby_code = lobbyCode, settings = settingsMap),
                 )
 
             supabase
@@ -266,15 +274,19 @@ object SupabaseLobbyHandler {
      */
     suspend fun updateLobbySettings(
         lobbyCode: String,
-        gameSettings: Map<String, String>,
+        gameSettings: SettingsDTO,
     ) {
         try {
-            println("Kotlin Map: $gameSettings \n")
+            val settingsMap = mapOf(
+                "boardSize" to gameSettings.boardSize.toString(),
+                "fogOfWar" to gameSettings.fogOfWar.toString()
+            )
+
             supabase
                 .from(SUPABASE_LOBBY_TABLE_NAME)
                 .update(
                     {
-                        set("settings", value = gameSettings)
+                        set("settings", value = settingsMap)
                     },
                 ) {
                     filter {

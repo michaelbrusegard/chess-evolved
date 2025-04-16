@@ -70,7 +70,6 @@ object Lobby {
         }
         try {
             val lobby = SupabaseLobbyHandler.getLobbyRow(lobbyId!!)
-            print(lobby.toString())
             return lobby
         } catch (e: Exception) {
             throw Exception("Something went wrong trying to fetch lobby: " + e.message)

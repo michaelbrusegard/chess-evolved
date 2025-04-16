@@ -1,5 +1,7 @@
 package io.github.chessevolved.singletons
 
+import io.github.chessevolved_shared.SettingsDTO
+
 object GameSettings {
     private var fogOfWar: Boolean = false
     private var boardSize: Int = 8
@@ -21,25 +23,16 @@ object GameSettings {
     /**
      * Retrieves all settings as a map of strings
      */
-    fun getGameSettings(): Map<String, String> {
-        val settingMap =
-            mapOf(
-                "boardSize" to boardSize.toString(),
-                "fogOfWar" to fogOfWar.toString(),
-            )
-        return settingMap
+    fun getGameSettings(): SettingsDTO {
+        val settingsDTO = SettingsDTO(fogOfWar, boardSize)
+        return settingsDTO
     }
 
     /**
      * Takes a map of strings and updates the settings
      */
-    fun setGameSettings(settingsMap: Map<String, String>) {
-        for ((setting, value) in settingsMap) {
-            when (setting) {
-                "fogOfWar" -> fogOfWar = value.toBooleanStrictOrNull() ?: false
-                "boardSize" -> boardSize = value.toIntOrNull() ?: 8
-            }
-        }
-        print("settings updated by listner")
+    fun setGameSettings(settings: SettingsDTO) {
+        fogOfWar = settings.fogOfWar
+        boardSize = settings.boardSize
     }
 }

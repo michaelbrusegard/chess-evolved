@@ -10,6 +10,7 @@ import io.github.chessevolved.singletons.Lobby.subscribeToLobbyUpdates
 import io.github.chessevolved.singletons.Lobby.unsubscribeFromLobbyUpdates
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import io.github.chessevolved.views.LobbyView
+import io.github.chessevolved_shared.SettingsDTO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,14 +44,20 @@ class LobbyPresenter(
         }
     }
 
-    private fun settingsChanged(updatedSettings: Map<String, String>) {
+    private fun settingsChanged(updatedSettings: SettingsDTO) {
+        
         GameSettings.setGameSettings(updatedSettings)
     }
 
     private fun lobbyUpdateHandler(newLobby: SupabaseLobbyHandler.Lobby) {
+        val settingsDTO = SettingsDTO(
+            fogOfWar = newLobby.settings["fogOfWar"]?.toBooleanStrictOrNull() ?: false,
+            boardSize = newLobby.settings["boardSize"]?.toIntOrNull() ?: 8
+        )
+
         playerJoinedLeftLobby(newLobby.second_player)
         lobbyStartedCheck(newLobby.game_started)
-        settingsChanged(newLobby.settings)
+        settingsChanged(settingsDTO)
     }
 
     /**
