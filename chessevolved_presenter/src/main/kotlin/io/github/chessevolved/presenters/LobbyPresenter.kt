@@ -45,15 +45,15 @@ class LobbyPresenter(
     }
 
     private fun settingsChanged(updatedSettings: SettingsDTO) {
-        
         GameSettings.setGameSettings(updatedSettings)
     }
 
     private fun lobbyUpdateHandler(newLobby: SupabaseLobbyHandler.Lobby) {
-        val settingsDTO = SettingsDTO(
-            fogOfWar = newLobby.settings["fogOfWar"]?.toBooleanStrictOrNull() ?: false,
-            boardSize = newLobby.settings["boardSize"]?.toIntOrNull() ?: 8
-        )
+        val settingsDTO =
+            SettingsDTO(
+                fogOfWar = newLobby.settings["fogOfWar"]?.toBooleanStrictOrNull() ?: false,
+                boardSize = newLobby.settings["boardSize"]?.toIntOrNull() ?: 8,
+            )
 
         playerJoinedLeftLobby(newLobby.second_player)
         lobbyStartedCheck(newLobby.game_started)

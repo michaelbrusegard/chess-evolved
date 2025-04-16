@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
+import io.github.chessevolved_shared.SettingsDTO
 import ktx.actors.onClick
 import ktx.scene2d.checkBox
 import ktx.scene2d.label
@@ -14,7 +15,6 @@ import ktx.scene2d.table
 import ktx.scene2d.textButton
 import ktx.scene2d.textField
 import kotlin.text.toIntOrNull
-import io.github.chessevolved_shared.SettingsDTO
 
 class SettingsView : IView {
     private lateinit var stage: Stage
@@ -76,7 +76,7 @@ class SettingsView : IView {
     private fun applySettings() {
         val boardSize = boardSizeField.text.toIntOrNull()
         val isFogOfWar = fogOfWarCheckBox.isChecked
-    
+
         if (boardSize != null && boardSize in 8..16) {
             val settings = SettingsDTO(fogOfWar = isFogOfWar, boardSize = boardSize)
             onApplyClicked(settings)
@@ -89,18 +89,16 @@ class SettingsView : IView {
     fun setExistingSettings(settings: SettingsDTO) {
         fowSetting = settings.fogOfWar
         fogOfWarCheckBox.isChecked = fowSetting
-    
+
         if (settings.boardSize in 8..16) {
             boardSizeSetting = settings.boardSize
             boardSizeField.text = boardSizeSetting.toString()
         } else {
             throw IllegalStateException("Invalid board size in settings")
         }
-    }    
+    }
 
-    fun setInitialValues(
-        initialSettings: SettingsDTO
-    ) {
+    fun setInitialValues(initialSettings: SettingsDTO) {
         if (::fogOfWarCheckBox.isInitialized) {
             fogOfWarCheckBox.isChecked = initialSettings.fogOfWar
         }
