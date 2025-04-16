@@ -1,9 +1,7 @@
 package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import ktx.scene2d.label
 import ktx.scene2d.scene2d
@@ -14,20 +12,11 @@ class GameUIView(
      * This variable can be used to make sure the ui doesn't overlap the game-board.
      */
     private val gameViewport: Viewport,
-    private val gameCamera: OrthographicCamera,
 ) : IView {
     private lateinit var stage: Stage
-    private lateinit var viewport: Viewport
 
     override fun init() {
-        viewport =
-            FitViewport(
-                Gdx.graphics.width.toFloat(),
-                Gdx.graphics.height.toFloat(),
-            )
-
-        stage =
-            Stage()
+        stage = Stage(gameViewport)
 
         val root =
             scene2d.table {
@@ -38,34 +27,18 @@ class GameUIView(
                     setColor(1f, 0f, 0f, 0.5f)
                 }
                 row()
-                label("Settings 2") { it.colspan(2).padBottom(50f).center() }
-                row()
-                label("Settings 3") { it.colspan(2).padBottom(50f).center() }
-                row()
-                label("Settings 4") {
-                    it.colspan(2).padBottom(50f).center()
-                }
-                row()
-                label("Settings 5") { it.colspan(2).padBottom(50f).center() }
-                row()
-                label("Settings 6") { it.colspan(2).padBottom(50f).center() }
-                row()
-                label("Settings") { it.colspan(2).padBottom(50f).center() }
-                row()
-                label("Settings") { it.colspan(2).padBottom(50f).center() }
-                row()
-                label("Settings") { it.colspan(2).padBottom(50f).center() }
-                row()
-                label("Settings") { it.colspan(2).padBottom(50f).center() }
-                row()
-                label("Settings") { it.colspan(2).padBottom(50f).center() }
-                row()
-                label("Settings") { it.colspan(2).padBottom(50f).center() }
+                label("Test 2") { it.colspan(2).padBottom(50f).center() }
                 row()
 
                 label("Fog of War:") { it.right() }
                 row()
 
+                label("Board Size (8-16):") { it.right() }
+                row()
+                label("Board Size (8-16):") { it.right() }
+                row()
+                label("Board Size (8-16):") { it.right() }
+                row()
                 label("Board Size (8-16):") { it.right() }
                 row()
             }

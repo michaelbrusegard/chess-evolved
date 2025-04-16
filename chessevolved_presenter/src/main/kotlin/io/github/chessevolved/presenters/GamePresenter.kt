@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.PieceType
@@ -38,10 +39,13 @@ class GamePresenter(
     private val boardSquareFactory = BoardSquareFactory(engine, assetManager)
 
     private val gameCamera = OrthographicCamera()
+    private val gameUICamera = OrthographicCamera()
     private val boardWorldSize = 8
 
     private val gameViewport: Viewport =
         FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
+    private val gameUIViewport: Viewport =
+        ScreenViewport()
     private lateinit var gameUIView: GameUIView
     private lateinit var gameBoardView: GameView
     private val gameBatch: SpriteBatch = SpriteBatch()
@@ -96,7 +100,7 @@ class GamePresenter(
     }
 
     private fun setupGameView() {
-        gameUIView = GameUIView(gameViewport, gameCamera)
+        gameUIView = GameUIView(gameUIViewport)
         gameUIView.init()
 
         gameBoardView = GameView(gameUIView.getStage(), gameViewport)
@@ -104,8 +108,10 @@ class GamePresenter(
 
         gameStage = gameBoardView.getStage()
 
-        gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
+        gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 1f)
+        gameUICamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
         gameCamera.update()
+        gameUICamera.update()
     }
 
     private fun setupBoard() {
@@ -220,13 +226,16 @@ class GamePresenter(
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         gameViewport.apply()
+        gameCamera.update()
         gameBatch.projectionMatrix = gameCamera.combined
 
         gameBatch.begin()
         engine.update(Gdx.graphics.deltaTime)
         gameBatch.end()
 
-        gameBoardView.render()
+        // gameBoardView.render()
+
+        gameUIViewport.apply()
         gameUIView.render()
     }
 
@@ -236,7 +245,7 @@ class GamePresenter(
     ) {
         gameViewport.update(width, height, false)
         gameBoardView.resize(width, height)
-        // TODO: Do some resize logic for GameUIView as well.
+        gameUIView.resize(width, height)
     }
 
     override fun dispose() {
