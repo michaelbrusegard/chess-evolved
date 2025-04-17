@@ -68,7 +68,19 @@ class EndGamePresenter(
     override fun dispose() {
         endGameView.dispose()
         Game.unsubscribeFromGameUpdates(this.toString())
-        // TODO: add leave game and leave lobby if player presses x on the app
+
+        runBlocking {
+            launch {
+                val wantsRematch = Game.getWantsRematch()
+                Game.leaveGame()
+
+                if (wantsRematch && !otherPlayerLeft) {
+                    Lobby.leaveLobbyWithoutUpdating()
+                } else {
+                    Lobby.leaveLobby()
+                }
+            }
+        }
     }
 
     override fun setInputProcessor() {
