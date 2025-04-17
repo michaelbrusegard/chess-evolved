@@ -3,6 +3,7 @@ package io.github.chessevolved.views
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
 import ktx.scene2d.label
@@ -12,8 +13,10 @@ import ktx.scene2d.textButton
 
 class EndGameView : IView {
     private lateinit var stage: Stage
-    private lateinit var statusLabel1: Label
-    private lateinit var statusLabel2: Label
+    private lateinit var winInformationLabelTop: Label
+    private lateinit var winInformationLabelBottom: Label
+    private lateinit var rematchLabel: Label
+    private lateinit var rematchButton: TextButton
 
     var endGameStatus: Boolean = false
         set(value) {
@@ -39,10 +42,13 @@ class EndGameView : IView {
             scene2d.table {
                 setFillParent(true)
                 defaults().pad(10f).center()
+                rematchLabel =
+                    label("Waiting for rematch request...") { it.padBottom(10f) }
 
-                statusLabel1 = label("") { it.padBottom(5f) }
                 row()
-                statusLabel2 = label("") { it.padBottom(20f) }
+                winInformationLabelTop = label("") { it.padBottom(5f) }
+                row()
+                winInformationLabelBottom = label("") { it.padBottom(20f) }
                 row()
 
                 textButton("Return to Menu") {
@@ -50,7 +56,7 @@ class EndGameView : IView {
                     onClick { onReturnToMenuClicked() }
                 }
                 row()
-                textButton("Request Rematch") { onClick { onRematchClicked() } }
+                rematchButton = textButton("Request Rematch") { onClick { onRematchClicked() } }
             }
 
         stage.addActor(root)
@@ -59,12 +65,22 @@ class EndGameView : IView {
 
     private fun updateStatusLabels() {
         if (endGameStatus) {
-            statusLabel1.setText("Congratulations!")
-            statusLabel2.setText("You won!")
+            winInformationLabelTop.setText("Congratulations!")
+            winInformationLabelBottom.setText("You won!")
         } else {
-            statusLabel1.setText("Better luck next time!")
-            statusLabel2.setText("You lost!")
+            winInformationLabelTop.setText("Better luck next time!")
+            winInformationLabelBottom.setText("You lost!")
         }
+    }
+
+    fun disableRematchButton() {
+        rematchButton.isDisabled = true
+        rematchButton.clearListeners()
+        rematchButton.setColor(0f, 0f, 0f, 0.3f)
+    }
+
+    fun updateRematchText(text: String) {
+        rematchLabel.setText(text)
     }
 
     override fun render() {
