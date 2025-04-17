@@ -2,8 +2,13 @@ package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.shared.SettingsDTO
 import io.github.chessevolved.singletons.GameSettings
+import io.github.chessevolved.singletons.Lobby.setLobbySettings
 import io.github.chessevolved.views.SettingsView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SettingsPresenter(
     private val settingsView: SettingsView,
@@ -11,8 +16,14 @@ class SettingsPresenter(
 ) : IPresenter {
     init {
         settingsView.init()
-        settingsView.onApplyClicked = { fowSetting, sizeSetting ->
-            onApplyPressed(fowSetting, sizeSetting)
+        settingsView.setExistingSettings(
+            SettingsDTO(
+                fogOfWar = GameSettings.isFOWEnabled(),
+                boardSize = GameSettings.getBoardSize(),
+            ),
+        )
+        settingsView.onApplyClicked = { settingsDTO ->
+            onApplyPressed(settingsDTO)
         }
         settingsView.onCancelClicked = { navigator.goBack() }
 
@@ -20,19 +31,26 @@ class SettingsPresenter(
     }
 
     private fun loadCurrentSettingsIntoView() {
-        val currentSettings = getCurrentSettings()
-        settingsView.setInitialValues(
-            currentSettings["FogOfWar"] as? Boolean ?: false,
-            currentSettings["BoardSize"] as? Int ?: 8,
-        )
+        val currentSettings =
+            SettingsDTO(
+                fogOfWar = GameSettings.isFOWEnabled(),
+                boardSize = GameSettings.getBoardSize(),
+            )
+        settingsView.setInitialValues(currentSettings)
     }
 
-    private fun onApplyPressed(
-        fowSetting: Boolean,
-        sizeSetting: Int,
-    ) {
-        GameSettings.setFOW(fowSetting)
-        GameSettings.setBoardSize(sizeSetting)
+    private fun onApplyPressed(settings: SettingsDTO) {
+        // Sets settings locally, must be done because Lobby uses local settings to update supabase
+        GameSettings.setGameSettings(settings)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                setLobbySettings()
+            } catch (e: Exception) {
+                error("Error fetching lobby settings from supabase: " + e.message)
+            }
+        }
+
         navigator.goBack()
     }
 

@@ -11,11 +11,17 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
 internal object SupabaseClient {
-    private val dotenv = dotenv()
+    private val dotenv =
+        dotenv {
+            directory = "./assets"
+            filename = "env"
+            ignoreIfMissing = true
+        }
+
     private val supabase: SupabaseClient =
         createSupabaseClient(
             supabaseUrl = dotenv["SUPABASE_URL"] ?: "no_url_found",
-            supabaseKey = dotenv["SUPABASE_ANON_KEY"],
+            supabaseKey = dotenv["SUPABASE_ANON_KEY"] ?: "no_pass_found",
         ) {
             install(Postgrest)
             install(Realtime) {

@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
+import io.github.chessevolved.shared.SettingsDTO
 import ktx.actors.onClick
 import ktx.scene2d.checkBox
 import ktx.scene2d.label
@@ -13,6 +14,7 @@ import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.textButton
 import ktx.scene2d.textField
+import kotlin.text.toIntOrNull
 
 class SettingsView : IView {
     private lateinit var stage: Stage
@@ -20,7 +22,10 @@ class SettingsView : IView {
     private lateinit var boardSizeField: TextField
     private lateinit var toastManager: ToastManager
 
-    var onApplyClicked: (Boolean, Int) -> Unit = { _, _ -> }
+    private var boardSizeSetting = 8
+    private var fowSetting = false
+
+    var onApplyClicked: (SettingsDTO) -> Unit = {}
     var onCancelClicked: () -> Unit = {}
 
     override fun init() {
@@ -69,27 +74,36 @@ class SettingsView : IView {
     }
 
     private fun applySettings() {
-        val boardSizeText = boardSizeField.text
-        val boardSize = boardSizeText.toIntOrNull()
+        val boardSize = boardSizeField.text.toIntOrNull()
         val isFogOfWar = fogOfWarCheckBox.isChecked
 
         if (boardSize != null && boardSize in 8..16) {
-            onApplyClicked(isFogOfWar, boardSize)
+            val settings = SettingsDTO(fogOfWar = isFogOfWar, boardSize = boardSize)
+            onApplyClicked(settings)
         } else {
             toastManager.showError("Board size must be a number between 8 and 16")
             boardSizeField.text = "8"
         }
     }
 
-    fun setInitialValues(
-        fowEnabled: Boolean,
-        boardSize: Int,
-    ) {
+    fun setExistingSettings(settings: SettingsDTO) {
+        fowSetting = settings.fogOfWar
+        fogOfWarCheckBox.isChecked = fowSetting
+
+        if (settings.boardSize in 8..16) {
+            boardSizeSetting = settings.boardSize
+            boardSizeField.text = boardSizeSetting.toString()
+        } else {
+            throw IllegalStateException("Invalid board size in settings")
+        }
+    }
+
+    fun setInitialValues(initialSettings: SettingsDTO) {
         if (::fogOfWarCheckBox.isInitialized) {
-            fogOfWarCheckBox.isChecked = fowEnabled
+            fogOfWarCheckBox.isChecked = initialSettings.fogOfWar
         }
         if (::boardSizeField.isInitialized) {
-            boardSizeField.text = boardSize.toString()
+            boardSizeField.text = initialSettings.boardSize.toString()
         }
     }
 
