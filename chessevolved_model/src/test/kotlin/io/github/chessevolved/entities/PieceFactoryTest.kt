@@ -7,10 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
-import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.singletons.ECSEngine
 import org.junit.jupiter.api.Assertions.*
-
 import org.junit.jupiter.api.Test
 
 class PieceFactoryTest {
@@ -36,8 +34,8 @@ class PieceFactoryTest {
         assetManager.finishLoading()
 
         pieceFactory.createRook(
-            Position(1,1),
-            PlayerColor.BLACK
+            Position(1, 1),
+            PlayerColor.BLACK,
         )
         val texture: TextureRegion = TextureRegion(Texture("pieces/black-rook.png"))
         assertEquals(texture, pieceFactory.getPieceTextureRegion(PieceType.ROOK, PlayerColor.BLACK))

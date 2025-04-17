@@ -9,7 +9,6 @@ import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.singletons.ECSEngine
 import org.junit.jupiter.api.Assertions.*
-
 import org.junit.jupiter.api.Test
 
 class BoardSquareFactoryTest {
@@ -23,12 +22,11 @@ class BoardSquareFactoryTest {
         assetManager.finishLoading()
 
         boardSquareFactory.createBoardSquare(
-            Position(1,1),
+            Position(1, 1),
             WeatherEvent.NONE,
-            PlayerColor.BLACK
+            PlayerColor.BLACK,
         )
         val texture: TextureRegion = TextureRegion(Texture("board/black-tile.png"))
         assertEquals(texture, boardSquareFactory.getBoardSquareTextureRegion(PlayerColor.BLACK))
     }
-
 }

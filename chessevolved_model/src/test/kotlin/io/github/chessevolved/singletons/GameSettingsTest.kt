@@ -2,11 +2,9 @@ package io.github.chessevolved.singletons
 
 import io.github.chessevolved.shared.SettingsDTO
 import org.junit.jupiter.api.Assertions.*
-
 import org.junit.jupiter.api.Test
 
 class GameSettingsTest {
-
     @Test
     fun isFOWEnabled() {
         assertEquals(false, GameSettings.isFOWEnabled())
