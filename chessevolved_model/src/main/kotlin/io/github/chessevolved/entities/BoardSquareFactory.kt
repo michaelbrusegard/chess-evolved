@@ -17,7 +17,7 @@ class BoardSquareFactory(
     private val engine: Engine,
     private val assetManager: AssetManager,
 ) {
-    private fun getBoardSquareTextureRegion(playerColor: PlayerColor): TextureRegion {
+    fun getBoardSquareTextureRegion(playerColor: PlayerColor): TextureRegion {
         val colorStr = playerColor.name.lowercase()
         val filename = "board/$colorStr-tile.png"
 
