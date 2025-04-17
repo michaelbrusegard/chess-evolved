@@ -5,14 +5,14 @@ import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import kotlin.reflect.KFunction1
 
 object Game {
-    private var lobbyCode: String? = null
+    private var inGame: Boolean = false
     private var subscribers = mutableMapOf<String, KFunction1<SupabaseGameHandler.Game, Unit>>()
     private var hasAskedForRematch = false
 
     suspend fun joinGame(gameId: String) {
         try {
             SupabaseGameHandler.joinGame(gameId, ::onGameRowUpdate)
-            this.lobbyCode = gameId
+            this.inGame = true
         } catch (e: Exception) {
             throw Exception("Problem with joining game: " + e.message)
         }
@@ -24,8 +24,8 @@ object Game {
         }
         try {
             hasAskedForRematch = false
-            SupabaseGameHandler.leaveGame(lobbyCode!!)
-            this.lobbyCode = null
+            SupabaseGameHandler.leaveGame(Lobby.getLobbyId()!!)
+            this.inGame = false
         } catch (e: Exception) {
             throw Exception("Problem with leaving game: " + e.message)
         }
@@ -37,8 +37,8 @@ object Game {
         }
         try {
             hasAskedForRematch = true
-            SupabaseLobbyHandler.setupRematchLobby(lobbyCode!!)
-            SupabaseGameHandler.requestRematch(lobbyCode!!)
+            SupabaseLobbyHandler.setupRematchLobby(Lobby.getLobbyId()!!)
+            SupabaseGameHandler.requestRematch(Lobby.getLobbyId()!!)
         } catch (e: Exception) {
             throw Exception("Problem with asking for rematch: " + e.message)
         }
@@ -46,9 +46,9 @@ object Game {
 
     fun getWantsRematch(): Boolean = hasAskedForRematch
 
-    fun getGameId(): String? = lobbyCode
+    fun getGameId(): String? = Lobby.getLobbyId()
 
-    fun isInGame(): Boolean = !lobbyCode.isNullOrEmpty()
+    fun isInGame(): Boolean = inGame
 
     private fun onGameRowUpdate(game: SupabaseGameHandler.Game) {
         subscribers.forEach {
