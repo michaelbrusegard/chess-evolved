@@ -3,6 +3,7 @@ package io.github.chessevolved.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import io.github.chessevolved.components.AbilityTriggerComponent
 import io.github.chessevolved.components.CanBeCapturedComponent
 import io.github.chessevolved.components.CapturedComponent
 import io.github.chessevolved.components.MovementIntentComponent
@@ -27,11 +28,7 @@ class CaptureSystem : IteratingSystem(
             piece.getComponent(SelectionComponent::class.java) != null
         }
 
-        if (capturedByAbility) {
-            val oldPosition = PositionComponent.mapper.get(capturingPiece).position
-            // We do want to trigger this, since it removes selection components
-            capturingPiece?.add(MovementIntentComponent(oldPosition))
-        } else {
+        if (!capturedByAbility) {
             capturingPiece?.add(MovementIntentComponent(capturedPosition))
         }
 

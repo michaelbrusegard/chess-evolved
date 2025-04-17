@@ -3,6 +3,7 @@ package io.github.chessevolved.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import io.github.chessevolved.components.AbilityTriggerComponent
 import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.MovementIntentComponent
 import io.github.chessevolved.components.MovementRuleComponent
@@ -34,6 +35,8 @@ class MovementSystem : IteratingSystem(
 
         piecePositionComponent.position = targetPosition
         pieceActorComponent.actor.setPosition(targetPosition.x.toFloat(), targetPosition.y.toFloat())
+
+        entity?.add(AbilityTriggerComponent(targetPosition))
 
         pieceMovementRuleComponent.getMovementRules().map {
             if (it.isFirstMove) {

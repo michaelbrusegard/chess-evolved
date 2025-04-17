@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.components.AbilityComponent
+import io.github.chessevolved.components.AbilityType
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
@@ -19,6 +21,7 @@ import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.systems.AbilitySystem
 import io.github.chessevolved.systems.CaptureSystem
 import io.github.chessevolved.systems.InputService
 import io.github.chessevolved.systems.InputSystem
@@ -53,6 +56,7 @@ class GamePresenter(
     private val captureSystem: CaptureSystem
     private val inputSystem: InputSystem
     private val inputService: InputService = InputService()
+    private val abilitySystem: AbilitySystem
 
     init {
         setupGameView()
@@ -71,6 +75,9 @@ class GamePresenter(
 
         inputSystem = InputSystem()
         engine.addSystem(inputSystem)
+
+        abilitySystem = AbilitySystem()
+        engine.addSystem(abilitySystem)
 
         loadRequiredAssets()
         assetManager.finishLoading()
@@ -130,6 +137,11 @@ class GamePresenter(
                 PlayerColor.WHITE,
                 gameStage,
             ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                .add(AbilityComponent(
+                    ability = AbilityType.EXPLOSION,
+                    abilityCooldownTime = 2,
+                    currentAbilityCDTime = 0
+                ))
 
             pieceFactory.createPawn(
                 false,
