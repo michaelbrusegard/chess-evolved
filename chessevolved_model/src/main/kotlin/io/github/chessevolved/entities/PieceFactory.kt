@@ -18,7 +18,7 @@ class PieceFactory(
     private val engine: Engine,
     private val assetManager: AssetManager,
 ) {
-    private fun getPieceTextureRegion(
+    fun getPieceTextureRegion(
         pieceType: PieceType,
         playerColor: PlayerColor,
     ): TextureRegion {
