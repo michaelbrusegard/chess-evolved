@@ -1,5 +1,6 @@
 package io.github.chessevolved.singletons.supabase
 
+import io.github.chessevolved.shared.SettingsDTO
 import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
@@ -40,8 +41,7 @@ object SupabaseLobbyHandler {
         val lobby_code: String,
         val second_player: Boolean,
         val game_started: Boolean,
-        // TODO: Turn this into a settings-type array when implemented
-        val settings: Array<String>,
+        val settings: Map<String, String>,
     )
 
     // Taken from https://stackoverflow.com/questions/46943860/idiomatic-way-to-generate-a-random-alphanumeric-string-in-kotlin
@@ -70,6 +70,7 @@ object SupabaseLobbyHandler {
         for (attempts in 1..3) {
             try {
                 supabase.from(SUPABASE_LOBBY_TABLE_NAME).insert(mapOf("lobby_code" to lobbyCode))
+
                 addLobbyListener(lobbyCode, onEventListener)
                 return lobbyCode
             } catch (e: PostgrestRestException) {
@@ -233,13 +234,19 @@ object SupabaseLobbyHandler {
      */
     suspend fun startGame(
         lobbyCode: String,
-        gameSettings: Map<String, String>,
+        gameSettings: SettingsDTO,
     ) {
         try {
+            val settingsMap =
+                mapOf(
+                    "boardSize" to gameSettings.boardSize.toString(),
+                    "fogOfWar" to gameSettings.fogOfWar.toString(),
+                )
+
             supabase
                 .from("games")
                 .insert(
-                    InsertGame(lobby_code = lobbyCode, settings = gameSettings),
+                    InsertGame(lobby_code = lobbyCode, settings = settingsMap),
                 )
 
             supabase
@@ -267,14 +274,20 @@ object SupabaseLobbyHandler {
      */
     suspend fun updateLobbySettings(
         lobbyCode: String,
-        gameSettings: Map<String, String>,
+        gameSettings: SettingsDTO,
     ) {
         try {
+            val settingsMap =
+                mapOf(
+                    "boardSize" to gameSettings.boardSize.toString(),
+                    "fogOfWar" to gameSettings.fogOfWar.toString(),
+                )
+
             supabase
                 .from(SUPABASE_LOBBY_TABLE_NAME)
                 .update(
                     {
-                        set("settings", value = Json.encodeToString(gameSettings))
+                        set("settings", value = settingsMap)
                     },
                 ) {
                     filter {

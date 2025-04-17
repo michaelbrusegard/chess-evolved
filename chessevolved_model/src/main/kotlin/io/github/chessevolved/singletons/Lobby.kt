@@ -47,8 +47,22 @@ object Lobby {
         if (!isInLobby()) {
             throw IllegalStateException("Can't update game settings when not in a lobby!")
         }
-        SupabaseLobbyHandler.updateLobbySettings(lobbyId!!, GameSettings.getGameSettings())
+        try {
+            SupabaseLobbyHandler.updateLobbySettings(lobbyId!!, GameSettings.getGameSettings())
+        } catch (e: Exception) {
+            throw Exception("Problem updating lobby settings! " + e.message)
+        }
     }
+
+    // suspend fun getLobbySettings(): Map<String, String> {
+    //     if (!isInLobby()) {
+    //         throw IllegalStateException("Can't get game settings when not in a lobby!")
+    //     }
+    //     val settingsArray = SupabaseLobbyHandler.getLobbyRow(lobbyId!!).settings
+    //     val settingsMap = mapOf(
+    //         settingsArray
+    //     )
+    // }
 
     suspend fun getLobby(): Lobby {
         if (!isInLobby()) {
