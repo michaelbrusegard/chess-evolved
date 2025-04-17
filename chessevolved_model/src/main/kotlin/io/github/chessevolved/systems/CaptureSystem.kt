@@ -19,12 +19,21 @@ class CaptureSystem : IteratingSystem(
         deltaTime: Float,
     ) {
         val capturedPosition = PositionComponent.mapper.get(entity).position
+        val capturedByAbility = CapturedComponent.mapper.get(entity).capturedByAbility
 
         // Trigger the movementSystem to move the entity that captured.
         // TODO: do ability logic here for when a piece is captured.
-        ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { piece ->
+        val capturingPiece = ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { piece ->
             piece.getComponent(SelectionComponent::class.java) != null
-        }?.add(MovementIntentComponent(capturedPosition))
+        }
+
+        if (capturedByAbility) {
+            val oldPosition = PositionComponent.mapper.get(capturingPiece).position
+            // We do want to trigger this, since it removes selection components
+            capturingPiece?.add(MovementIntentComponent(oldPosition))
+        } else {
+            capturingPiece?.add(MovementIntentComponent(capturedPosition))
+        }
 
         ECSEngine.getEntitiesFor(Family.all(CanBeCapturedComponent::class.java).get()).map { piece ->
             piece.remove(CanBeCapturedComponent::class.java)

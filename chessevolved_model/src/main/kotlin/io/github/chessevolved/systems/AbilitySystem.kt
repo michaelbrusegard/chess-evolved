@@ -32,5 +32,6 @@ class AbilitySystem : IteratingSystem(
         // Hard coded values define the Explosion
         // Search from here all the pieces on positions in the radius.
         // Add an animation component which either the rendering system or an own system handles.
+
     }
 }
