@@ -66,7 +66,6 @@ internal object SupabaseChannelManager {
      */
     suspend fun unsubscribeFromChannel(channelName: String) {
         val channel = channels[channelName] ?: throw Exception("Can't unsubscribe from non-existent channel.")
-
         // TODO: Error handling for when removing a channel fails.
         supabase.realtime.removeChannel(channel)
         channels.remove(channelName)
