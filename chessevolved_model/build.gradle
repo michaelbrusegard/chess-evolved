@@ -63,6 +63,7 @@ dependencies {
 
   // Testing with kotlin.test and JUnit
   testImplementation 'org.jetbrains.kotlin:kotlin-test'
+  testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1"
 }
 
 test {
