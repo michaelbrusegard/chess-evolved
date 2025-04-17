@@ -28,5 +28,7 @@ class GameSettingsTest {
         val settingsDTO: SettingsDTO = SettingsDTO(true, 16)
         GameSettings.setGameSettings(settingsDTO)
         assertEquals(settingsDTO, GameSettings.getGameSettings())
+        assertEquals(true, GameSettings.isFOWEnabled())
+        assertEquals(16, GameSettings.getBoardSize())
     }
 }
