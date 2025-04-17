@@ -74,7 +74,9 @@ CREATE TABLE IF NOT EXISTS "public"."games" (
     "last_move" "text",
     "turn" "public"."color" DEFAULT 'WHITE'::"public"."color" NOT NULL,
     "board_squares" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
-    "pieces" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL
+    "pieces" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
+    "player_disconnected" boolean DEFAULT false NOT NULL,
+    "want_rematch" boolean DEFAULT false NOT NULL
 );
 
 
