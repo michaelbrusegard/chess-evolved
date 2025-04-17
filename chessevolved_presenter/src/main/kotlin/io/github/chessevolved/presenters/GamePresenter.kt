@@ -19,13 +19,12 @@ import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.singletons.ECSEngine
-import io.github.chessevolved.systems.CaptureSystem
-import io.github.chessevolved.systems.InputService
-import io.github.chessevolved.systems.InputSystem
-import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
 import io.github.chessevolved.singletons.Lobby
+import io.github.chessevolved.systems.CaptureSystem
+import io.github.chessevolved.systems.InputSystem
+import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
 import io.github.chessevolved.systems.SelectionEntityListener
 import io.github.chessevolved.views.GameUIView
@@ -57,7 +56,6 @@ class GamePresenter(
     private val selectionListener: SelectionEntityListener
     private val captureSystem: CaptureSystem
     private val inputSystem: InputSystem
-    private val inputService: InputService = InputService()
 
     private var navigatingToEndGame = false
 
@@ -132,7 +130,7 @@ class GamePresenter(
                     WeatherEvent.NONE,
                     tileColor,
                     gameStage,
-                ) { clickedPosition -> inputService.clickBoardSquareAtPosition(clickedPosition) }
+                )
             }
         }
 
@@ -143,14 +141,14 @@ class GamePresenter(
                 Position(startPos, 1),
                 PlayerColor.WHITE,
                 gameStage,
-            ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+            )
 
             pieceFactory.createPawn(
                 false,
                 Position(startPos, boardWorldSize - 2),
                 PlayerColor.BLACK,
                 gameStage,
-            ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+            )
 
             when (startPos) {
                 startX -> {
@@ -159,13 +157,13 @@ class GamePresenter(
                             Position(startX + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
 
                         pieceFactory.createRook(
                             Position(startX + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
                     }
                 }
                 startX + 1 -> {
@@ -174,13 +172,13 @@ class GamePresenter(
                             Position(startX + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
 
                         pieceFactory.createKnight(
                             Position(startX + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
                     }
                 }
                 startX + 2 -> {
@@ -189,13 +187,13 @@ class GamePresenter(
                             Position(startX + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
 
                         pieceFactory.createBishop(
                             Position(startX + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
                     }
                 }
                 startX + 3 -> {
@@ -203,26 +201,26 @@ class GamePresenter(
                         Position(startPos, 0),
                         PlayerColor.WHITE,
                         gameStage,
-                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                    )
 
                     pieceFactory.createQueen(
                         Position(startPos, boardWorldSize - 1),
                         PlayerColor.BLACK,
                         gameStage,
-                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                    )
                 }
                 startX + 4 -> {
                     pieceFactory.createKing(
                         Position(startPos, 0),
                         PlayerColor.WHITE,
                         gameStage,
-                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                    )
 
                     pieceFactory.createKing(
                         Position(startPos, boardWorldSize - 1),
                         PlayerColor.BLACK,
                         gameStage,
-                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                    )
                 }
                 else -> {}
             }
