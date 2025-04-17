@@ -40,4 +40,11 @@ dependencies {
 
   // Needed to access shared classes like DTO
   implementation project(":chessevolved_shared")
+
+  // Testing with kotlin.test and JUnit
+  testImplementation 'org.jetbrains.kotlin:kotlin-test'
+}
+
+test {
+  useJUnitPlatform()
 }
