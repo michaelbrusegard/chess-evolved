@@ -28,6 +28,7 @@ import io.github.chessevolved.systems.InputSystem
 import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
 import io.github.chessevolved.systems.SelectionEntityListener
+import io.github.chessevolved.systems.VisualEffectSystem
 import io.github.chessevolved.views.GameUIView
 import io.github.chessevolved.views.GameView
 
@@ -57,6 +58,7 @@ class GamePresenter(
     private val inputSystem: InputSystem
     private val inputService: InputService = InputService()
     private val abilitySystem: AbilitySystem
+    private val visualEffectSystem: VisualEffectSystem
 
     init {
         setupGameView()
@@ -76,8 +78,11 @@ class GamePresenter(
         inputSystem = InputSystem()
         engine.addSystem(inputSystem)
 
-        abilitySystem = AbilitySystem()
+        abilitySystem = AbilitySystem(assetManager)
         engine.addSystem(abilitySystem)
+
+        visualEffectSystem = VisualEffectSystem(gameBatch, assetManager)
+        engine.addSystem(visualEffectSystem)
 
         loadRequiredAssets()
         assetManager.finishLoading()

@@ -36,7 +36,7 @@ class MovementSystem : IteratingSystem(
         piecePositionComponent.position = targetPosition
         pieceActorComponent.actor.setPosition(targetPosition.x.toFloat(), targetPosition.y.toFloat())
 
-        entity?.add(AbilityTriggerComponent(targetPosition))
+        entity?.add(AbilityTriggerComponent(targetPosition, true))
 
         pieceMovementRuleComponent.getMovementRules().map {
             if (it.isFirstMove) {
