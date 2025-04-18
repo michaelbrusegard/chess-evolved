@@ -1,7 +1,7 @@
 package io.github.chessevolved.dtos
 
-import kotlinx.serialization.Serializable
 import io.github.chessevolved.enums.PlayerColor
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class GameDto(
