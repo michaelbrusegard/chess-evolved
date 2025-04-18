@@ -34,6 +34,8 @@ class VisualEffectSystem(
         for (i in 1..6) {
             assetManager.load(filePathPrefix + "explosion/explosion$i.png", Texture::class.java)
         }
+
+        assetManager.load(filePathPrefix + "shield/shield1.png", Texture::class.java)
     }
 
     fun initializeAnimations() {
@@ -42,21 +44,31 @@ class VisualEffectSystem(
             explosionFrames.add(TextureRegion(assetManager.get(filePathPrefix + "explosion/explosion$i.png", Texture::class.java)))
         }
         animations[VisualEffectType.EXPLOSION] = Animation(VisualEffectType.EXPLOSION.value, explosionFrames, Animation.PlayMode.NORMAL)
+
+        val shieldFrames = com.badlogic.gdx.utils.Array<TextureRegion>()
+        shieldFrames.add((TextureRegion(assetManager.get(filePathPrefix + "shield/shield1.png", Texture::class.java))))
+        animations[VisualEffectType.SHIELD_ACTIVE] = Animation(VisualEffectType.SHIELD_ACTIVE.value, shieldFrames, Animation.PlayMode.LOOP)
     }
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
+
+        val entitiesToRemove = mutableListOf<Entity>()
 
         entityTimers.forEach { (entity, elapsedTime) ->
             val visualEffect = VisualEffectComponent.mapper.get(entity)
             val newElapsedTime = elapsedTime + deltaTime
 
             if (visualEffect.duration > 0 && newElapsedTime >= visualEffect.duration) {
-                entityTimers.remove(entity)
-                ECSEngine.removeEntity(entity)
+                entitiesToRemove.add(entity)
             } else {
                 entityTimers[entity] = newElapsedTime
             }
+        }
+
+        entitiesToRemove.forEach { entity ->
+            entityTimers.remove(entity)
+            ECSEngine.removeEntity(entity)
         }
     }
 

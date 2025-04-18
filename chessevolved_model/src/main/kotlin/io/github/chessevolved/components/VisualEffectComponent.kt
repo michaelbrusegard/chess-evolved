@@ -25,7 +25,7 @@ enum class VisualEffectSize(val value: Int) {
 class VisualEffectComponent(
     val effectType: VisualEffectType,
     val amountOfFrames: Int,
-    val duration: Float = amountOfFrames * effectType.value,
+    var duration: Float = amountOfFrames * effectType.value,
     val squareSize: VisualEffectSize,
 ) : Component {
     companion object {

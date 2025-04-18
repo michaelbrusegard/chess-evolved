@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.AbilityComponent
+import io.github.chessevolved.components.AbilityTriggerComponent
 import io.github.chessevolved.components.AbilityType
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
@@ -156,19 +157,30 @@ class GamePresenter(
                 PlayerColor.WHITE,
                 gameStage,
             ).add(
-                    AbilityComponent(
-                        ability = AbilityType.EXPLOSION,
-                        abilityCooldownTime = 2,
-                        currentAbilityCDTime = 0,
-                    ),
+                AbilityComponent(
+                    ability = AbilityType.EXPLOSION,
+                    abilityCooldownTime = 2,
+                    currentAbilityCDTime = 0
                 )
+            )
 
             pieceFactory.createPawn(
                 false,
                 Position(startPos, boardWorldSize - 2),
                 PlayerColor.BLACK,
                 gameStage,
-            )
+            ).apply {
+                add(
+                    AbilityComponent(
+                        ability = AbilityType.SHIELD,
+                        abilityCooldownTime = 3,
+                        currentAbilityCDTime = 0
+                    )
+                )
+                add(
+                    AbilityTriggerComponent(Position(startPos, boardWorldSize - 2), false)
+                )
+            }
 
             when (startPos) {
                 startX -> {

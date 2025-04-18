@@ -25,10 +25,6 @@ class CaptureSystem : IteratingSystem(
         val capturedPosition = PositionComponent.mapper.get(entity).position
         val capturedByAbility = CapturedComponent.mapper.get(entity).capturedByAbility
 
-        // Trigger the ability.
-        // Ability will give a BlockedComponent if it can block the capture.
-        entity?.add(AbilityTriggerComponent(capturedPosition, false))
-
         val capturedBlockedComponent = BlockedComponent.mapper.get(entity)
 
         // Trigger the movementSystem to move the entity that captured.
@@ -42,8 +38,9 @@ class CaptureSystem : IteratingSystem(
         }
 
         if (capturedBlockedComponent != null) {
-            entity?.remove(BlockedComponent::class.java)
-            entity?.remove(CapturedComponent::class.java)
+            // Trigger the ability.
+            entity?.add(AbilityTriggerComponent(capturedPosition, false))
+            // entity?.remove(CapturedComponent::class.java)
             capturingPiece?.remove(SelectionComponent::class.java)
             capturingPiece?.remove(ValidMovesComponent::class.java)
             return

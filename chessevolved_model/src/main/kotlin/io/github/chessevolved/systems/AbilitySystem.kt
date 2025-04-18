@@ -94,14 +94,30 @@ class AbilitySystem : IteratingSystem(
         targetPosition: Position,
         abilityComponent: AbilityComponent,
     ) {
-        // Should play an animation that the shield breaks.
-        // If the shield was called through capturing, we actually do the cooldown.
-        if (CapturedComponent.mapper.get(entity) != null) {
+        // Check if shield effect exists
+        val shieldEffectEntity = ECSEngine.getEntitiesFor(Family.all(VisualEffectComponent::class.java, PositionComponent::class.java).get())
+            .firstOrNull {
+                VisualEffectComponent.mapper.get(it).effectType == VisualEffectType.SHIELD_ACTIVE &&
+                        PositionComponent.mapper.get(it).position == targetPosition
+            }
+
+        val isCaptured = CapturedComponent.mapper.get(entity) != null
+
+        if (isCaptured && shieldEffectEntity != null) {
+            entity?.remove(BlockedComponent::class.java)
+            entity?.remove(CapturedComponent::class.java)
+
+            // Give duration such that it gets deleted
+            VisualEffectComponent.mapper.get(shieldEffectEntity).duration = 0.1f
+            abilityComponent.currentAbilityCDTime = abilityComponent.abilityCooldownTime
+            // Start animation for shield break
+        } else if (shieldEffectEntity == null) {
             entity?.add(BlockedComponent())
-        } else {
-            // Reset the cooldown so the shield stays active again.
-            // Can be considered to remove
-            abilityComponent.currentAbilityCDTime = 0
+            val effectEntity = ECSEngine.createEntity()
+            effectEntity.add(VisualEffectComponent(VisualEffectType.SHIELD_ACTIVE, 1, duration = 0f, squareSize = VisualEffectSize.NORMAL))
+            effectEntity.add(HighlightComponent(Color.WHITE))
+            effectEntity.add(PositionComponent(targetPosition))
+            ECSEngine.addEntity(effectEntity)
         }
     }
 }
