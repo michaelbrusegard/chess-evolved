@@ -15,8 +15,8 @@ class GameView(
 
     override fun init() {
         gameStage = Stage(gameViewport)
-        inputMultiplexer.addProcessor(gameStage)
         inputMultiplexer.addProcessor(uiStage)
+        inputMultiplexer.addProcessor(gameStage)
     }
 
     fun getStage(): Stage = gameStage

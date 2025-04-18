@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
-import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.PieceType
@@ -45,7 +44,7 @@ class GamePresenter(
     private val gameViewport: Viewport =
         FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
     private val gameUIViewport: Viewport =
-        ScreenViewport()
+        FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), gameUICamera)
     private lateinit var gameUIView: GameUIView
     private lateinit var gameBoardView: GameView
     private val gameBatch: SpriteBatch = SpriteBatch()
@@ -83,6 +82,10 @@ class GamePresenter(
 
         // If we do not call this the board will not be displayed
         resize(Gdx.graphics.width, Gdx.graphics.height)
+
+        // TODO: Remove after testing ability card UI
+        val copyIconTexture = Texture(Gdx.files.internal("icons/copy-icon.png"))
+        gameUIView.addAbilityCardToInventory(copyIconTexture, ::onAbilityCardUsed, 1)
     }
 
     private fun loadRequiredAssets() {
@@ -100,7 +103,8 @@ class GamePresenter(
     }
 
     private fun setupGameView() {
-        gameUIView = GameUIView(gameUIViewport)
+        // TODO: Pass in if the player is the white player or not.
+        gameUIView = GameUIView(gameUIViewport, true)
         gameUIView.init()
 
         gameBoardView = GameView(gameUIView.getStage(), gameViewport)
@@ -243,7 +247,8 @@ class GamePresenter(
         width: Int,
         height: Int,
     ) {
-        gameViewport.update(width, height, false)
+        gameViewport.update(width, height, true)
+        gameUIViewport.update(width, height, false)
         gameBoardView.resize(width, height)
         gameUIView.resize(width, height)
     }
@@ -274,6 +279,11 @@ class GamePresenter(
                 }
             }
         }
+    }
+
+    fun onAbilityCardUsed(abilityId: Int) {
+        // TODO: Fetch which ability to use.
+        println("Abilitycard used!")
     }
 
     override fun setInputProcessor() {
