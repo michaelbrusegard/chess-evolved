@@ -13,7 +13,7 @@ import kotlin.time.Duration.Companion.seconds
 internal object SupabaseClient {
     private val dotenv =
         dotenv {
-            directory = "./assets"
+            directory = "./"
             filename = "env"
             ignoreIfMissing = true
         }
