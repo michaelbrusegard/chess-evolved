@@ -1,7 +1,7 @@
 package io.github.chessevolved.singletons
 
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertFalse
 import kotlin.test.Test
 import kotlin.test.assertFails
 

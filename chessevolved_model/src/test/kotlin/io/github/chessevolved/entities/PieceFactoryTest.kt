@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
 import io.github.chessevolved.singletons.ECSEngine
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFails
 

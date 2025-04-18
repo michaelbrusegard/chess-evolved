@@ -1,7 +1,7 @@
 package io.github.chessevolved.singletons
 
 import io.github.chessevolved.shared.SettingsDTO
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import kotlin.test.Test
 
 class GameSettingsTest {
