@@ -31,19 +31,6 @@ object SupabaseLobbyHandler {
      */
     private val SUPABASE_LOBBY_TABLE_NAME = "lobbies"
 
-    /**
-     * Type used for lobbies saved in database.
-     */
-    @Serializable
-    data class Lobby(
-        val id: Int,
-        val created_at: String,
-        val lobby_code: String,
-        val second_player: Boolean,
-        val game_started: Boolean,
-        val settings: Map<String, String>,
-    )
-
     // Taken from https://stackoverflow.com/questions/46943860/idiomatic-way-to-generate-a-random-alphanumeric-string-in-kotlin
 
     /**

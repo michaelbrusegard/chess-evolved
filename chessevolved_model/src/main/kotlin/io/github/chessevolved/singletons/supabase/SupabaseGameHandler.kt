@@ -24,29 +24,6 @@ object SupabaseGameHandler {
      */
     private val SUPABASE_GAME_TABLE_NAME = "games"
 
-    enum class TurnColor {
-        WHITE,
-        BLACK,
-    }
-
-    /**
-     * Type used for games saved in database.
-     */
-    @Serializable
-    data class Game(
-        val id: Int,
-        val updated_at: String,
-        val lobby_code: String,
-        val last_move: String?,
-        val turn: TurnColor,
-        // TODO: Change this to be an array of pieces when that is implemented
-        val pieces: Array<String>,
-        // TODO: Change this to be an array of board squares when that is implemented
-        val board_squares: Array<String>,
-        val player_disconnected: Boolean,
-        val want_rematch: Boolean,
-    )
-
     /**
      * Method that checks if a game-row corresponding to a lobbyCode exists, and subscribes
      * to updates on it.

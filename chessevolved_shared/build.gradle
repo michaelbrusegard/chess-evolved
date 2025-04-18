@@ -2,5 +2,6 @@
 eclipse.project.name = appName + '-chessevolved_shared'
 
 dependencies {
-  api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    api "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
 }
