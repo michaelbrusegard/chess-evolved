@@ -16,6 +16,7 @@ import ktx.scene2d.image
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.textButton
+import ktx.style.skin
 
 class MenuView : IView {
     private lateinit var stage: Stage
@@ -34,6 +35,7 @@ class MenuView : IView {
 
     override fun init() {
         skinSetup.loadAllCommonAssets()
+        skinSetup.setupSkins()
 
         val screenRatio = Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat()
 

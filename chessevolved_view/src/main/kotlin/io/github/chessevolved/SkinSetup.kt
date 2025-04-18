@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import ktx.scene2d.Scene2DSkin
+import ktx.style.get
+import ktx.style.has
 
 object SkinSetup {
     var assetManager = AssetManager()
@@ -18,30 +20,31 @@ object SkinSetup {
         setupSkins()
     }
 
-    private fun setupSkins() {
+    fun setupSkins() {
+        if (!Scene2DSkin.defaultSkin.has("CEtextButtonStyle", TextButtonStyle::class.java) ) {
+            val textButtonStyle = TextButtonStyle().apply {
+                up = TextureRegionDrawable(
+                    TextureRegion(
+                        assetManager.get("customUI/buttonNormal.png", Texture::class.java)
+                    )
+                )
+                down = TextureRegionDrawable(
+                    TextureRegion(
+                        assetManager.get("customUI/buttonPressed.png", Texture::class.java)
+                    )
+                )
+                over = TextureRegionDrawable(
+                    TextureRegion(
+                        assetManager.get("customUI/buttonNormal.png", Texture::class.java)
+                    )
+                )
+                font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
 
-        val textButtonStyle = TextButtonStyle().apply {
-            up = TextureRegionDrawable(
-                TextureRegion(
-                    assetManager.get("customUI/buttonNormal.png", Texture::class.java)
-                )
-            )
-            down = TextureRegionDrawable(
-                TextureRegion(
-                    assetManager.get("customUI/buttonPressed.png", Texture::class.java)
-                )
-            )
-            over = TextureRegionDrawable(
-                TextureRegion(
-                assetManager.get("customUI/buttonNormal.png", Texture::class.java)
-                )
-            )
-            font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
+                font.data.setLineHeight(0.5f * font.data.lineHeight)
+            }
 
-            font.data.setLineHeight(0.5f * font.data.lineHeight)
+            Scene2DSkin.defaultSkin.add("CEtextButtonStyle", textButtonStyle)
         }
-
-        Scene2DSkin.defaultSkin.add("CEtextButtonStyle", textButtonStyle)
     }
 
     fun loadAllCommonAssets() {
