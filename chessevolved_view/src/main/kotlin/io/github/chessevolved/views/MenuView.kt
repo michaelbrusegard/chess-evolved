@@ -1,9 +1,12 @@
 package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
+import ktx.scene2d.image
 import ktx.scene2d.label
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
@@ -17,21 +20,32 @@ class MenuView : IView {
 
     private lateinit var toastManager: ToastManager
 
+    private lateinit var camera: OrthographicCamera
+    private lateinit var viewport: FitViewport
+
+    private val logoTexture = Texture("customUI/chessEvolvedLogo.png")
+
     override fun init() {
-        stage =
-            Stage(
-                FitViewport(
-                    Gdx.graphics.width.toFloat(),
-                    Gdx.graphics.height.toFloat(),
-                ),
-            )
+        val screenRatio = Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat()
+
+        camera = OrthographicCamera()
+        viewport = FitViewport(500f, 500f / screenRatio, camera)
+
+        stage = Stage(viewport)
+
+        println("ScreenWidth: ${Gdx.graphics.width}, ScreenHeight: ${Gdx.graphics.height}")
 
         val root =
             scene2d.table {
                 setFillParent(true)
                 defaults().pad(10f).center()
 
-                label("Chess Evolved!") { it.padBottom(20f) }
+                image(logoTexture) {
+                    it.padBottom(20f)
+
+                    val ratio = logoTexture.width.toFloat() / logoTexture.height.toFloat()
+                    it.size(300f, 300f / ratio)
+                }
                 row()
 
                 textButton("Create Lobby") {

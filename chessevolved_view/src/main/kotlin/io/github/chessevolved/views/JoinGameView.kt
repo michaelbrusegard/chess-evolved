@@ -1,6 +1,7 @@
 package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.viewport.FitViewport
@@ -19,7 +20,17 @@ class JoinGameView : IView {
     var onJoinButtonClicked: (String) -> Unit = {}
     var onReturnButtonClicked: () -> Unit = {}
 
+    private lateinit var camera: OrthographicCamera
+    private lateinit var viewport: FitViewport
+
     override fun init() {
+        val screenRatio = Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat()
+
+        camera = OrthographicCamera()
+        viewport = FitViewport(500f, 500f / screenRatio, camera)
+
+        stage = Stage(viewport)
+
         stage =
             Stage(
                 FitViewport(

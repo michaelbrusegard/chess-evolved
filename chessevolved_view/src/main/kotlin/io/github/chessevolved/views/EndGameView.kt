@@ -1,6 +1,7 @@
 package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
@@ -29,14 +30,16 @@ class EndGameView : IView {
     var onReturnToMenuClicked: () -> Unit = {}
     var onRematchClicked: () -> Unit = {}
 
+    private lateinit var camera: OrthographicCamera
+    private lateinit var viewport: FitViewport
+
     override fun init() {
-        stage =
-            Stage(
-                FitViewport(
-                    Gdx.graphics.width.toFloat(),
-                    Gdx.graphics.height.toFloat(),
-                ),
-            )
+        val screenRatio = Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat()
+
+        camera = OrthographicCamera()
+        viewport = FitViewport(500f, 500f / screenRatio, camera)
+
+        stage = Stage(viewport)
 
         val root =
             scene2d.table {

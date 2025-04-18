@@ -1,5 +1,6 @@
 package io.github.chessevolved.views
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -29,14 +30,17 @@ class LobbyView(
     var onOpenSettingsButtonClicked: () -> Unit = {}
     var onStartGameButtonClicked: () -> Unit = {}
 
+    private lateinit var camera: OrthographicCamera
+    private lateinit var viewport: FitViewport
+
     override fun init() {
-        stage =
-            Stage(
-                FitViewport(
-                    Gdx.graphics.width.toFloat(),
-                    Gdx.graphics.height.toFloat(),
-                ),
-            )
+        val screenRatio = Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat()
+
+        camera = OrthographicCamera()
+        viewport = FitViewport(500f, 500f / screenRatio, camera)
+
+        stage = Stage(viewport)
+
         toastManager = ToastManager(stage)
 
         val copyIconTexture = Texture(Gdx.files.internal("icons/copy-icon.png"))
