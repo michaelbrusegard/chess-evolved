@@ -98,7 +98,6 @@ class PieceFactory(
             add(PieceTypeComponent(pieceType))
             add(PlayerColorComponent(playerColor))
             add(MovementRuleComponent())
-            // add(AbilityComponent(emptyList()))
             add(TextureRegionComponent(getPieceTextureRegion(pieceType, playerColor)))
             add(HighlightComponent(Color.WHITE))
             add(

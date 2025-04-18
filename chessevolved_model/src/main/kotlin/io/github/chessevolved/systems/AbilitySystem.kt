@@ -43,7 +43,6 @@ class AbilitySystem : IteratingSystem(
                 // It is the ability's job to determine.
                 if (CapturedComponent.mapper.get(entity) == null) {
                     triggerExplosionEffect(entity, abilityTriggerComponent.targetPosition)
-                    println("Got triggered")
                 }
             }
             AbilityType.SHIELD -> {
