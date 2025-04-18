@@ -154,7 +154,6 @@ class MoveValidator {
 
         while (newPosition.x != position.x || newPosition.y != position.y) {
             newPosition = Position(newPosition.x + xIncrementer, newPosition.y + yIncrementer)
-            println(newPosition)
 
             // Break out, since the normal validation takes care of this edge case.
             if (newPosition == position) {

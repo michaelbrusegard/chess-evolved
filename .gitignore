@@ -7,6 +7,7 @@ gradle-app.setting
 /chessevolved_presenter/build/
 /chessevolved_model/build/
 /chessevolved_view/build/
+/chessevolved_shared/build/
 /lwjgl2/build/
 /lwjgl3/build/
 /html/build/
@@ -86,6 +87,7 @@ www-test/
 /chessevolved_model/bin/
 /chessevolved_presenter/bin/
 /chessevolved_view/bin/
+/chessevolved_shared/bin/
 *.tmp
 *.bak
 *.swp
