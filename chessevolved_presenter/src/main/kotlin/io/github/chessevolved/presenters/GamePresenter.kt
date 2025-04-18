@@ -22,10 +22,10 @@ import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.singletons.ECSEngine
-import io.github.chessevolved.systems.AbilitySystem
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
 import io.github.chessevolved.singletons.Lobby
+import io.github.chessevolved.systems.AbilitySystem
 import io.github.chessevolved.systems.CaptureSystem
 import io.github.chessevolved.systems.InputSystem
 import io.github.chessevolved.systems.MovementSystem
@@ -160,8 +160,8 @@ class GamePresenter(
                 AbilityComponent(
                     ability = AbilityType.EXPLOSION,
                     abilityCooldownTime = 2,
-                    currentAbilityCDTime = 0
-                )
+                    currentAbilityCDTime = 0,
+                ),
             )
 
             pieceFactory.createPawn(
@@ -174,11 +174,11 @@ class GamePresenter(
                     AbilityComponent(
                         ability = AbilityType.SHIELD,
                         abilityCooldownTime = 3,
-                        currentAbilityCDTime = 0
-                    )
+                        currentAbilityCDTime = 0,
+                    ),
                 )
                 add(
-                    AbilityTriggerComponent(Position(startPos, boardWorldSize - 2), Position(startPos, boardWorldSize - 2))
+                    AbilityTriggerComponent(Position(startPos, boardWorldSize - 2), Position(startPos, boardWorldSize - 2)),
                 )
             }
 

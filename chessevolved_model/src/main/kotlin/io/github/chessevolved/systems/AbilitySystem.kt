@@ -93,11 +93,12 @@ class AbilitySystem : IteratingSystem(
         abilityComponent: AbilityComponent,
     ) {
         // Check if shield effect exists
-        val shieldEffectEntity = ECSEngine.getEntitiesFor(Family.all(VisualEffectComponent::class.java, PositionComponent::class.java).get())
-            .firstOrNull {
-                VisualEffectComponent.mapper.get(it).effectType == VisualEffectType.SHIELD_ACTIVE &&
+        val shieldEffectEntity =
+            ECSEngine.getEntitiesFor(Family.all(VisualEffectComponent::class.java, PositionComponent::class.java).get())
+                .firstOrNull {
+                    VisualEffectComponent.mapper.get(it).effectType == VisualEffectType.SHIELD_ACTIVE &&
                         PositionComponent.mapper.get(it).position == oldPosition
-            }
+                }
 
         val isCaptured = CapturedComponent.mapper.get(entity) != null
 

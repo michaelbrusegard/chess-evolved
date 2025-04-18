@@ -113,9 +113,8 @@ class VisualEffectSystem(
         frameAmount: Int,
         effectType: VisualEffectType,
         animationPlayMode: Animation.PlayMode,
-        filePathSuffix: String
-    )
-    {
+        filePathSuffix: String,
+    ) {
         val frames = com.badlogic.gdx.utils.Array<TextureRegion>()
         for (i in 1..frameAmount) {
             frames.add(TextureRegion(assetManager.get("$filePathPrefix$filePathSuffix$i.png", Texture::class.java)))
