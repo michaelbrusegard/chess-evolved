@@ -35,7 +35,9 @@ class VisualEffectSystem(
             assetManager.load(filePathPrefix + "explosion/explosion$i.png", Texture::class.java)
         }
 
-        assetManager.load(filePathPrefix + "shield/shield1.png", Texture::class.java)
+        for (i in 1..3) {
+            assetManager.load(filePathPrefix + "shield/shield$i.png", Texture::class.java)
+        }
     }
 
     fun initializeAnimations() {
@@ -46,7 +48,9 @@ class VisualEffectSystem(
         animations[VisualEffectType.EXPLOSION] = Animation(VisualEffectType.EXPLOSION.value, explosionFrames, Animation.PlayMode.NORMAL)
 
         val shieldFrames = com.badlogic.gdx.utils.Array<TextureRegion>()
-        shieldFrames.add((TextureRegion(assetManager.get(filePathPrefix + "shield/shield1.png", Texture::class.java))))
+        for (i in 1..3) {
+            shieldFrames.add((TextureRegion(assetManager.get(filePathPrefix + "shield/shield$i.png", Texture::class.java))))
+        }
         animations[VisualEffectType.SHIELD_ACTIVE] = Animation(VisualEffectType.SHIELD_ACTIVE.value, shieldFrames, Animation.PlayMode.LOOP)
     }
 

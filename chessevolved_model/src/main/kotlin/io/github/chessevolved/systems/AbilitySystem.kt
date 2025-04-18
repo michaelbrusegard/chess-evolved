@@ -114,7 +114,7 @@ class AbilitySystem : IteratingSystem(
         } else if (shieldEffectEntity == null) {
             entity?.add(BlockedComponent())
             val effectEntity = ECSEngine.createEntity()
-            effectEntity.add(VisualEffectComponent(VisualEffectType.SHIELD_ACTIVE, 1, duration = 0f, squareSize = VisualEffectSize.NORMAL))
+            effectEntity.add(VisualEffectComponent(VisualEffectType.SHIELD_ACTIVE, 3, duration = 0f, squareSize = VisualEffectSize.NORMAL))
             effectEntity.add(HighlightComponent(Color.WHITE))
             effectEntity.add(PositionComponent(targetPosition))
             ECSEngine.addEntity(effectEntity)

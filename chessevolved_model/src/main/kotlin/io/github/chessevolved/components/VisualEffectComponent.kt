@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
 
 enum class VisualEffectType(val value: Float) {
-    SHIELD_ACTIVE(0.5f),
+    SHIELD_ACTIVE(0.2f),
     SHIELD_BREAK(0.1f),
     EXPLOSION(0.1f),
 }
