@@ -1,39 +1,43 @@
 package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 
-class GameView : IView {
-    private lateinit var stage: Stage
+class GameView(
+    private val uiStage: Stage,
+    private val gameViewport: Viewport,
+) : IView {
+    private lateinit var gameStage: Stage
 
-    private val gameBatch = SpriteBatch()
+    private val inputMultiplexer = InputMultiplexer()
 
     override fun init() {
-        stage = Stage(ScreenViewport())
+        gameStage = Stage(gameViewport)
+        inputMultiplexer.addProcessor(gameStage)
+        inputMultiplexer.addProcessor(uiStage)
     }
 
-    fun getGameBatch(): SpriteBatch = gameBatch
+    fun getStage(): Stage = gameStage
 
     override fun render() {
-        stage.act(Gdx.graphics.deltaTime)
-        stage.draw()
+        gameStage.act(Gdx.graphics.deltaTime)
+        gameStage.draw()
     }
 
     override fun resize(
         width: Int,
         height: Int,
     ) {
-        stage.viewport.update(width, height, true)
+        gameStage.viewport.update(width, height, true)
     }
 
     override fun dispose() {
-        stage.dispose()
-        gameBatch.dispose()
+        gameStage.dispose()
     }
 
     override fun setInputProcessor() {
-        Gdx.input.inputProcessor = stage
+        Gdx.input.inputProcessor = inputMultiplexer
     }
 }
