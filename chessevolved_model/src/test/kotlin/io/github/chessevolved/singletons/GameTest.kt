@@ -2,13 +2,10 @@ package io.github.chessevolved.singletons
 
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.*
-
 import kotlin.test.Test
 import kotlin.test.assertFails
 
-
 class GameTest {
-
     suspend fun joinGame() {
         Game.joinGame("HY76UYTERFRGET")
     }
@@ -45,7 +42,7 @@ class GameTest {
     @Test
     fun testAskForRematch() =
         runTest {
-        assertFails({ askForRematch() })
+            assertFails({ askForRematch() })
         }
 
     @Test

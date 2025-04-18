@@ -2,13 +2,9 @@ package io.github.chessevolved.entities
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
-import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
-import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.singletons.ECSEngine
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -61,7 +57,6 @@ class PieceFactoryTest {
             )
         })
     }
-
 
     /**
      * Attempt to create a rook at an invalid location

@@ -46,5 +46,4 @@ class PresenterManagerTest {
         }
         assertTrue { PresenterManager.isEmpty() }
     }
-
 }

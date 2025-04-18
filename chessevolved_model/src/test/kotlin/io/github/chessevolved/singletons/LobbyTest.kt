@@ -1,13 +1,11 @@
 package io.github.chessevolved.singletons
 
 import kotlinx.coroutines.test.runTest
-
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.test.assertFails
 
 class LobbyTest {
-
     suspend fun joinLobby() {
         Lobby.joinLobby("E6U5Y5GTRFEZE45")
     }
