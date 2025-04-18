@@ -23,10 +23,38 @@ object Lobby {
         }
     }
 
+    suspend fun joinRematchLobbyAsHost() {
+        println("Lobby: Joining rematch-lobby with ID: $lobbyId...")
+        if (!isInLobby()) {
+            throw Exception("Can't rematch when not in a lobby!")
+        }
+        try {
+            SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
+            SupabaseLobbyHandler.joinLobbyNoUpdateSecondPlayer(lobbyId!!, ::onLobbyRowUpdate)
+        } catch (e: Exception) {
+            println(e.message)
+            error(e)
+            // throw e
+        }
+    }
+
+    suspend fun joinRematchLobbyNonHost() {
+        if (!isInLobby()) {
+            throw Exception("Can't rematch when not in a lobby!")
+        }
+        try {
+            SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
+            SupabaseLobbyHandler.joinLobby(lobbyId!!, ::onLobbyRowUpdate)
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
     suspend fun createLobby() {
         try {
             val lobbyId = SupabaseLobbyHandler.createLobby(::onLobbyRowUpdate)
             this.lobbyId = lobbyId
+            println("Lobby: Creating lobby with ID: $lobbyId...")
         } catch (e: Exception) {
             throw Exception("Problem when creating lobby! " + e.message)
         }
@@ -38,6 +66,19 @@ object Lobby {
         }
         try {
             SupabaseLobbyHandler.leaveLobby(lobbyId!!)
+            this.lobbyId = null
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    suspend fun leaveLobbyWithoutUpdating() {
+        if (!isInLobby()) {
+            throw Exception("Can't leave lobby when not in a lobby!")
+        }
+        try {
+            SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
+            lobbyId = null
         } catch (e: Exception) {
             throw e
         }
@@ -47,8 +88,22 @@ object Lobby {
         if (!isInLobby()) {
             throw IllegalStateException("Can't update game settings when not in a lobby!")
         }
-        SupabaseLobbyHandler.updateLobbySettings(lobbyId!!, GameSettings.getGameSettings())
+        try {
+            SupabaseLobbyHandler.updateLobbySettings(lobbyId!!, GameSettings.getGameSettings())
+        } catch (e: Exception) {
+            throw Exception("Problem updating lobby settings! " + e.message)
+        }
     }
+
+    // suspend fun getLobbySettings(): Map<String, String> {
+    //     if (!isInLobby()) {
+    //         throw IllegalStateException("Can't get game settings when not in a lobby!")
+    //     }
+    //     val settingsArray = SupabaseLobbyHandler.getLobbyRow(lobbyId!!).settings
+    //     val settingsMap = mapOf(
+    //         settingsArray
+    //     )
+    // }
 
     suspend fun getLobby(): Lobby {
         if (!isInLobby()) {
@@ -67,9 +122,9 @@ object Lobby {
             throw IllegalStateException("Can't start game when not in a lobby!")
         }
         try {
-            SupabaseLobbyHandler.startGame(lobbyId!!, GameSettings.getGameSettings())
+            SupabaseLobbyHandler.startGame(lobbyId!!)
         } catch (e: Exception) {
-            // TODO: Elevate exception with appropriate message
+            throw e
         }
     }
 

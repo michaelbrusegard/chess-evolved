@@ -41,7 +41,7 @@ class Navigator(
     }
 
     fun navigateToLobby(lobbyId: String) {
-        if (PresenterManager.getCurrent() is JoinGamePresenter) {
+        if (PresenterManager.getCurrent() is JoinGamePresenter || PresenterManager.getCurrent() is EndGamePresenter) {
             PresenterManager.set(createLobbyPresenter(lobbyId))
         } else {
             PresenterManager.push(createLobbyPresenter(lobbyId))

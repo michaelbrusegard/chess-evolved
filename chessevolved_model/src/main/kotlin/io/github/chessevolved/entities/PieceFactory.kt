@@ -19,12 +19,15 @@ import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.TextureRegionComponent
+import io.github.chessevolved.systems.InputService
 import ktx.actors.onClick
 
 class PieceFactory(
     private val engine: Engine,
     private val assetManager: AssetManager,
 ) {
+    private val inputService: InputService = InputService()
+
     private val diagonalDirections =
         listOf(
             Vector2(1f, 1f),
@@ -89,7 +92,6 @@ class PieceFactory(
         pieceType: PieceType,
         playerColor: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
         Entity().apply {
             add(PositionComponent(position))
@@ -104,8 +106,7 @@ class PieceFactory(
                     getPieceActor(
                         positionProvider = { PositionComponent.mapper.get(this).position },
                         stage,
-                        onClick,
-                    ),
+                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) },
                 ),
             )
             engine.addEntity(this)
@@ -116,8 +117,7 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
-    ) = createPiece(position, PieceType.PAWN, color, stage, onClick).apply {
+    ) = createPiece(position, PieceType.PAWN, color, stage).apply {
         getComponent(MovementRuleComponent::class.java).apply {
             val pawnDirections: List<Vector2>
             val pawnCaptureDirections: List<Vector2>
@@ -166,9 +166,8 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
-        createPiece(position, PieceType.KNIGHT, color, stage, onClick).apply {
+        createPiece(position, PieceType.KNIGHT, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
                     MovementRuleComponent.MovementPattern(
@@ -185,9 +184,8 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
-        createPiece(position, PieceType.BISHOP, color, stage, onClick).apply {
+        createPiece(position, PieceType.BISHOP, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
                     MovementRuleComponent.MovementPattern(
@@ -202,9 +200,8 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
-        createPiece(position, PieceType.ROOK, color, stage, onClick).apply {
+        createPiece(position, PieceType.ROOK, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
                     MovementRuleComponent.MovementPattern(
@@ -219,9 +216,8 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
-        createPiece(position, PieceType.QUEEN, color, stage, onClick).apply {
+        createPiece(position, PieceType.QUEEN, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
                     MovementRuleComponent.MovementPattern(
@@ -236,9 +232,8 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
-        createPiece(position, PieceType.KING, color, stage, onClick).apply {
+        createPiece(position, PieceType.KING, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
                     MovementRuleComponent.MovementPattern(

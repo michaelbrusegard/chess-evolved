@@ -17,12 +17,15 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.components.WeatherEventComponent
+import io.github.chessevolved.systems.InputService
 import ktx.actors.onClick
 
 class BoardSquareFactory(
     private val engine: Engine,
     private val assetManager: AssetManager,
 ) {
+    private val inputService: InputService = InputService()
+
     private fun getBoardSquareTextureRegion(playerColor: PlayerColor): TextureRegion {
         val colorStr = playerColor.name.lowercase()
         val filename = "board/$colorStr-tile.png"
@@ -55,7 +58,6 @@ class BoardSquareFactory(
         weatherEvent: WeatherEvent,
         playerColor: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
         Entity().apply {
             add(PositionComponent(position))
@@ -63,7 +65,11 @@ class BoardSquareFactory(
             add(PlayerColorComponent(playerColor))
             add(TextureRegionComponent(getBoardSquareTextureRegion(playerColor)))
             add(HighlightComponent(Color.WHITE))
-            add(ActorComponent(getBoardActor(position, stage, onClick)))
+            add(
+                ActorComponent(
+                    getBoardActor(position, stage) { clickedPosition -> inputService.clickBoardSquareAtPosition(clickedPosition) },
+                ),
+            )
             engine.addEntity(this)
         }
 }
