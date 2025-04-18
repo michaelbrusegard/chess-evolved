@@ -1,12 +1,13 @@
 package io.github.chessevolved.singletons
 
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
-import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.Lobby
-import kotlin.reflect.KFunction1
+import io.github.chessevolved.dtos.LobbyDto
 
 object Lobby {
     private var lobbyId: String? = null
-    private var subscribers = mutableMapOf<String, KFunction1<Lobby, Unit>>()
+    private var subscribers = mutableMapOf<String, 
+(updatedLobby: LobbyDto) -> Unit
+    >()
 
     /**
      * Method to join a lobby.
@@ -95,17 +96,7 @@ object Lobby {
         }
     }
 
-    // suspend fun getLobbySettings(): Map<String, String> {
-    //     if (!isInLobby()) {
-    //         throw IllegalStateException("Can't get game settings when not in a lobby!")
-    //     }
-    //     val settingsArray = SupabaseLobbyHandler.getLobbyRow(lobbyId!!).settings
-    //     val settingsMap = mapOf(
-    //         settingsArray
-    //     )
-    // }
-
-    suspend fun getLobby(): Lobby {
+    suspend fun getLobby(): LobbyDto {
         if (!isInLobby()) {
             throw IllegalStateException("Can't retrieve lobby if not in a lobby yet.")
         }
@@ -132,7 +123,7 @@ object Lobby {
 
     fun getLobbyId(): String? = lobbyId
 
-    private fun onLobbyRowUpdate(lobby: SupabaseLobbyHandler.Lobby) {
+    private fun onLobbyRowUpdate(lobby: LobbyDto) {
         subscribers.forEach {
             it.value.invoke(lobby)
         }
@@ -140,7 +131,7 @@ object Lobby {
 
     fun subscribeToLobbyUpdates(
         subscriberName: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         subscribers.put(subscriberName, onEventListener)
     }

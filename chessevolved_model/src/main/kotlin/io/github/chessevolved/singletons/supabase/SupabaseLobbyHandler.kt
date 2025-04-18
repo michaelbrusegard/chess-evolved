@@ -1,6 +1,6 @@
 package io.github.chessevolved.singletons.supabase
 
-import io.github.chessevolved.shared.SettingsDTO
+import io.github.chessevolved.dtos.SettingsDto
 import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
@@ -49,7 +49,7 @@ object SupabaseLobbyHandler {
      * @return string containing the lobby-code of the lobby created.
      * @throws PostgrestRestException if creating a lobby fails three times.
      */
-    suspend fun createLobby(onEventListener: (newLobbyRow: LobbyDto) -> Unit): String {
+    suspend fun createLobby(onEventListener: (updatedLobby: LobbyDto) -> Unit): String {
         var lobbyCode = getRandomString(LOBBY_CODE_LENGTH)
 
         for (attempts in 1..3) {
@@ -76,7 +76,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun joinLobby(
         lobbyCode: String,
-        onEventListener: (updatedRow: LobbyDto) -> Unit,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         val response =
             supabase
@@ -278,7 +278,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun updateLobbySettings(
         lobbyCode: String,
-        gameSettings: SettingsDTO,
+        gameSettings: SettingsDto,
     ) {
         try {
             val settingsMap =
