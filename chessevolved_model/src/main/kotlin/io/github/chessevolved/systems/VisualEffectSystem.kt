@@ -41,7 +41,7 @@ class VisualEffectSystem(
         for (i in 1..6) {
             explosionFrames.add(TextureRegion(assetManager.get(filePathPrefix + "explosion/explosion$i.png", Texture::class.java)))
         }
-        animations[VisualEffectType.EXPLOSION] = Animation(0.1f, explosionFrames, Animation.PlayMode.NORMAL)
+        animations[VisualEffectType.EXPLOSION] = Animation(VisualEffectType.EXPLOSION.value, explosionFrames, Animation.PlayMode.NORMAL)
     }
 
     override fun update(deltaTime: Float) {
@@ -51,7 +51,7 @@ class VisualEffectSystem(
             val visualEffect = VisualEffectComponent.mapper.get(entity)
             val newElapsedTime = elapsedTime + deltaTime
 
-            if (visualEffect.durationSeconds > 0 && newElapsedTime >= visualEffect.durationSeconds) {
+            if (visualEffect.duration > 0 && newElapsedTime >= visualEffect.duration) {
                 entityTimers.remove(entity)
                 ECSEngine.removeEntity(entity)
             } else {
@@ -80,13 +80,16 @@ class VisualEffectSystem(
         if (animation != null) {
             val currentFrame = animation.getKeyFrame(elapsedTime)
 
+            val x = positionComponent.position.x - visualEffectComponent.squareSize.value / 2
+            val y = positionComponent.position.y - visualEffectComponent.squareSize.value / 2
+
             batch.color = highlightComponent.color
             batch.draw(
                 currentFrame,
-                positionComponent.position.x.toFloat(),
-                positionComponent.position.y.toFloat(),
-                1f,
-                1f
+                x.toFloat(),
+                y.toFloat(),
+                visualEffectComponent.squareSize.value.toFloat(),
+                visualEffectComponent.squareSize.value.toFloat()
             )
 
             batch.color = Color.WHITE

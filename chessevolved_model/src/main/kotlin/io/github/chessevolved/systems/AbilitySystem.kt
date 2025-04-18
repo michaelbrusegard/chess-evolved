@@ -19,6 +19,7 @@ import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.components.VisualEffectComponent
+import io.github.chessevolved.components.VisualEffectSize
 import io.github.chessevolved.components.VisualEffectType
 import io.github.chessevolved.singletons.ECSEngine
 
@@ -67,7 +68,7 @@ class AbilitySystem : IteratingSystem(
         val radius = 1
 
         val effectEntity = ECSEngine.createEntity()
-        effectEntity.add(VisualEffectComponent(VisualEffectType.EXPLOSION, 1f))
+        effectEntity.add(VisualEffectComponent(VisualEffectType.EXPLOSION, 6, squareSize = VisualEffectSize.MEDIUM))
         effectEntity.add(HighlightComponent(Color.WHITE))
         effectEntity.add(PositionComponent(targetPosition))
         ECSEngine.addEntity(effectEntity)
