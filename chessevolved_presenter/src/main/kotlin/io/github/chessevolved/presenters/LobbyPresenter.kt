@@ -1,5 +1,6 @@
 package io.github.chessevolved.presenters
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.shared.SettingsDTO
@@ -7,6 +8,7 @@ import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.singletons.Lobby.getLobby
 import io.github.chessevolved.singletons.Lobby.leaveLobby
+import io.github.chessevolved.singletons.Lobby.startGame
 import io.github.chessevolved.singletons.Lobby.subscribeToLobbyUpdates
 import io.github.chessevolved.singletons.Lobby.unsubscribeFromLobbyUpdates
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
@@ -20,9 +22,11 @@ class LobbyPresenter(
     private val lobbyView: LobbyView,
     private val navigator: Navigator,
 ) : IPresenter {
+    private var lobbyStarted = false
+
     init {
         lobbyView.onLeaveButtonClicked = { returnToMenu() }
-        lobbyView.onStartGameButtonClicked = { navigator.navigateToGame() }
+        lobbyView.onStartGameButtonClicked = { onStartGameButtonClicked() }
         lobbyView.onOpenSettingsButtonClicked = { navigator.navigateToSettings() }
         lobbyView.init()
         subscribeToLobbyUpdates(this.toString(), ::lobbyUpdateHandler)
@@ -30,6 +34,7 @@ class LobbyPresenter(
             launch {
                 val lobby = getLobby()
                 lobbyUpdateHandler(lobby)
+                playerJoinedLeftLobby(true)
             }
         }
     }
@@ -40,7 +45,11 @@ class LobbyPresenter(
 
     private fun lobbyStartedCheck(lobbyStarted: Boolean) {
         if (lobbyStarted) {
-            // TODO: Send player to GamePresenter.
+            // Get back on main thread.
+            Gdx.app.postRunnable {
+                this.lobbyStarted = true
+                navigator.navigateToGame()
+            }
         }
     }
 
@@ -60,6 +69,20 @@ class LobbyPresenter(
         settingsChanged(settingsDTO)
     }
 
+    private fun onStartGameButtonClicked() {
+        if (lobbyStarted) return
+        runBlocking {
+            launch {
+                try {
+                    startGame()
+                    lobbyStarted = true
+                } catch (e: Exception) {
+                    lobbyView.showError("Failure when starting game from presenter. " + e.message)
+                }
+            }
+        }
+    }
+
     /**
      * Change to MenuPresenter
      */
@@ -68,7 +91,7 @@ class LobbyPresenter(
             try {
                 leaveLobby()
             } catch (e: Exception) {
-                error("Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
+                println("Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
             }
         }
         unsubscribeFromLobbyUpdates(this.toString())
@@ -88,13 +111,14 @@ class LobbyPresenter(
 
     override fun dispose() {
         lobbyView.dispose()
-        if (Lobby.isInLobby()) {
+        unsubscribeFromLobbyUpdates(this.toString())
+        if (Lobby.isInLobby() && !lobbyStarted) {
             runBlocking {
                 launch {
                     try {
                         leaveLobby()
                     } catch (e: Exception) {
-                        error("Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
+                        println("Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
                     }
                 }
             }
