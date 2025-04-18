@@ -17,14 +17,14 @@ import io.github.chessevolved.singletons.ECSEngine
 
 class VisualEffectSystem(
     private val batch: SpriteBatch,
-    private val assetManager: AssetManager
+    private val assetManager: AssetManager,
 ) : IteratingSystem(
-    Family.all(
-        VisualEffectComponent::class.java,
-        HighlightComponent::class.java,
-        PositionComponent::class.java).get()
-)
-{
+        Family.all(
+            VisualEffectComponent::class.java,
+            HighlightComponent::class.java,
+            PositionComponent::class.java,
+        ).get(),
+    ) {
     private val filePathPrefix = "ability/effects/"
     private val entityTimers = mutableMapOf<Entity, Float>()
     private val animations = mutableMapOf<VisualEffectType, Animation<TextureRegion>>()
@@ -60,7 +60,10 @@ class VisualEffectSystem(
         }
     }
 
-    override fun processEntity(entity: Entity?, deltaTime: Float) {
+    override fun processEntity(
+        entity: Entity?,
+        deltaTime: Float,
+    ) {
         if (entity == null) {
             return
         }
@@ -89,7 +92,7 @@ class VisualEffectSystem(
                 x.toFloat(),
                 y.toFloat(),
                 visualEffectComponent.squareSize.value.toFloat(),
-                visualEffectComponent.squareSize.value.toFloat()
+                visualEffectComponent.squareSize.value.toFloat(),
             )
 
             batch.color = Color.WHITE

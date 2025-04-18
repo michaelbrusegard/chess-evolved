@@ -3,9 +3,7 @@ package io.github.chessevolved.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
-import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.AbilityTriggerComponent
-import io.github.chessevolved.components.AbilityType
 import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.BlockedComponent
 import io.github.chessevolved.components.CanBeCapturedComponent
@@ -34,9 +32,10 @@ class CaptureSystem : IteratingSystem(
         val capturedBlockedComponent = BlockedComponent.mapper.get(entity)
 
         // Trigger the movementSystem to move the entity that captured.
-        val capturingPiece = ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { piece ->
-            piece.getComponent(SelectionComponent::class.java) != null
-        }
+        val capturingPiece =
+            ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { piece ->
+                piece.getComponent(SelectionComponent::class.java) != null
+            }
 
         ECSEngine.getEntitiesFor(Family.all(CanBeCapturedComponent::class.java).get()).map { piece ->
             piece.remove(CanBeCapturedComponent::class.java)

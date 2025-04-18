@@ -2,7 +2,6 @@ package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
-import com.badlogic.gdx.graphics.Color
 
 enum class VisualEffectType(val value: Float) {
     SHIELD_ACTIVE(0.5f),
@@ -13,7 +12,7 @@ enum class VisualEffectType(val value: Float) {
 enum class VisualEffectSize(val value: Int) {
     NORMAL(1), // 1x1
     MEDIUM(3), // 3x3
-    LARGE(5) // 5x5
+    LARGE(5), // 5x5
 }
 
 /**
@@ -27,10 +26,10 @@ class VisualEffectComponent(
     val effectType: VisualEffectType,
     val amountOfFrames: Int,
     val duration: Float = amountOfFrames * effectType.value,
-    val squareSize: VisualEffectSize
+    val squareSize: VisualEffectSize,
 ) : Component {
     companion object {
-        val mapper : ComponentMapper<VisualEffectComponent> =
+        val mapper: ComponentMapper<VisualEffectComponent> =
             ComponentMapper.getFor(VisualEffectComponent::class.java)
     }
 }

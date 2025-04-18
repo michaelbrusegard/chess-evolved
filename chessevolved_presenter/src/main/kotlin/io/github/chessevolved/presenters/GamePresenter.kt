@@ -144,11 +144,13 @@ class GamePresenter(
                 PlayerColor.WHITE,
                 gameStage,
             ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
-                .add(AbilityComponent(
-                    ability = AbilityType.EXPLOSION,
-                    abilityCooldownTime = 2,
-                    currentAbilityCDTime = 0
-                ))
+                .add(
+                    AbilityComponent(
+                        ability = AbilityType.EXPLOSION,
+                        abilityCooldownTime = 2,
+                        currentAbilityCDTime = 0,
+                    ),
+                )
 
             pieceFactory.createPawn(
                 false,
