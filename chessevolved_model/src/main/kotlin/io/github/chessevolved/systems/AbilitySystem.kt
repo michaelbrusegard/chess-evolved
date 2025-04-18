@@ -37,25 +37,22 @@ class AbilitySystem : IteratingSystem(
             return
         }
 
-        if (abilityTriggerComponent.active) {
-            // Active abilities:
-            when (abilityComponent.ability) {
-                AbilityType.EXPLOSION -> {
-                    triggerExplosionEffect(entity, abilityTriggerComponent.position)
+        when (abilityComponent.ability) {
+            AbilityType.EXPLOSION -> {
+                // Since the trigger doesn't know if it was an active call or passive call.
+                // It is the ability's job to determine.
+                if (CapturedComponent.mapper.get(entity) == null) {
+                    triggerExplosionEffect(entity, abilityTriggerComponent.targetPosition)
+                    println("Got triggered")
                 }
-                AbilityType.SWAP -> {}
-                AbilityType.MIRROR -> {}
-                else -> {}
             }
-        } else {
-            // Passive abilities
-            when (abilityComponent.ability) {
-                AbilityType.SHIELD -> {
-                    triggerShieldEffect(entity, abilityTriggerComponent.position, abilityComponent)
-                }
-                AbilityType.NEW_MOVEMENT -> {}
-                else -> {}
+            AbilityType.SHIELD -> {
+                triggerShieldEffect(entity, abilityTriggerComponent.targetPosition, abilityTriggerComponent.oldPosition, abilityComponent)
             }
+            AbilityType.NEW_MOVEMENT -> {}
+            AbilityType.SWAP -> {}
+            AbilityType.MIRROR -> {}
+            else -> {}
         }
 
         entity?.remove(AbilityTriggerComponent::class.java)
@@ -92,13 +89,14 @@ class AbilitySystem : IteratingSystem(
     private fun triggerShieldEffect(
         entity: Entity?,
         targetPosition: Position,
+        oldPosition: Position,
         abilityComponent: AbilityComponent,
     ) {
         // Check if shield effect exists
         val shieldEffectEntity = ECSEngine.getEntitiesFor(Family.all(VisualEffectComponent::class.java, PositionComponent::class.java).get())
             .firstOrNull {
                 VisualEffectComponent.mapper.get(it).effectType == VisualEffectType.SHIELD_ACTIVE &&
-                        PositionComponent.mapper.get(it).position == targetPosition
+                        PositionComponent.mapper.get(it).position == oldPosition
             }
 
         val isCaptured = CapturedComponent.mapper.get(entity) != null
@@ -111,7 +109,11 @@ class AbilitySystem : IteratingSystem(
             VisualEffectComponent.mapper.get(shieldEffectEntity).duration = 0.1f
             abilityComponent.currentAbilityCDTime = abilityComponent.abilityCooldownTime
             // Start animation for shield break
-        } else if (shieldEffectEntity == null) {
+        } else if (shieldEffectEntity != null) {
+            abilityComponent.currentAbilityCDTime = 0
+            PositionComponent.mapper.get(shieldEffectEntity).position = targetPosition
+        } else {
+            abilityComponent.currentAbilityCDTime = 0
             entity?.add(BlockedComponent())
             val effectEntity = ECSEngine.createEntity()
             effectEntity.add(VisualEffectComponent(VisualEffectType.SHIELD_ACTIVE, 3, duration = 0f, squareSize = VisualEffectSize.NORMAL))

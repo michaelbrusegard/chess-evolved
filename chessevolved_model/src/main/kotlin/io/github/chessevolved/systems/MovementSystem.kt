@@ -33,10 +33,10 @@ class MovementSystem : IteratingSystem(
         val pieceActorComponent = ActorComponent.mapper.get(entity)
         val pieceMovementRuleComponent = MovementRuleComponent.mapper.get(entity)
 
+        entity?.add(AbilityTriggerComponent(targetPosition, piecePositionComponent.position))
+
         piecePositionComponent.position = targetPosition
         pieceActorComponent.actor.setPosition(targetPosition.x.toFloat(), targetPosition.y.toFloat())
-
-        entity?.add(AbilityTriggerComponent(targetPosition, true))
 
         pieceMovementRuleComponent.getMovementRules().map {
             if (it.isFirstMove) {

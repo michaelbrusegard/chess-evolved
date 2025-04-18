@@ -178,7 +178,7 @@ class GamePresenter(
                     )
                 )
                 add(
-                    AbilityTriggerComponent(Position(startPos, boardWorldSize - 2), false)
+                    AbilityTriggerComponent(Position(startPos, boardWorldSize - 2), Position(startPos, boardWorldSize - 2))
                 )
             }
 

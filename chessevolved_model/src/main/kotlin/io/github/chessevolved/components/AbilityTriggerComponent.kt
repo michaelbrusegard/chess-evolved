@@ -5,8 +5,8 @@ import com.badlogic.ashley.core.ComponentMapper
 
 class AbilityTriggerComponent(
     // The position of where the trigger happens
-    val position: Position,
-    val active: Boolean,
+    val targetPosition: Position,
+    val oldPosition: Position
 ) : Component {
     companion object {
         val mapper: ComponentMapper<AbilityTriggerComponent> =
