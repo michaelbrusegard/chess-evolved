@@ -5,11 +5,14 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.PositionComponent
-import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.components.VisualEffectComponent
+import io.github.chessevolved.components.VisualEffectType
 import io.github.chessevolved.singletons.ECSEngine
 
 class VisualEffectSystem(
@@ -18,12 +21,28 @@ class VisualEffectSystem(
 ) : IteratingSystem(
     Family.all(
         VisualEffectComponent::class.java,
-        TextureRegionComponent::class.java,
         HighlightComponent::class.java,
         PositionComponent::class.java).get()
 )
 {
+    private val filePathPrefix = "ability/effects/"
     private val entityTimers = mutableMapOf<Entity, Float>()
+    private val animations = mutableMapOf<VisualEffectType, Animation<TextureRegion>>()
+
+    init {
+        // Load explosion frames
+        for (i in 1..6) {
+            assetManager.load(filePathPrefix + "explosion/explosion$i.png", Texture::class.java)
+        }
+    }
+
+    fun initializeAnimations() {
+        val explosionFrames = com.badlogic.gdx.utils.Array<TextureRegion>()
+        for (i in 1..6) {
+            explosionFrames.add(TextureRegion(assetManager.get(filePathPrefix + "explosion/explosion$i.png", Texture::class.java)))
+        }
+        animations[VisualEffectType.EXPLOSION] = Animation(0.1f, explosionFrames, Animation.PlayMode.NORMAL)
+    }
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
@@ -47,7 +66,6 @@ class VisualEffectSystem(
         }
 
         val positionComponent = PositionComponent.mapper.get(entity)
-        val textureRegionComponent = TextureRegionComponent.mapper.get(entity)
         val highlightComponent = HighlightComponent.mapper.get(entity)
         val visualEffectComponent = VisualEffectComponent.mapper.get(entity)
 
@@ -55,23 +73,23 @@ class VisualEffectSystem(
             entityTimers[entity] = 0f
         }
 
-//        val elapsedTime = entityTimers[entity]
-//        val progress = if (visualEffectComponent.durationSeconds <= 0) {
-//            1.0f
-//        } else {
-//            elapsedTime?.div(visualEffectComponent.durationSeconds)
-//        }
+        val elapsedTime = entityTimers[entity] ?: 0f
 
-        batch.color = highlightComponent.color
+        val animation = animations[visualEffectComponent.effectType]
 
-        batch.draw(
-            textureRegionComponent.region,
-            positionComponent.position.x.toFloat(),
-            positionComponent.position.y.toFloat(),
-            1f,
-            1f
-        )
+        if (animation != null) {
+            val currentFrame = animation.getKeyFrame(elapsedTime)
 
-        batch.color = Color.WHITE
+            batch.color = highlightComponent.color
+            batch.draw(
+                currentFrame,
+                positionComponent.position.x.toFloat(),
+                positionComponent.position.y.toFloat(),
+                1f,
+                1f
+            )
+
+            batch.color = Color.WHITE
+        }
     }
 }

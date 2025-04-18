@@ -78,7 +78,7 @@ class GamePresenter(
         inputSystem = InputSystem()
         engine.addSystem(inputSystem)
 
-        abilitySystem = AbilitySystem(assetManager)
+        abilitySystem = AbilitySystem()
         engine.addSystem(abilitySystem)
 
         visualEffectSystem = VisualEffectSystem(gameBatch, assetManager)
@@ -86,6 +86,8 @@ class GamePresenter(
 
         loadRequiredAssets()
         assetManager.finishLoading()
+
+        visualEffectSystem.initializeAnimations()
 
         setupBoard()
 

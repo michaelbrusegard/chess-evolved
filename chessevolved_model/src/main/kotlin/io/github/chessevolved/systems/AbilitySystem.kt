@@ -22,17 +22,10 @@ import io.github.chessevolved.components.VisualEffectComponent
 import io.github.chessevolved.components.VisualEffectType
 import io.github.chessevolved.singletons.ECSEngine
 
-class AbilitySystem(
-    val assetManager: AssetManager
-) : IteratingSystem(
+class AbilitySystem : IteratingSystem(
     Family.all(AbilityComponent::class.java, AbilityTriggerComponent::class.java).get()
 )
 {
-    init {
-        val filePathPrefix = "ability/effects/"
-        assetManager.load(filePathPrefix + "explosion.png", Texture::class.java)
-    }
-
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         val abilityComponent = AbilityComponent.mapper.get(entity)
         val abilityTriggerComponent = AbilityTriggerComponent.mapper.get(entity)
@@ -75,9 +68,6 @@ class AbilitySystem(
 
         val effectEntity = ECSEngine.createEntity()
         effectEntity.add(VisualEffectComponent(VisualEffectType.EXPLOSION, 1f))
-        effectEntity.add(TextureRegionComponent(
-            TextureRegion(assetManager.get("ability/effects/explosion.png", Texture::class.java))
-        ))
         effectEntity.add(HighlightComponent(Color.WHITE))
         effectEntity.add(PositionComponent(targetPosition))
         ECSEngine.addEntity(effectEntity)
