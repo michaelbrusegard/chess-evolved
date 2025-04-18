@@ -1,6 +1,7 @@
 package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
+import com.badlogic.ashley.core.ComponentMapper
 
 enum class WeatherEvent {
     FOG,
@@ -11,4 +12,9 @@ enum class WeatherEvent {
 
 class WeatherEventComponent(
     var event: WeatherEvent,
-) : Component
+) : Component {
+    companion object {
+        val mapper: ComponentMapper<WeatherEventComponent> =
+            ComponentMapper.getFor(WeatherEventComponent::class.java)
+    }
+}

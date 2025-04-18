@@ -8,7 +8,6 @@ import io.github.chessevolved.presenters.LobbyPresenter
 import io.github.chessevolved.presenters.MenuPresenter
 import io.github.chessevolved.presenters.SettingsPresenter
 import io.github.chessevolved.views.EndGameView
-import io.github.chessevolved.views.GameView
 import io.github.chessevolved.views.JoinGameView
 import io.github.chessevolved.views.LobbyView
 import io.github.chessevolved.views.MenuView
@@ -23,7 +22,7 @@ class Navigator(
 
     private fun createLobbyPresenter(lobbyId: String): LobbyPresenter = LobbyPresenter(LobbyView(lobbyId), this)
 
-    private fun createGamePresenter(): GamePresenter = GamePresenter(GameView(), this, assetManager)
+    private fun createGamePresenter(): GamePresenter = GamePresenter(this, assetManager)
 
     private fun createSettingsPresenter(): SettingsPresenter = SettingsPresenter(SettingsView(), this)
 
