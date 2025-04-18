@@ -4,18 +4,15 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.Texture.TextureWrap
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable
 import com.badlogic.gdx.utils.viewport.FitViewport
+import io.github.chessevolved.SkinSetup
 import ktx.actors.onClick
-import ktx.scene2d.Scene2DSkin
 import ktx.scene2d.image
-import ktx.scene2d.label
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.textButton
@@ -33,10 +30,10 @@ class MenuView : IView {
 
     private val logoTexture = Texture("customUI/chessEvolvedLogo.png")
 
-    private val bitmapFont = BitmapFont(Gdx.files.internal("customUI/pixeled.fnt"))
+    private val skinSetup = SkinSetup
 
     override fun init() {
-        setupSkins()
+        skinSetup.loadAllCommonAssets()
 
         val screenRatio = Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat()
 
@@ -45,7 +42,22 @@ class MenuView : IView {
 
         stage = Stage(viewport)
 
-        println("ScreenWidth: ${Gdx.graphics.width}, ScreenHeight: ${Gdx.graphics.height}")
+        // Make background repeat it's tile
+        val backgroundTexture = SkinSetup.assetManager.get("customUI/backgroundTile.png", Texture::class.java)
+        backgroundTexture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat)
+
+        val tiledDrawable = TiledDrawable(TextureRegion(
+            backgroundTexture
+        ))
+        val background = Image(tiledDrawable).apply {
+            setSize(1500f, 1500f)
+            setPosition(-10f, -10f)
+            color = Color(1f, 1f, 1f, 0.25f)
+            zIndex = 0
+        }
+
+        stage.addActor(background)
+
 
         val root =
             scene2d.table {
@@ -98,19 +110,6 @@ class MenuView : IView {
         stage.addActor(root)
     }
 
-    private fun setupSkins() {
-        val textButtonStyle = TextButtonStyle().apply {
-            up = TextureRegionDrawable(TextureRegion(Texture("customUI/buttonNormal.png")))
-            down = TextureRegionDrawable(TextureRegion(Texture("customUI/buttonPressed.png")))
-            over = TextureRegionDrawable(TextureRegion(Texture("customUI/buttonNormal.png")))
-            font = bitmapFont
-
-            font.data.setLineHeight(0.5f * font.data.lineHeight)
-        }
-
-        Scene2DSkin.defaultSkin.add("CEtextButtonStyle", textButtonStyle)
-    }
-
     override fun render() {
         stage.act(Gdx.graphics.deltaTime)
         stage.draw()
@@ -125,6 +124,8 @@ class MenuView : IView {
 
     override fun dispose() {
         stage.dispose()
+        logoTexture.dispose()
+        skinSetup.unloadAllCommonAssets()
     }
 
     override fun setInputProcessor() {
