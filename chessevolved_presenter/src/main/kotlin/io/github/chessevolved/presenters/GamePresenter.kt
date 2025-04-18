@@ -11,6 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.components.AbilityComponent
+import io.github.chessevolved.components.AbilityTriggerComponent
+import io.github.chessevolved.components.AbilityType
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
@@ -22,11 +25,13 @@ import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
 import io.github.chessevolved.singletons.Lobby
+import io.github.chessevolved.systems.AbilitySystem
 import io.github.chessevolved.systems.CaptureSystem
 import io.github.chessevolved.systems.InputSystem
 import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
 import io.github.chessevolved.systems.SelectionEntityListener
+import io.github.chessevolved.systems.VisualEffectSystem
 import io.github.chessevolved.views.GameUIView
 import io.github.chessevolved.views.GameView
 import kotlinx.coroutines.launch
@@ -56,6 +61,8 @@ class GamePresenter(
     private val selectionListener: SelectionEntityListener
     private val captureSystem: CaptureSystem
     private val inputSystem: InputSystem
+    private val abilitySystem: AbilitySystem
+    private val visualEffectSystem: VisualEffectSystem
 
     private var navigatingToEndGame = false
 
@@ -77,8 +84,16 @@ class GamePresenter(
         inputSystem = InputSystem()
         engine.addSystem(inputSystem)
 
+        abilitySystem = AbilitySystem()
+        engine.addSystem(abilitySystem)
+
+        visualEffectSystem = VisualEffectSystem(gameBatch, assetManager)
+        engine.addSystem(visualEffectSystem)
+
         loadRequiredAssets()
         assetManager.finishLoading()
+
+        visualEffectSystem.initializeAnimations()
 
         setupBoard()
 
@@ -141,6 +156,12 @@ class GamePresenter(
                 Position(startPos, 1),
                 PlayerColor.WHITE,
                 gameStage,
+            ).add(
+                AbilityComponent(
+                    ability = AbilityType.EXPLOSION,
+                    abilityCooldownTime = 2,
+                    currentAbilityCDTime = 0,
+                ),
             )
 
             pieceFactory.createPawn(
@@ -148,7 +169,18 @@ class GamePresenter(
                 Position(startPos, boardWorldSize - 2),
                 PlayerColor.BLACK,
                 gameStage,
-            )
+            ).apply {
+                add(
+                    AbilityComponent(
+                        ability = AbilityType.SHIELD,
+                        abilityCooldownTime = 3,
+                        currentAbilityCDTime = 0,
+                    ),
+                )
+                add(
+                    AbilityTriggerComponent(Position(startPos, boardWorldSize - 2), Position(startPos, boardWorldSize - 2)),
+                )
+            }
 
             when (startPos) {
                 startX -> {
