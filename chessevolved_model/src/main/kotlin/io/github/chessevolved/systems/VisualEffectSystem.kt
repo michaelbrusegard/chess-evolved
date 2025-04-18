@@ -33,6 +33,8 @@ class VisualEffectSystem(
         // Load explosion frames
         for (i in 1..6) {
             assetManager.load(filePathPrefix + "explosion/explosion$i.png", Texture::class.java)
+            // Shield break is also 6 frames, so load this.
+            assetManager.load(filePathPrefix + "shield/shieldBreak$i.png", Texture::class.java)
         }
 
         for (i in 1..3) {
@@ -41,17 +43,9 @@ class VisualEffectSystem(
     }
 
     fun initializeAnimations() {
-        val explosionFrames = com.badlogic.gdx.utils.Array<TextureRegion>()
-        for (i in 1..6) {
-            explosionFrames.add(TextureRegion(assetManager.get(filePathPrefix + "explosion/explosion$i.png", Texture::class.java)))
-        }
-        animations[VisualEffectType.EXPLOSION] = Animation(VisualEffectType.EXPLOSION.value, explosionFrames, Animation.PlayMode.NORMAL)
-
-        val shieldFrames = com.badlogic.gdx.utils.Array<TextureRegion>()
-        for (i in 1..3) {
-            shieldFrames.add((TextureRegion(assetManager.get(filePathPrefix + "shield/shield$i.png", Texture::class.java))))
-        }
-        animations[VisualEffectType.SHIELD_ACTIVE] = Animation(VisualEffectType.SHIELD_ACTIVE.value, shieldFrames, Animation.PlayMode.LOOP)
+        addAnimation(6, VisualEffectType.EXPLOSION, Animation.PlayMode.NORMAL, "explosion/explosion")
+        addAnimation(3, VisualEffectType.SHIELD_ACTIVE, Animation.PlayMode.LOOP, "shield/shield")
+        addAnimation(6, VisualEffectType.SHIELD_BREAK, Animation.PlayMode.NORMAL, "shield/shieldBreak")
     }
 
     override fun update(deltaTime: Float) {
@@ -113,5 +107,19 @@ class VisualEffectSystem(
 
             batch.color = Color.WHITE
         }
+    }
+
+    private fun addAnimation(
+        frameAmount: Int,
+        effectType: VisualEffectType,
+        animationPlayMode: Animation.PlayMode,
+        filePathSuffix: String
+    )
+    {
+        val frames = com.badlogic.gdx.utils.Array<TextureRegion>()
+        for (i in 1..frameAmount) {
+            frames.add(TextureRegion(assetManager.get("$filePathPrefix$filePathSuffix$i.png", Texture::class.java)))
+        }
+        animations[effectType] = Animation(effectType.value, frames, animationPlayMode)
     }
 }

@@ -108,13 +108,20 @@ class AbilitySystem : IteratingSystem(
             // Give duration such that it gets deleted
             VisualEffectComponent.mapper.get(shieldEffectEntity).duration = 0.1f
             abilityComponent.currentAbilityCDTime = abilityComponent.abilityCooldownTime
+
             // Start animation for shield break
+            val effectEntity = ECSEngine.createEntity()
+            effectEntity.add(VisualEffectComponent(VisualEffectType.SHIELD_BREAK, 3, squareSize = VisualEffectSize.NORMAL))
+            effectEntity.add(HighlightComponent(Color.WHITE))
+            effectEntity.add(PositionComponent(targetPosition))
+            ECSEngine.addEntity(effectEntity)
         } else if (shieldEffectEntity != null) {
             abilityComponent.currentAbilityCDTime = 0
             PositionComponent.mapper.get(shieldEffectEntity).position = targetPosition
         } else {
             abilityComponent.currentAbilityCDTime = 0
             entity?.add(BlockedComponent())
+
             val effectEntity = ECSEngine.createEntity()
             effectEntity.add(VisualEffectComponent(VisualEffectType.SHIELD_ACTIVE, 3, duration = 0f, squareSize = VisualEffectSize.NORMAL))
             effectEntity.add(HighlightComponent(Color.WHITE))
