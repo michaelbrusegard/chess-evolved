@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlin.reflect.KFunction1
+import io.github.chessevolved.dtos.LobbyDto
 
 object SupabaseLobbyHandler {
     /**
@@ -30,8 +30,6 @@ object SupabaseLobbyHandler {
      * Supabase lobby-table name
      */
     private val SUPABASE_LOBBY_TABLE_NAME = "lobbies"
-
-    // Taken from https://stackoverflow.com/questions/46943860/idiomatic-way-to-generate-a-random-alphanumeric-string-in-kotlin
 
     /**
      * Generates a random string containing capital letters and numbers.
@@ -51,7 +49,7 @@ object SupabaseLobbyHandler {
      * @return string containing the lobby-code of the lobby created.
      * @throws PostgrestRestException if creating a lobby fails three times.
      */
-    suspend fun createLobby(onEventListener: KFunction1<Lobby, Unit>): String {
+    suspend fun createLobby(onEventListener: (newLobbyRow: LobbyDto) -> Unit): String {
         var lobbyCode = getRandomString(LOBBY_CODE_LENGTH)
 
         for (attempts in 1..3) {
@@ -78,7 +76,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun joinLobby(
         lobbyCode: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedRow: LobbyDto) -> Unit,
     ) {
         val response =
             supabase
@@ -87,7 +85,7 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
@@ -122,7 +120,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun joinLobbyNoUpdateSecondPlayer(
         lobbyCode: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         val response =
             supabase
@@ -131,7 +129,7 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
@@ -158,7 +156,7 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
@@ -215,7 +213,7 @@ object SupabaseLobbyHandler {
      */
     private suspend fun addLobbyListener(
         lobbyCode: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         val channel = SupabaseChannelManager.getOrCreateChannel("lobby_$lobbyCode")
         try {
@@ -230,7 +228,7 @@ object SupabaseLobbyHandler {
             changeFlow
                 .onEach {
                     val updatedRecord = it.record
-                    val lobby = Json.decodeFromString<Lobby>(updatedRecord.toString())
+                    val lobby = Json.decodeFromString<LobbyDto>(updatedRecord.toString())
 
                     onEventListener(lobby)
                 }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
@@ -311,7 +309,7 @@ object SupabaseLobbyHandler {
      * @return Lobby-object representing the data.
      * @throws IllegalArgumentException if the lobby does not exist.
      */
-    suspend fun getLobbyRow(lobbyCode: String): Lobby {
+    suspend fun getLobbyRow(lobbyCode: String): LobbyDto {
         val response =
             supabase
                 .from(SUPABASE_LOBBY_TABLE_NAME)
@@ -319,7 +317,7 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw IllegalArgumentException("Lobby does not exist.")

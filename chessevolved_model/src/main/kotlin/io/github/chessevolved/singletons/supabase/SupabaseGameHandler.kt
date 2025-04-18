@@ -12,6 +12,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import io.github.chessevolved.dtos.GameDto;
+import io.github.chessevolved.dtos.TurnColor;
+import io.github.chessevolved.dtos.PieceDto;
+import io.github.chessevolved.dtos.BoardSquareDto;
 
 object SupabaseGameHandler {
     /**
@@ -34,7 +38,7 @@ object SupabaseGameHandler {
      */
     suspend fun joinGame(
         lobbyCode: String,
-        onEventListener: (newGameRow: Game) -> Unit,
+        onEventListener: (updatedGame: GameDto) -> Unit,
     ) {
         if (!checkIfGameExists(lobbyCode)) {
             throw Exception("Game does not exist.")
@@ -57,7 +61,7 @@ object SupabaseGameHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Game>()
+                }.decodeList<GameDto>()
 
         if (response.isEmpty()) {
             throw IllegalArgumentException("Game does not exist.")
@@ -109,7 +113,7 @@ object SupabaseGameHandler {
                         filter {
                             eq("lobby_code", lobbyCode)
                         }
-                    }.decodeList<Game>()
+                    }.decodeList<GameDto>()
 
             if (response.isEmpty()) throw IllegalStateException("Illegal state when requesting rematch. Game does not exist.")
 
@@ -138,9 +142,8 @@ object SupabaseGameHandler {
      */
     private suspend fun addGameListener(
         lobbyCode: String,
-        onEventListener: (newGameRow: Game) -> Unit,
+        onEventListener: (updatedGame: GameDto) -> Unit,
     ) {
-        // TODO: More error handling
         val channel = SupabaseChannelManager.getOrCreateChannel("game_$lobbyCode")
 
         try {
@@ -156,7 +159,7 @@ object SupabaseGameHandler {
                 .onEach {
                     val updatedRecord = it.record
 
-                    val game = Json.decodeFromString<Game>(updatedRecord.toString())
+                    val game = Json.decodeFromString<GameDto>(updatedRecord.toString())
 
                     onEventListener(game)
                 }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
@@ -179,8 +182,8 @@ object SupabaseGameHandler {
      */
     suspend fun updateGameState(
         lobbyCode: String,
-        pieces: Array<String>,
-        boardSquares: Array<String>,
+        pieces: PieceDto,
+        boardSquares: BoardSquareDto,
         turn: TurnColor,
         lastMove: String,
     ) {
@@ -217,7 +220,7 @@ object SupabaseGameHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Game>()
+                }.decodeList<GameDto>()
 
         return response.isNotEmpty()
     }
