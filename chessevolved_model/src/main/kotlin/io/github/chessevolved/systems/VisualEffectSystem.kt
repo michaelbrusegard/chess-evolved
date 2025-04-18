@@ -12,18 +12,19 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.VisualEffectComponent
-import io.github.chessevolved.components.VisualEffectType
+import io.github.chessevolved.enums.VisualEffectType
 import io.github.chessevolved.singletons.ECSEngine
 
 class VisualEffectSystem(
     private val batch: SpriteBatch,
     private val assetManager: AssetManager,
 ) : IteratingSystem(
-        Family.all(
-            VisualEffectComponent::class.java,
-            HighlightComponent::class.java,
-            PositionComponent::class.java,
-        ).get(),
+        Family
+            .all(
+                VisualEffectComponent::class.java,
+                HighlightComponent::class.java,
+                PositionComponent::class.java,
+            ).get(),
     ) {
     private val filePathPrefix = "ability/effects/"
     private val entityTimers = mutableMapOf<Entity, Float>()
@@ -115,7 +116,9 @@ class VisualEffectSystem(
         animationPlayMode: Animation.PlayMode,
         filePathSuffix: String,
     ) {
-        val frames = com.badlogic.gdx.utils.Array<TextureRegion>()
+        val frames =
+            com.badlogic.gdx.utils
+                .Array<TextureRegion>()
         for (i in 1..frameAmount) {
             frames.add(TextureRegion(assetManager.get("$filePathPrefix$filePathSuffix$i.png", Texture::class.java)))
         }

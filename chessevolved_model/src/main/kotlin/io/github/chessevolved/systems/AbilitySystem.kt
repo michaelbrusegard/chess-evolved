@@ -6,22 +6,23 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.graphics.Color
 import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.AbilityTriggerComponent
-import io.github.chessevolved.components.AbilityType
 import io.github.chessevolved.components.BlockedComponent
 import io.github.chessevolved.components.CapturedComponent
 import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
-import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.VisualEffectComponent
-import io.github.chessevolved.components.VisualEffectSize
-import io.github.chessevolved.components.VisualEffectType
+import io.github.chessevolved.data.Position
+import io.github.chessevolved.enums.AbilityType
+import io.github.chessevolved.enums.VisualEffectSize
+import io.github.chessevolved.enums.VisualEffectType
 import io.github.chessevolved.singletons.ECSEngine
 
-class AbilitySystem : IteratingSystem(
-    Family.all(AbilityComponent::class.java, AbilityTriggerComponent::class.java).get(),
-) {
+class AbilitySystem :
+    IteratingSystem(
+        Family.all(AbilityComponent::class.java, AbilityTriggerComponent::class.java).get(),
+    ) {
     override fun processEntity(
         entity: Entity?,
         deltaTime: Float,
@@ -74,7 +75,8 @@ class AbilitySystem : IteratingSystem(
                 val position = Position(targetPosition.x + j, targetPosition.y + i)
                 val pieceColor = PlayerColorComponent.mapper.get(entity).color
                 val capturingPiece =
-                    ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get())
+                    ECSEngine
+                        .getEntitiesFor(Family.all(PieceTypeComponent::class.java).get())
                         .firstOrNull {
                             PlayerColorComponent.mapper.get(it).color != pieceColor &&
                                 PositionComponent.mapper.get(it).position == position
@@ -93,7 +95,8 @@ class AbilitySystem : IteratingSystem(
     ) {
         // Check if shield effect exists
         val shieldEffectEntity =
-            ECSEngine.getEntitiesFor(Family.all(VisualEffectComponent::class.java, PositionComponent::class.java).get())
+            ECSEngine
+                .getEntitiesFor(Family.all(VisualEffectComponent::class.java, PositionComponent::class.java).get())
                 .firstOrNull {
                     VisualEffectComponent.mapper.get(it).effectType == VisualEffectType.SHIELD_ACTIVE &&
                         PositionComponent.mapper.get(it).position == oldPosition

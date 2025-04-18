@@ -1,8 +1,8 @@
 package io.github.chessevolved.dtos
 
-import io.github.chessevolved.components.PieceType
-import io.github.chessevolved.components.PlayerColor
-import io.github.chessevolved.components.Position
+import io.github.chessevolved.data.Position
+import io.github.chessevolved.enums.PieceType
+import io.github.chessevolved.enums.PlayerColor
 import kotlinx.serialization.Serializable
 
 @Serializable

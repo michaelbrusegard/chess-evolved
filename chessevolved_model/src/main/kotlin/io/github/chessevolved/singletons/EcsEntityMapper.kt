@@ -10,8 +10,8 @@ import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.WeatherEventComponent
-import io.github.chessevolved.components.PieceType
-import io.github.chessevolved.components.Position
+import io.github.chessevolved.enums.PieceType
+import io.github.chessevolved.data.Position
 import io.github.chessevolved.dtos.BoardSquareDto
 import io.github.chessevolved.dtos.PieceDto
 import io.github.chessevolved.entities.PieceFactory

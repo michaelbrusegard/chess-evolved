@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
-import io.github.chessevolved.shared.SettingsDTO
+import io.github.chessevolved.dtos.SettingsDto
 import ktx.actors.onClick
 import ktx.scene2d.checkBox
 import ktx.scene2d.label
@@ -25,7 +25,7 @@ class SettingsView : IView {
     private var boardSizeSetting = 8
     private var fowSetting = false
 
-    var onApplyClicked: (SettingsDTO) -> Unit = {}
+    var onApplyClicked: (SettingsDto) -> Unit = {}
     var onCancelClicked: () -> Unit = {}
 
     override fun init() {
@@ -78,7 +78,7 @@ class SettingsView : IView {
         val isFogOfWar = fogOfWarCheckBox.isChecked
 
         if (boardSize != null && boardSize in 8..16) {
-            val settings = SettingsDTO(fogOfWar = isFogOfWar, boardSize = boardSize)
+            val settings = SettingsDto(fogOfWar = isFogOfWar, boardSize = boardSize)
             onApplyClicked(settings)
         } else {
             toastManager.showError("Board size must be a number between 8 and 16")
@@ -86,7 +86,7 @@ class SettingsView : IView {
         }
     }
 
-    fun setExistingSettings(settings: SettingsDTO) {
+    fun setExistingSettings(settings: SettingsDto) {
         fowSetting = settings.fogOfWar
         fogOfWarCheckBox.isChecked = fowSetting
 
@@ -98,7 +98,7 @@ class SettingsView : IView {
         }
     }
 
-    fun setInitialValues(initialSettings: SettingsDTO) {
+    fun setInitialValues(initialSettings: SettingsDto) {
         if (::fogOfWarCheckBox.isInitialized) {
             fogOfWarCheckBox.isChecked = initialSettings.fogOfWar
         }

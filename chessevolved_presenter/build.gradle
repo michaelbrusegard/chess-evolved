@@ -39,7 +39,5 @@ dependencies {
 
   implementation project(":chessevolved_model")
   implementation project(":chessevolved_view")
-
-  // Needed to access shared classes like DTO
   implementation project(":chessevolved_shared")
 }

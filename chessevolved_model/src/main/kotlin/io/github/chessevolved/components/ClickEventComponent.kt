@@ -2,4 +2,4 @@ package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
 
-class ClickEventComponent() : Component
+class ClickEventComponent : Component

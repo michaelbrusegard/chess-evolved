@@ -11,18 +11,24 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.ValidMovesComponent
 
-class MovementSystem : IteratingSystem(
-    Family.all(
-        SelectionComponent::class.java,
-        ValidMovesComponent::class.java,
-        MovementIntentComponent::class.java,
-    ).get(),
-) {
+class MovementSystem :
+    IteratingSystem(
+        Family
+            .all(
+                SelectionComponent::class.java,
+                ValidMovesComponent::class.java,
+                MovementIntentComponent::class.java,
+            ).get(),
+    ) {
     override fun processEntity(
         entity: Entity?,
         deltaTime: Float,
     ) {
-        val availableMoveSet = ValidMovesComponent.mapper.get(entity).validMoves.toSet()
+        val availableMoveSet =
+            ValidMovesComponent.mapper
+                .get(entity)
+                .validMoves
+                .toSet()
         val targetPosition = MovementIntentComponent.mapper.get(entity).targetPosition
 
         if (!availableMoveSet.contains(targetPosition)) {

@@ -1,5 +1,9 @@
 package io.github.chessevolved.singletons.supabase
 
+import io.github.chessevolved.dtos.BoardSquareDto
+import io.github.chessevolved.dtos.GameDto
+import io.github.chessevolved.dtos.PieceDto
+import io.github.chessevolved.enums.PlayerColor
 import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
@@ -10,12 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import io.github.chessevolved.dtos.GameDto;
-import io.github.chessevolved.dtos.TurnColor;
-import io.github.chessevolved.dtos.PieceDto;
-import io.github.chessevolved.dtos.BoardSquareDto;
 
 object SupabaseGameHandler {
     /**
@@ -184,7 +183,7 @@ object SupabaseGameHandler {
         lobbyCode: String,
         pieces: PieceDto,
         boardSquares: BoardSquareDto,
-        turn: TurnColor,
+        turn: PlayerColor,
         lastMove: String,
     ) {
         if (!checkIfGameExists(lobbyCode)) {

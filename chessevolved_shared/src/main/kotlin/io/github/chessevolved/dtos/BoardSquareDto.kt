@@ -1,7 +1,7 @@
 package io.github.chessevolved.dtos
 
-import io.github.chessevolved.components.Position
-import io.github.chessevolved.components.WeatherEvent
+import io.github.chessevolved.data.Position
+import io.github.chessevolved.enums.WeatherEvent
 import kotlinx.serialization.Serializable
 
 @Serializable

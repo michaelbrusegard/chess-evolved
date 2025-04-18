@@ -13,14 +13,14 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.AbilityTriggerComponent
-import io.github.chessevolved.components.AbilityType
-import io.github.chessevolved.components.PieceType
-import io.github.chessevolved.components.PlayerColor
-import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.SelectionComponent
-import io.github.chessevolved.components.WeatherEvent
+import io.github.chessevolved.data.Position
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
+import io.github.chessevolved.enums.AbilityType
+import io.github.chessevolved.enums.PieceType
+import io.github.chessevolved.enums.PlayerColor
+import io.github.chessevolved.enums.WeatherEvent
 import io.github.chessevolved.singletons.ECSEngine
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
@@ -151,36 +151,38 @@ class GamePresenter(
 
         val startX: Int = (boardWorldSize / 2) - 4
         for (startPos in startX until startX + 8) {
-            pieceFactory.createPawn(
-                true,
-                Position(startPos, 1),
-                PlayerColor.WHITE,
-                gameStage,
-            ).add(
-                AbilityComponent(
-                    ability = AbilityType.EXPLOSION,
-                    abilityCooldownTime = 2,
-                    currentAbilityCDTime = 0,
-                ),
-            )
-
-            pieceFactory.createPawn(
-                false,
-                Position(startPos, boardWorldSize - 2),
-                PlayerColor.BLACK,
-                gameStage,
-            ).apply {
-                add(
+            pieceFactory
+                .createPawn(
+                    true,
+                    Position(startPos, 1),
+                    PlayerColor.WHITE,
+                    gameStage,
+                ).add(
                     AbilityComponent(
-                        ability = AbilityType.SHIELD,
-                        abilityCooldownTime = 3,
+                        ability = AbilityType.EXPLOSION,
+                        abilityCooldownTime = 2,
                         currentAbilityCDTime = 0,
                     ),
                 )
-                add(
-                    AbilityTriggerComponent(Position(startPos, boardWorldSize - 2), Position(startPos, boardWorldSize - 2)),
-                )
-            }
+
+            pieceFactory
+                .createPawn(
+                    false,
+                    Position(startPos, boardWorldSize - 2),
+                    PlayerColor.BLACK,
+                    gameStage,
+                ).apply {
+                    add(
+                        AbilityComponent(
+                            ability = AbilityType.SHIELD,
+                            abilityCooldownTime = 3,
+                            currentAbilityCDTime = 0,
+                        ),
+                    )
+                    add(
+                        AbilityTriggerComponent(Position(startPos, boardWorldSize - 2), Position(startPos, boardWorldSize - 2)),
+                    )
+                }
 
             when (startPos) {
                 startX -> {
