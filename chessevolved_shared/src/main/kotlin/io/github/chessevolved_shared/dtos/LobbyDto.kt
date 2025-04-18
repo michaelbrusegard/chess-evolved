@@ -9,5 +9,5 @@ data class LobbyDto(
     val lobby_code: String,
     val second_player: Boolean,
     val game_started: Boolean,
-    val settings: List<SettingsDto>,
+    val settings: SettingsDto,
 )

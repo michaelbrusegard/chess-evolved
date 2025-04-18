@@ -1,35 +1,32 @@
 package io.github.chessevolved.singletons
 
 import com.badlogic.ashley.core.Engine
+import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
-import io.github.chessevolved.components.PieceType
+import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
-import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.WeatherEventComponent
+import io.github.chessevolved.components.PieceType
+import io.github.chessevolved.components.Position
 import io.github.chessevolved.dtos.BoardSquareDto
 import io.github.chessevolved.dtos.PieceDto
 import io.github.chessevolved.entities.PieceFactory
 
 object ECSEntityMapper {
-    private val pieceFamily: Family =
-        Family
-            .all(
-                PositionComponent::class.java,
-                PieceTypeComponent::class.java,
-                PlayerColorComponent::class.java,
-            ).get()
+    private val pieceFamily: Family = Family.all(
+        PositionComponent::class.java,
+        PieceTypeComponent::class.java,
+        PlayerColorComponent::class.java,
+    ).get()
 
-    private val boardSquareFamily: Family =
-        Family
-            .all(
-                PositionComponent::class.java,
-                WeatherEventComponent::class.java,
-            ).exclude(PieceTypeComponent::class.java)
-            .get()
+    private val boardSquareFamily: Family = Family.all(
+        PositionComponent::class.java,
+        WeatherEventComponent::class.java,
+    ).exclude(PieceTypeComponent::class.java).get()
 
     fun extractStateFromEngine(engine: Engine): Pair<List<PieceDto>, List<BoardSquareDto>> {
         val pieces =
@@ -62,10 +59,9 @@ object ECSEntityMapper {
         Gdx.app.log("ECSEntityMapper", "Applying received state to engine...")
         try {
             val existingPieceEntities = engine.getEntitiesFor(pieceFamily)
-            val existingPiecesMap =
-                existingPieceEntities.associateBy {
-                    PositionComponent.mapper.get(it).position
-                }
+            val existingPiecesMap = existingPieceEntities.associateBy {
+                PositionComponent.mapper.get(it).position
+            }
             val currentPositions = mutableSetOf<Position>()
 
             for (receivedPiece in receivedPieces) {
@@ -105,20 +101,15 @@ object ECSEntityMapper {
                 if (receivedSquare != null) {
                     val weatherComp = WeatherEventComponent.mapper.get(squareEntity)
                     if (weatherComp.event != receivedSquare.weather) {
-                        Gdx.app.debug(
-                            "ECSEntityMapper",
-                            "Updating weather at ${posComp.position} from ${weatherComp.event} to ${receivedSquare.weather}",
-                        )
+                        Gdx.app.debug("ECSEntityMapper", "Updating weather at ${posComp.position} from ${weatherComp.event} to ${receivedSquare.weather}")
                         weatherComp.event = receivedSquare.weather
                     }
                 } else {
-                    Gdx.app.error(
-                        "ECSEntityMapper",
-                        "Board square at ${posComp.position} exists locally but not in received state. Ignoring.",
-                    )
+                     Gdx.app.error("ECSEntityMapper", "Board square at ${posComp.position} exists locally but not in received state. Ignoring.")
                 }
             }
             Gdx.app.log("ECSEntityMapper", "Finished applying state.")
+
         } catch (e: Exception) {
             Gdx.app.error("ECSEntityMapper", "Error during state application: ${e.message}", e)
         }

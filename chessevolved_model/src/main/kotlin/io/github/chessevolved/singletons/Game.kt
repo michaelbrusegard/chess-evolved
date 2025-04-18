@@ -1,12 +1,12 @@
 package io.github.chessevolved.singletons
 
+import io.github.chessevolved.dtos.GameDto
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
-import kotlin.reflect.KFunction1
 
 object Game {
     private var inGame: Boolean = false
-    private var subscribers = mutableMapOf<String, KFunction1<SupabaseGameHandler.Game, Unit>>()
+    private var subscribers = mutableMapOf<String, (updatedGame: GameDto) -> Unit>()
     private var hasAskedForRematch = false
 
     suspend fun joinGame(gameId: String) {
@@ -50,7 +50,7 @@ object Game {
 
     fun isInGame(): Boolean = inGame
 
-    private fun onGameRowUpdate(game: SupabaseGameHandler.Game) {
+    private fun onGameRowUpdate(game: GameDto) {
         subscribers.forEach {
             it.value.invoke(game)
         }
@@ -58,7 +58,7 @@ object Game {
 
     fun subscribeToGameUpdates(
         subscriberName: String,
-        onEventListener: KFunction1<SupabaseGameHandler.Game, Unit>,
+        onEventListener: (updatedGame: GameDto) -> Unit,
     ) {
         subscribers.put(subscriberName, onEventListener)
     }

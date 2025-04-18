@@ -3,9 +3,9 @@ package io.github.chessevolved.presenters
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.dtos.GameDto
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Lobby
-import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
 import io.github.chessevolved.views.EndGameView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -87,7 +87,7 @@ class EndGamePresenter(
         endGameView.setInputProcessor()
     }
 
-    fun onGameRowUpdate(gameRow: SupabaseGameHandler.Game) {
+    fun onGameRowUpdate(gameRow: GameDto) {
         if (gameRow.want_rematch) {
             if (!Game.getWantsRematch()) {
                 otherPlayerHasAskedForRematch = true

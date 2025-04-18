@@ -1,13 +1,16 @@
 package io.github.chessevolved.singletons
 
-import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
+import com.badlogic.gdx.Gdx
 import io.github.chessevolved.dtos.LobbyDto
+import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 
 object Lobby {
     private var lobbyId: String? = null
-    private var subscribers = mutableMapOf<String, 
-(updatedLobby: LobbyDto) -> Unit
-    >()
+    private var subscribers =
+        mutableMapOf<
+            String,
+            (updatedLobby: LobbyDto) -> Unit,
+        >()
 
     /**
      * Method to join a lobby.
@@ -15,7 +18,7 @@ object Lobby {
      * @throws Exception if something goes wrong.
      */
     suspend fun joinLobby(lobbyId: String) {
-        println("Lobby: Joining lobby with ID: $lobbyId...")
+        Gdx.app.log("Lobby", "Joining lobby with ID: $lobbyId...")
         try {
             SupabaseLobbyHandler.joinLobby(lobbyId, ::onLobbyRowUpdate)
             this.lobbyId = lobbyId
@@ -33,9 +36,7 @@ object Lobby {
             SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
             SupabaseLobbyHandler.joinLobbyNoUpdateSecondPlayer(lobbyId!!, ::onLobbyRowUpdate)
         } catch (e: Exception) {
-            println(e.message)
-            error(e)
-            // throw e
+            Gdx.app.error("Lobby", "Error when joining rematch lobby: " + e.message)
         }
     }
 
@@ -55,7 +56,7 @@ object Lobby {
         try {
             val lobbyId = SupabaseLobbyHandler.createLobby(::onLobbyRowUpdate)
             this.lobbyId = lobbyId
-            println("Lobby: Creating lobby with ID: $lobbyId...")
+            Gdx.app.log("Lobby", "Creating lobby with ID: $lobbyId...")
         } catch (e: Exception) {
             throw Exception("Problem when creating lobby! " + e.message)
         }
