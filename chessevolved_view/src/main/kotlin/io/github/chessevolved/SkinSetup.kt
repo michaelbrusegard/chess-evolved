@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox.CheckBoxStyle
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
@@ -80,6 +81,26 @@ object SkinSetup {
 
             Scene2DSkin.defaultSkin.add("CEtextFieldStyle", textFieldStyle)
         }
+
+        if (!Scene2DSkin.defaultSkin.has("CEcheckboxStyle", CheckBoxStyle::class.java)) {
+            val checkBoxStyle = CheckBoxStyle().apply {
+                checkboxOff = TextureRegionDrawable(TextureRegion(
+                    assetManager.get("customUI/checkboxUnchecked.png", Texture::class.java)
+                )).apply {
+                    minWidth = 65f
+                    minHeight = 65f
+                }
+                checkboxOn = TextureRegionDrawable(TextureRegion(
+                    assetManager.get("customUI/checkboxChecked.png", Texture::class.java)
+                )).apply {
+                    minWidth = 65f
+                    minHeight = 65f
+                }
+                font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
+            }
+
+            Scene2DSkin.defaultSkin.add("CEcheckboxStyle", checkBoxStyle)
+        }
     }
 
     fun loadAllCommonAssets() {
@@ -94,6 +115,8 @@ object SkinSetup {
         assetManager.load("customUI/labelPanel.png", Texture::class.java)
         assetManager.load("customUI/textMarker.png", Texture::class.java)
         assetManager.load("customUI/textFieldPanel.png", Texture::class.java)
+        assetManager.load("customUI/checkboxChecked.png", Texture::class.java)
+        assetManager.load("customUI/checkboxUnchecked.png", Texture::class.java)
 
         assetManager.finishLoading()
     }
@@ -110,5 +133,7 @@ object SkinSetup {
         assetManager.unload("customUI/labelPanel.png")
         assetManager.unload("customUI/textMarker.png")
         assetManager.unload("customUI/textFieldPanel.png")
+        assetManager.unload("customUI/checkboxChecked.png")
+        assetManager.unload("customUI/checkboxUnchecked.png")
     }
 }
