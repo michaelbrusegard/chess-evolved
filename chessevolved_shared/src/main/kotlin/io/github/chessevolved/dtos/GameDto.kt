@@ -12,9 +12,9 @@ data class GameDto(
     @SerialName("lobby_code")
     val lobbyCode: String,
     val turn: PlayerColor,
-    val pieces: List<PieceDto>,
+    val pieces: List<PieceDto> = emptyList(),
     @SerialName("board_squares")
-    val boardSquares: List<BoardSquareDto>,
+    val boardSquares: List<BoardSquareDto> = emptyList(),
     @SerialName("player_disconnected")
     val playerDisconnected: Boolean,
     @SerialName("want_rematch")
