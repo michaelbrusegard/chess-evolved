@@ -1,12 +1,14 @@
 package io.github.chessevolved
 
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import ktx.scene2d.Scene2DSkin
 
@@ -62,6 +64,22 @@ object SkinSetup {
 
             Scene2DSkin.defaultSkin.add("CElabelStyle", labelStyle)
         }
+
+        if (!Scene2DSkin.defaultSkin.has("CEtextFieldStyle", TextFieldStyle::class.java)) {
+            val textFieldStyle = TextFieldStyle().apply {
+                background = TextureRegionDrawable(TextureRegion(
+                    assetManager.get("customUI/textFieldPanel.png", Texture::class.java)
+                ))
+                font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
+                fontColor = Color.BLACK
+                messageFontColor = Color(0.35f, 0.35f, 0.35f, 1f)
+                cursor = TextureRegionDrawable(TextureRegion(
+                    assetManager.get("customUI/textMarker.png", Texture::class.java)
+                ))
+            }
+
+            Scene2DSkin.defaultSkin.add("CEtextFieldStyle", textFieldStyle)
+        }
     }
 
     fun loadAllCommonAssets() {
@@ -74,6 +92,8 @@ object SkinSetup {
         assetManager.load("customUI/copySymbol.png", Texture::class.java)
         assetManager.load("customUI/copySymbolPressed.png", Texture::class.java)
         assetManager.load("customUI/labelPanel.png", Texture::class.java)
+        assetManager.load("customUI/textMarker.png", Texture::class.java)
+        assetManager.load("customUI/textFieldPanel.png", Texture::class.java)
 
         assetManager.finishLoading()
     }
@@ -88,5 +108,7 @@ object SkinSetup {
         assetManager.unload("customUI/copySymbol.png")
         assetManager.unload("customUI/copySymbolPressed.png")
         assetManager.unload("customUI/labelPanel.png")
+        assetManager.unload("customUI/textMarker.png")
+        assetManager.unload("customUI/textFieldPanel.png")
     }
 }
