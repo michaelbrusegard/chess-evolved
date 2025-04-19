@@ -102,6 +102,7 @@ object Lobby {
             val lobby = SupabaseLobbyHandler.getLobbyRow(lobbyId!!)
             return lobby
         } catch (e: Exception) {
+            Gdx.app.error("Lobby", "Error when trying to fetch lobby: " + e.message)
             throw Exception("Something went wrong trying to fetch lobby: " + e.message)
         }
     }
