@@ -50,10 +50,20 @@ object SupabaseLobbyHandler {
      */
     suspend fun createLobby(onEventListener: (updatedLobby: LobbyDto) -> Unit): String {
         var lobbyCode = getRandomString(LOBBY_CODE_LENGTH)
+        val defaultSettings =
+            mapOf(
+                "boardSize" to "8",
+                "fogOfWar" to "false",
+            )
 
         for (attempts in 1..3) {
             try {
-                supabase.from(SUPABASE_LOBBY_TABLE_NAME).insert(mapOf("lobby_code" to lobbyCode))
+                supabase.from(SUPABASE_LOBBY_TABLE_NAME).insert(
+                    mapOf(
+                        "lobby_code" to lobbyCode,
+                        "settings" to defaultSettings,
+                    ),
+                )
 
                 addLobbyListener(lobbyCode, onEventListener)
                 return lobbyCode
