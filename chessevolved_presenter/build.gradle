@@ -37,4 +37,11 @@ dependencies {
   implementation project(":chessevolved_model")
   implementation project(":chessevolved_view")
   implementation project(":chessevolved_shared")
+
+  // Testing with kotlin.test and JUnit
+  testImplementation 'org.jetbrains.kotlin:kotlin-test'
+}
+
+test {
+  useJUnitPlatform()
 }

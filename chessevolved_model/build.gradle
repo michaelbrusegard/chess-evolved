@@ -57,4 +57,13 @@ dependencies {
   implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
   implementation project(":chessevolved_shared")
+
+  // Testing with kotlin.test and JUnit
+  testImplementation 'org.jetbrains.kotlin:kotlin-test'
+  testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1"
+}
+
+test {
+  useJUnitPlatform()
+  workingDir = rootProject.file('assets').path
 }
