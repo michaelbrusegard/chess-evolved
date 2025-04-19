@@ -13,7 +13,7 @@ import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.VisualEffectComponent
 import io.github.chessevolved.enums.VisualEffectType
-import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.singletons.EcsEngine
 
 class VisualEffectSystem(
     private val batch: SpriteBatch,
@@ -67,7 +67,7 @@ class VisualEffectSystem(
 
         entitiesToRemove.forEach { entity ->
             entityTimers.remove(entity)
-            ECSEngine.removeEntity(entity)
+            EcsEngine.removeEntity(entity)
         }
     }
 

@@ -18,7 +18,7 @@ import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.enums.PieceType
 import io.github.chessevolved.enums.PlayerColor
 import io.github.chessevolved.enums.WeatherEvent
-import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.singletons.EcsEngine
 import io.github.chessevolved.singletons.EcsEntityMapper
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Game.subscribeToGameUpdates
@@ -40,7 +40,7 @@ class GamePresenter(
     private val navigator: Navigator,
     private val assetManager: AssetManager,
 ) : IPresenter {
-    private val engine = ECSEngine
+    private val engine = EcsEngine
 
     private val pieceFactory = PieceFactory(engine, assetManager)
     private val boardSquareFactory = BoardSquareFactory(engine, assetManager)

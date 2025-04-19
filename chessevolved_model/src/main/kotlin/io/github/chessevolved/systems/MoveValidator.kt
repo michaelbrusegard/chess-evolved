@@ -11,7 +11,7 @@ import io.github.chessevolved.data.MovementPattern
 import io.github.chessevolved.data.Position
 import io.github.chessevolved.enums.MoveType
 import io.github.chessevolved.enums.PlayerColor
-import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.singletons.EcsEngine
 
 class MoveValidator {
     fun checkAvailablePositions(
@@ -70,7 +70,7 @@ class MoveValidator {
 
             // Check if there's a piece at the new position
             val piece =
-                ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
+                EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
                     val pos = PositionComponent.mapper.get(entity).position
                     pos == newPosition
                 }
@@ -165,7 +165,7 @@ class MoveValidator {
             }
 
             val piece =
-                ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
+                EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
                     val pos = PositionComponent.mapper.get(entity).position
                     pos == newPosition
                 }
