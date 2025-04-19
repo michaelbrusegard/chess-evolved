@@ -1,4 +1,5 @@
 package io.github.chessevolved.dtos
+
 import kotlinx.serialization.Serializable
 
 @Serializable

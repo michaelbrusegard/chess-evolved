@@ -11,18 +11,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
-import io.github.chessevolved.components.AbilityComponent
-import io.github.chessevolved.components.AbilityTriggerComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.data.Position
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
-import io.github.chessevolved.enums.AbilityType
 import io.github.chessevolved.enums.PieceType
 import io.github.chessevolved.enums.PlayerColor
 import io.github.chessevolved.enums.WeatherEvent
 import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.singletons.EcsEntityMapper
 import io.github.chessevolved.singletons.Game
+import io.github.chessevolved.singletons.Game.subscribeToGameUpdates
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.systems.AbilitySystem
@@ -72,7 +71,7 @@ class GamePresenter(
         renderingSystem = RenderingSystem(gameBatch)
         engine.addSystem(renderingSystem)
 
-        movementSystem = MovementSystem()
+        movementSystem = MovementSystem(this::onTurnComplete)
         engine.addSystem(movementSystem)
 
         selectionListener = SelectionEntityListener(boardWorldSize)
@@ -97,8 +96,8 @@ class GamePresenter(
 
         setupBoard()
 
-        // If we do not call this the board will not be displayed
         resize(Gdx.graphics.width, Gdx.graphics.height)
+        subscribeToGameUpdates(this.toString(), this::onGameStateUpdate)
     }
 
     private fun loadRequiredAssets() {
@@ -118,7 +117,6 @@ class GamePresenter(
     private fun setupGameView() {
         runBlocking {
             launch {
-                // Crash app if not in lobby. App should never be in a state where it is in a game without being in a lobby first.
                 Game.joinGame(Lobby.getLobbyId() ?: throw IllegalStateException("Can't join a game if not in a lobby first!"))
             }
         }
@@ -157,12 +155,6 @@ class GamePresenter(
                     Position(startPos, 1),
                     PlayerColor.WHITE,
                     gameStage,
-                ).add(
-                    AbilityComponent(
-                        ability = AbilityType.EXPLOSION,
-                        abilityCooldownTime = 2,
-                        currentAbilityCDTime = 0,
-                    ),
                 )
 
             pieceFactory
@@ -171,66 +163,58 @@ class GamePresenter(
                     Position(startPos, boardWorldSize - 2),
                     PlayerColor.BLACK,
                     gameStage,
-                ).apply {
-                    add(
-                        AbilityComponent(
-                            ability = AbilityType.SHIELD,
-                            abilityCooldownTime = 3,
-                            currentAbilityCDTime = 0,
-                        ),
-                    )
-                    add(
-                        AbilityTriggerComponent(Position(startPos, boardWorldSize - 2), Position(startPos, boardWorldSize - 2)),
-                    )
-                }
+                )
+        }
 
+        val startXLocal: Int = (boardWorldSize / 2) - 4
+        for (startPos in startXLocal until startXLocal + 8) {
             when (startPos) {
-                startX -> {
+                startXLocal -> {
                     for (j in listOf(0, 7)) {
                         pieceFactory.createRook(
-                            Position(startX + j, 0),
+                            Position(startXLocal + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
                         )
 
                         pieceFactory.createRook(
-                            Position(startX + j, boardWorldSize - 1),
+                            Position(startXLocal + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
                         )
                     }
                 }
-                startX + 1 -> {
+                startXLocal + 1 -> {
                     for (j in listOf(1, 6)) {
                         pieceFactory.createKnight(
-                            Position(startX + j, 0),
+                            Position(startXLocal + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
                         )
 
                         pieceFactory.createKnight(
-                            Position(startX + j, boardWorldSize - 1),
+                            Position(startXLocal + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
                         )
                     }
                 }
-                startX + 2 -> {
+                startXLocal + 2 -> {
                     for (j in listOf(2, 5)) {
                         pieceFactory.createBishop(
-                            Position(startX + j, 0),
+                            Position(startXLocal + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
                         )
 
                         pieceFactory.createBishop(
-                            Position(startX + j, boardWorldSize - 1),
+                            Position(startXLocal + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
                         )
                     }
                 }
-                startX + 3 -> {
+                startXLocal + 3 -> {
                     pieceFactory.createQueen(
                         Position(startPos, 0),
                         PlayerColor.WHITE,
@@ -243,7 +227,7 @@ class GamePresenter(
                         gameStage,
                     )
                 }
-                startX + 4 -> {
+                startXLocal + 4 -> {
                     pieceFactory.createKing(
                         Position(startPos, 0),
                         PlayerColor.WHITE,
@@ -287,7 +271,6 @@ class GamePresenter(
     ) {
         gameViewport.update(width, height, false)
         gameBoardView.resize(width, height)
-        // TODO: Do some resize logic for GameUIView as well.
     }
 
     override fun dispose() {
@@ -333,5 +316,26 @@ class GamePresenter(
 
     override fun setInputProcessor() {
         gameBoardView.setInputProcessor()
+    }
+
+    private fun onGameStateUpdate(gameDto: io.github.chessevolved.dtos.GameDto) {
+        val pieces = gameDto.pieces ?: return
+        val boardSquares = gameDto.board_squares ?: return
+
+        EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
+    }
+
+    private fun onTurnComplete() {
+        runBlocking {
+            launch {
+                val (pieces, boardSquares) = EcsEntityMapper.extractStateFromEngine(engine)
+
+                Game.updateGameState(
+                    Lobby.getLobbyId()!!,
+                    pieces,
+                    boardSquares,
+                )
+            }
+        }
     }
 }

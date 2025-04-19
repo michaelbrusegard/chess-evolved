@@ -7,10 +7,7 @@ import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 object Lobby {
     private var lobbyId: String? = null
     private var subscribers =
-        mutableMapOf<
-            String,
-            (updatedLobby: LobbyDto) -> Unit,
-        >()
+        mutableMapOf<String, (updatedLobby: LobbyDto) -> Unit>()
 
     /**
      * Method to join a lobby.

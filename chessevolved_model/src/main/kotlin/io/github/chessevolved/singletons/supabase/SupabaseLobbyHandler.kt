@@ -1,5 +1,6 @@
 package io.github.chessevolved.singletons.supabase
 
+import io.github.chessevolved.dtos.LobbyDto
 import io.github.chessevolved.dtos.SettingsDto
 import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
@@ -11,9 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import io.github.chessevolved.dtos.LobbyDto
 
 object SupabaseLobbyHandler {
     /**

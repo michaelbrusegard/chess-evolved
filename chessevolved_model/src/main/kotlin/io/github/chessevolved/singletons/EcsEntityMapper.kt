@@ -14,7 +14,7 @@ import io.github.chessevolved.dtos.PieceDto
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.enums.PieceType
 
-object ECSEntityMapper {
+object EcsEntityMapper {
     private val pieceFamily: Family =
         Family
             .all(
