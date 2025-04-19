@@ -16,7 +16,6 @@ import ktx.scene2d.image
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
 import ktx.scene2d.textButton
-import ktx.style.skin
 
 class MenuView : IView {
     private lateinit var stage: Stage
@@ -28,8 +27,6 @@ class MenuView : IView {
 
     private lateinit var camera: OrthographicCamera
     private lateinit var viewport: FitViewport
-
-    private val logoTexture = Texture("customUI/chessEvolvedLogo.png")
 
     private val skinSetup = SkinSetup
 
@@ -60,6 +57,7 @@ class MenuView : IView {
 
         stage.addActor(background)
 
+        val logoTexture = skinSetup.assetManager.get("customUI/chessEvolvedLogo.png", Texture::class.java)
 
         val root =
             scene2d.table {
@@ -106,10 +104,12 @@ class MenuView : IView {
                     label.color = Color.BLACK
                     onClick { Gdx.app.exit() }
                 }
+
+                zIndex = 5
             }
 
-        toastManager = ToastManager(stage)
         stage.addActor(root)
+        toastManager = ToastManager(stage)
     }
 
     override fun render() {
@@ -126,7 +126,6 @@ class MenuView : IView {
 
     override fun dispose() {
         stage.dispose()
-        logoTexture.dispose()
         skinSetup.unloadAllCommonAssets()
     }
 

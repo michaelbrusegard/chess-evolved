@@ -24,6 +24,7 @@ class ToastManager(
             setFillParent(true)
             top()
             padTop(20f)
+            zIndex = 0
         }
 
     init {
@@ -63,6 +64,7 @@ class ToastManager(
                     it.align(Align.center)
                     setWrap(true)
                 }
+                zIndex = 0
             }
 
         toastContainer.add(toast).width(width).pad(10f)
