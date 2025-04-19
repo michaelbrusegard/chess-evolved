@@ -13,8 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
-import io.github.chessevolved.dtos.SettingsDto
 import io.github.chessevolved.SkinSetup
+import io.github.chessevolved.dtos.SettingsDto
 import ktx.actors.onClick
 import ktx.scene2d.checkBox
 import ktx.scene2d.image
