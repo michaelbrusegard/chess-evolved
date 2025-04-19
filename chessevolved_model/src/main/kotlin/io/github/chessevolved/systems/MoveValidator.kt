@@ -5,11 +5,13 @@ import com.badlogic.gdx.math.Vector2
 import io.github.chessevolved.components.CanBeCapturedComponent
 import io.github.chessevolved.components.MovementRuleComponent
 import io.github.chessevolved.components.PieceTypeComponent
-import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.PlayerColorComponent
-import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
-import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.data.MovementPattern
+import io.github.chessevolved.data.Position
+import io.github.chessevolved.enums.MoveType
+import io.github.chessevolved.enums.PlayerColor
+import io.github.chessevolved.singletons.EcsEngine
 
 class MoveValidator {
     fun checkAvailablePositions(
@@ -41,7 +43,7 @@ class MoveValidator {
     }
 
     private fun validateDirection(
-        movementPattern: MovementRuleComponent.MovementPattern,
+        movementPattern: MovementPattern,
         boardSize: Int,
         position: Position,
         direction: Vector2,
@@ -56,8 +58,10 @@ class MoveValidator {
             val newY = position.y + (direction.y * step).toInt()
 
             // Check if position is outside the board
-            if (newX < 0 || newX >= boardSize ||
-                newY < 0 || newY >= boardSize
+            if (newX < 0 ||
+                newX >= boardSize ||
+                newY < 0 ||
+                newY >= boardSize
             ) {
                 break
             }
@@ -66,7 +70,7 @@ class MoveValidator {
 
             // Check if there's a piece at the new position
             val piece =
-                ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
+                EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
                     val pos = PositionComponent.mapper.get(entity).position
                     pos == newPosition
                 }
@@ -80,8 +84,8 @@ class MoveValidator {
                 } else {
                     // Found an opponent's piece - can capture but not move beyond
                     when (movementPattern.moveType) {
-                        MovementRuleComponent.MoveType.NORMAL,
-                        MovementRuleComponent.MoveType.CAPTURE_ONLY,
+                        MoveType.NORMAL,
+                        MoveType.CAPTURE_ONLY,
                         -> {
                             if (!movementPattern.canJump &&
                                 !walkToPosition(
@@ -106,8 +110,8 @@ class MoveValidator {
             } else {
                 // Empty position
                 when (movementPattern.moveType) {
-                    MovementRuleComponent.MoveType.NORMAL,
-                    MovementRuleComponent.MoveType.MOVE_ONLY,
+                    MoveType.NORMAL,
+                    MoveType.MOVE_ONLY,
                     -> {
                         if (!movementPattern.canJump &&
                             !walkToPosition(
@@ -161,7 +165,7 @@ class MoveValidator {
             }
 
             val piece =
-                ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
+                EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { entity ->
                     val pos = PositionComponent.mapper.get(entity).position
                     pos == newPosition
                 }

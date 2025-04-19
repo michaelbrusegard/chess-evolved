@@ -1,6 +1,6 @@
 package io.github.chessevolved.singletons
 
-import io.github.chessevolved.shared.SettingsDTO
+import io.github.chessevolved.dtos.SettingsDto
 
 object GameSettings {
     private var fogOfWar: Boolean = false
@@ -23,15 +23,15 @@ object GameSettings {
     /**
      * Retrieves all settings as a map of strings
      */
-    fun getGameSettings(): SettingsDTO {
-        val settingsDTO = SettingsDTO(fogOfWar, boardSize)
+    fun getGameSettings(): SettingsDto {
+        val settingsDTO = SettingsDto(fogOfWar, boardSize)
         return settingsDTO
     }
 
     /**
      * Takes a map of strings and updates the settings
      */
-    fun setGameSettings(settings: SettingsDTO) {
+    fun setGameSettings(settings: SettingsDto) {
         fogOfWar = settings.fogOfWar
         boardSize = settings.boardSize
     }

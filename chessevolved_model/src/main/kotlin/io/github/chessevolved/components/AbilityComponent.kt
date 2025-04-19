@@ -2,14 +2,7 @@ package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
-
-enum class AbilityType {
-    SHIELD,
-    EXPLOSION,
-    SWAP,
-    MIRROR,
-    NEW_MOVEMENT,
-}
+import io.github.chessevolved.enums.AbilityType
 
 class AbilityComponent(
     val ability: AbilityType,

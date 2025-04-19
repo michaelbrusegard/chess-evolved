@@ -2,18 +2,8 @@ package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
-
-enum class VisualEffectType(val value: Float) {
-    SHIELD_ACTIVE(0.2f),
-    SHIELD_BREAK(0.075f),
-    EXPLOSION(0.1f),
-}
-
-enum class VisualEffectSize(val value: Int) {
-    NORMAL(1), // 1x1
-    MEDIUM(3), // 3x3
-    LARGE(5), // 5x5
-}
+import io.github.chessevolved.enums.VisualEffectSize
+import io.github.chessevolved.enums.VisualEffectType
 
 /**
  * @param effectType The visual effect type.

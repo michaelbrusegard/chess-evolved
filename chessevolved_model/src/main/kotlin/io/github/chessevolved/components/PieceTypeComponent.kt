@@ -2,15 +2,7 @@ package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
-
-enum class PieceType {
-    PAWN,
-    KNIGHT,
-    BISHOP,
-    ROOK,
-    QUEEN,
-    KING,
-}
+import io.github.chessevolved.enums.PieceType
 
 class PieceTypeComponent(
     var type: PieceType = PieceType.PAWN,

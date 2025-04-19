@@ -2,7 +2,7 @@ package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
-import io.github.chessevolved.shared.SettingsDTO
+import io.github.chessevolved.dtos.SettingsDto
 import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby.setLobbySettings
 import io.github.chessevolved.views.SettingsView
@@ -17,7 +17,7 @@ class SettingsPresenter(
     init {
         settingsView.init()
         settingsView.setExistingSettings(
-            SettingsDTO(
+            SettingsDto(
                 fogOfWar = GameSettings.isFOWEnabled(),
                 boardSize = GameSettings.getBoardSize(),
             ),
@@ -32,14 +32,14 @@ class SettingsPresenter(
 
     private fun loadCurrentSettingsIntoView() {
         val currentSettings =
-            SettingsDTO(
+            SettingsDto(
                 fogOfWar = GameSettings.isFOWEnabled(),
                 boardSize = GameSettings.getBoardSize(),
             )
         settingsView.setInitialValues(currentSettings)
     }
 
-    private fun onApplyPressed(settings: SettingsDTO) {
+    private fun onApplyPressed(settings: SettingsDto) {
         // Sets settings locally, must be done because Lobby uses local settings to update supabase
         GameSettings.setGameSettings(settings)
 

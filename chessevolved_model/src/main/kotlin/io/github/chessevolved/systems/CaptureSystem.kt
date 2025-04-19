@@ -13,7 +13,7 @@ import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.ValidMovesComponent
-import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.singletons.EcsEngine
 
 class CaptureSystem : IteratingSystem(
     Family.all(CapturedComponent::class.java).get(),
@@ -29,11 +29,11 @@ class CaptureSystem : IteratingSystem(
 
         // Trigger the movementSystem to move the entity that captured.
         val capturingPiece =
-            ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { piece ->
+            EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { piece ->
                 piece.getComponent(SelectionComponent::class.java) != null
             }
 
-        ECSEngine.getEntitiesFor(Family.all(CanBeCapturedComponent::class.java).get()).map { piece ->
+        EcsEngine.getEntitiesFor(Family.all(CanBeCapturedComponent::class.java).get()).map { piece ->
             piece.remove(CanBeCapturedComponent::class.java)
         }
 
@@ -56,6 +56,6 @@ class CaptureSystem : IteratingSystem(
         val actor = ActorComponent.mapper.get(entity).actor
         actor.remove()
 
-        ECSEngine.removeEntity(entity)
+        EcsEngine.removeEntity(entity)
     }
 }

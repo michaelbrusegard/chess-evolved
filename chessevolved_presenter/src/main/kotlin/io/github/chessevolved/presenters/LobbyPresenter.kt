@@ -3,7 +3,7 @@ package io.github.chessevolved.presenters
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
-import io.github.chessevolved.shared.SettingsDTO
+import io.github.chessevolved.dtos.LobbyDto
 import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.singletons.Lobby.getLobby
@@ -11,7 +11,6 @@ import io.github.chessevolved.singletons.Lobby.leaveLobby
 import io.github.chessevolved.singletons.Lobby.startGame
 import io.github.chessevolved.singletons.Lobby.subscribeToLobbyUpdates
 import io.github.chessevolved.singletons.Lobby.unsubscribeFromLobbyUpdates
-import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 import io.github.chessevolved.views.LobbyView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,13 +33,8 @@ class LobbyPresenter(
             launch {
                 val lobby = getLobby()
                 lobbyUpdateHandler(lobby)
-                playerJoinedLeftLobby(true)
             }
         }
-    }
-
-    private fun playerJoinedLeftLobby(playerJoined: Boolean) {
-        lobbyView.setSecondPlayerConnected(playerJoined)
     }
 
     private fun lobbyStartedCheck(lobbyStarted: Boolean) {
@@ -53,20 +47,10 @@ class LobbyPresenter(
         }
     }
 
-    private fun settingsChanged(updatedSettings: SettingsDTO) {
-        GameSettings.setGameSettings(updatedSettings)
-    }
-
-    private fun lobbyUpdateHandler(newLobby: SupabaseLobbyHandler.Lobby) {
-        val settingsDTO =
-            SettingsDTO(
-                fogOfWar = newLobby.settings["fogOfWar"]?.toBooleanStrictOrNull() ?: false,
-                boardSize = newLobby.settings["boardSize"]?.toIntOrNull() ?: 8,
-            )
-
-        playerJoinedLeftLobby(newLobby.second_player)
-        lobbyStartedCheck(newLobby.game_started)
-        settingsChanged(settingsDTO)
+    private fun lobbyUpdateHandler(newLobby: LobbyDto) {
+        lobbyView.setSecondPlayerConnected(newLobby.secondPlayer)
+        lobbyStartedCheck(newLobby.gameStarted)
+        GameSettings.setGameSettings(newLobby.settings)
     }
 
     private fun onStartGameButtonClicked() {
@@ -91,7 +75,7 @@ class LobbyPresenter(
             try {
                 leaveLobby()
             } catch (e: Exception) {
-                println("Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
+                Gdx.app.error("LobbyPresenter", "Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
             }
         }
         unsubscribeFromLobbyUpdates(this.toString())
@@ -118,7 +102,7 @@ class LobbyPresenter(
                     try {
                         leaveLobby()
                     } catch (e: Exception) {
-                        println("Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
+                        Gdx.app.error("LobbyPresenter", "Non fatal error: Problem with calling leaveLobby(). Error: " + e.message)
                     }
                 }
             }

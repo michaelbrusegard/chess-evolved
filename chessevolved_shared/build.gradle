@@ -1,13 +1,10 @@
 plugins {
-
-  // Our serializer for HTTP-stuff will be KotlinX Serialization
   id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion"
 }
 
-apply plugin: 'org.jetbrains.kotlin.jvm'
-apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
-
 dependencies {
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
   api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   api "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
 }
