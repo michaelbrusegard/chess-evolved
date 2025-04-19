@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS "public"."lobbies" (
     "lobby_code" "text" NOT NULL,
     "second_player" boolean DEFAULT false NOT NULL,
     "game_started" boolean DEFAULT false NOT NULL,
-    "settings" "jsonb"
+    "settings" "jsonb" DEFAULT '{}'::"jsonb" NOT NULL
 );
 
 
@@ -72,8 +72,8 @@ CREATE TABLE IF NOT EXISTS "public"."games" (
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "lobby_code" "text" NOT NULL,
     "turn" "public"."color" DEFAULT 'WHITE'::"public"."color" NOT NULL,
-    "board_squares" "jsonb",
-    "pieces" "jsonb",
+    "board_squares" "jsonb" DEFAULT '[]'::"jsonb",
+    "pieces" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
     "player_disconnected" boolean DEFAULT false NOT NULL,
     "want_rematch" boolean DEFAULT false NOT NULL
 );
