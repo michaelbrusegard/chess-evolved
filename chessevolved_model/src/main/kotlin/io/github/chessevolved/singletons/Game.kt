@@ -1,13 +1,17 @@
 package io.github.chessevolved.singletons
 
+import io.github.chessevolved.dtos.BoardSquareDto
+import io.github.chessevolved.dtos.GameDto
+import io.github.chessevolved.dtos.PieceDto
+import io.github.chessevolved.enums.PlayerColor
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
-import kotlin.reflect.KFunction1
 
 object Game {
     private var inGame: Boolean = false
-    private var subscribers = mutableMapOf<String, KFunction1<SupabaseGameHandler.Game, Unit>>()
+    private var subscribers = mutableMapOf<String, (updatedGame: GameDto) -> Unit>()
     private var hasAskedForRematch = false
+    private var currentTurn: PlayerColor? = null
 
     suspend fun joinGame(gameId: String) {
         try {
@@ -26,6 +30,7 @@ object Game {
             hasAskedForRematch = false
             SupabaseGameHandler.leaveGame(Lobby.getLobbyId()!!)
             this.inGame = false
+            this.currentTurn = null
         } catch (e: Exception) {
             throw Exception("Problem with leaving game: " + e.message)
         }
@@ -50,15 +55,35 @@ object Game {
 
     fun isInGame(): Boolean = inGame
 
-    private fun onGameRowUpdate(game: SupabaseGameHandler.Game) {
+    fun getCurrentTurn(): PlayerColor? = currentTurn
+
+    suspend fun updateGameState(
+        lobbyCode: String,
+        pieces: List<PieceDto>,
+        boardSquares: List<BoardSquareDto>,
+    ) {
+        val nextTurn =
+            if (currentTurn == PlayerColor.WHITE) PlayerColor.BLACK else PlayerColor.WHITE
+        try {
+            SupabaseGameHandler.updateGameState(lobbyCode, pieces, boardSquares, nextTurn)
+            currentTurn = nextTurn
+        } catch (e: Exception) {
+            throw Exception("Problem updating game state: " + e.message)
+        }
+    }
+
+    private fun onGameRowUpdate(game: GameDto) {
         subscribers.forEach {
             it.value.invoke(game)
+        }
+        game.turn.let {
+            currentTurn = PlayerColor.valueOf(it.toString())
         }
     }
 
     fun subscribeToGameUpdates(
         subscriberName: String,
-        onEventListener: KFunction1<SupabaseGameHandler.Game, Unit>,
+        onEventListener: (updatedGame: GameDto) -> Unit,
     ) {
         subscribers.put(subscriberName, onEventListener)
     }

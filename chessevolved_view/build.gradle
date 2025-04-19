@@ -38,7 +38,6 @@ dependencies {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
 
-  // Needed to access shared classes like DTO
   implementation project(":chessevolved_shared")
 
   // Testing with kotlin.test and JUnit

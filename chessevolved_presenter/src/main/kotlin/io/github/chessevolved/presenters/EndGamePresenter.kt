@@ -3,9 +3,9 @@ package io.github.chessevolved.presenters
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.dtos.GameDto
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Lobby
-import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
 import io.github.chessevolved.views.EndGameView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -19,7 +19,7 @@ class EndGamePresenter(
     private var otherPlayerLeft = false
 
     init {
-        Game.subscribeToGameUpdates(this.toString(), ::onGameRowUpdate)
+        Game.subscribeToGameUpdates(this.toString(), ::onGameUpdate)
         endGameView.endGameStatus = endGameStatus
         endGameView.init()
         endGameView.onReturnToMenuClicked = { returnToMenu() }
@@ -28,7 +28,7 @@ class EndGamePresenter(
 
     private fun requestRematch() {
         endGameView.disableRematchButton()
-        endGameView.updateRematchText("Rematch request sent...")
+        endGameView.updateRematchText("Rematch request\nsent...")
         runBlocking {
             launch {
                 Game.askForRematch()
@@ -87,16 +87,16 @@ class EndGamePresenter(
         endGameView.setInputProcessor()
     }
 
-    fun onGameRowUpdate(gameRow: SupabaseGameHandler.Game) {
-        if (gameRow.want_rematch) {
+    fun onGameUpdate(updatedGame: GameDto) {
+        if (updatedGame.wantRematch) {
             if (!Game.getWantsRematch()) {
                 otherPlayerHasAskedForRematch = true
-                endGameView.updateRematchText("Other player wants a rematch.")
+                endGameView.updateRematchText("Other player\nwants a rematch.")
             }
         }
 
         // If want_rematch gets set back to false, it's an ACK from the other player, accepting the rematch.
-        if (!gameRow.want_rematch && Game.getWantsRematch()) {
+        if (!updatedGame.wantRematch && Game.getWantsRematch()) {
             Gdx.app.postRunnable {
                 // This ensures that the first one to request a rematch doesn't update the lobby-column "second_player". Needed to avoid a full lobby exception.
                 if (otherPlayerHasAskedForRematch) {
@@ -118,10 +118,10 @@ class EndGamePresenter(
             }
         }
 
-        if (gameRow.player_disconnected) {
+        if (updatedGame.playerDisconnected) {
             otherPlayerLeft = true
             endGameView.disableRematchButton()
-            endGameView.updateRematchText("Other player has left...")
+            endGameView.updateRematchText("Other player\nhas left...")
         }
     }
 }

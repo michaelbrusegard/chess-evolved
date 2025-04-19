@@ -1,6 +1,4 @@
 plugins {
-
-  // Our serializer for HTTP-stuff will be KotlinX Serialization
   id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion"
 }
 
@@ -52,13 +50,12 @@ dependencies {
   // as using websockets! https://ktor.io/docs/client-engines.html#limitations
   implementation("io.ktor:ktor-client-cio:$ktor_version")
   // Our serializer for JSON objects.
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
   //END SUPABASE DEPENDENCIES
 
   // We need this to be able to retrieve .env variables. See https://github.com/cdimascio/dotenv-kotlin?tab=readme-ov-file#faq
   implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
-  // Needed to access shared classes like DTO
   implementation project(":chessevolved_shared")
 
   // Testing with kotlin.test and JUnit

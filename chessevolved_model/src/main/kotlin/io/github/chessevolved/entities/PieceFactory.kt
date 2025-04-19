@@ -12,13 +12,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.MovementRuleComponent
-import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PieceTypeComponent
-import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.PlayerColorComponent
-import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.TextureRegionComponent
+import io.github.chessevolved.data.MovementPattern
+import io.github.chessevolved.data.Position
+import io.github.chessevolved.enums.MoveType
+import io.github.chessevolved.enums.PieceType
+import io.github.chessevolved.enums.PlayerColor
 import io.github.chessevolved.systems.InputService
 import ktx.actors.onClick
 
@@ -132,30 +134,30 @@ class PieceFactory(
             }
 
             addPattern(
-                MovementRuleComponent.MovementPattern(
+                MovementPattern(
                     moveName = "pawnMove",
                     directions = pawnDirections,
                     maxSteps = 1,
-                    moveType = MovementRuleComponent.MoveType.MOVE_ONLY,
+                    moveType = MoveType.MOVE_ONLY,
                 ),
             )
 
             addPattern(
-                MovementRuleComponent.MovementPattern(
+                MovementPattern(
                     moveName = "pawnCapture",
                     directions = pawnCaptureDirections,
                     maxSteps = 1,
-                    moveType = MovementRuleComponent.MoveType.CAPTURE_ONLY,
+                    moveType = MoveType.CAPTURE_ONLY,
                 ),
             )
 
             addPattern(
-                MovementRuleComponent.MovementPattern(
+                MovementPattern(
                     moveName = "pawnStart",
                     directions = pawnStartDirections,
                     maxSteps = 1,
                     isFirstMove = true,
-                    moveType = MovementRuleComponent.MoveType.MOVE_ONLY,
+                    moveType = MoveType.MOVE_ONLY,
                 ),
             )
         }
@@ -169,7 +171,7 @@ class PieceFactory(
         createPiece(position, PieceType.KNIGHT, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
-                    MovementRuleComponent.MovementPattern(
+                    MovementPattern(
                         moveName = "knightNormal",
                         directions = knightDirections,
                         maxSteps = 1,
@@ -187,7 +189,7 @@ class PieceFactory(
         createPiece(position, PieceType.BISHOP, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
-                    MovementRuleComponent.MovementPattern(
+                    MovementPattern(
                         moveName = "bishopNormal",
                         directions = diagonalDirections,
                     ),
@@ -203,7 +205,7 @@ class PieceFactory(
         createPiece(position, PieceType.ROOK, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
-                    MovementRuleComponent.MovementPattern(
+                    MovementPattern(
                         moveName = "rookNormal",
                         directions = straightDirections,
                     ),
@@ -219,7 +221,7 @@ class PieceFactory(
         createPiece(position, PieceType.QUEEN, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
-                    MovementRuleComponent.MovementPattern(
+                    MovementPattern(
                         moveName = "queenNormal",
                         directions = straightDirections + diagonalDirections,
                     ),
@@ -235,7 +237,7 @@ class PieceFactory(
         createPiece(position, PieceType.KING, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
-                    MovementRuleComponent.MovementPattern(
+                    MovementPattern(
                         moveName = "kingNormal",
                         directions = straightDirections + diagonalDirections,
                         maxSteps = 1,

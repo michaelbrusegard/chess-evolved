@@ -1,6 +1,3 @@
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-eclipse.project.name = appName + '-chessevolved_presenter'
-
 dependencies {
   api "com.badlogicgames.ashley:ashley:$ashleyVersion"
   api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
@@ -39,8 +36,6 @@ dependencies {
 
   implementation project(":chessevolved_model")
   implementation project(":chessevolved_view")
-
-  // Needed to access shared classes like DTO
   implementation project(":chessevolved_shared")
 
   // Testing with kotlin.test and JUnit

@@ -10,13 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.HighlightComponent
-import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.PlayerColorComponent
-import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.TextureRegionComponent
-import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.components.WeatherEventComponent
+import io.github.chessevolved.data.Position
+import io.github.chessevolved.enums.PlayerColor
+import io.github.chessevolved.enums.WeatherEvent
 import io.github.chessevolved.systems.InputService
 import ktx.actors.onClick
 

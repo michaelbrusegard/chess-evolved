@@ -1,6 +1,7 @@
 package io.github.chessevolved.singletons.supabase
 
-import io.github.chessevolved.shared.SettingsDTO
+import io.github.chessevolved.dtos.LobbyDto
+import io.github.chessevolved.dtos.SettingsDto
 import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
@@ -11,9 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlin.reflect.KFunction1
 
 object SupabaseLobbyHandler {
     /**
@@ -30,21 +29,6 @@ object SupabaseLobbyHandler {
      * Supabase lobby-table name
      */
     private val SUPABASE_LOBBY_TABLE_NAME = "lobbies"
-
-    /**
-     * Type used for lobbies saved in database.
-     */
-    @Serializable
-    data class Lobby(
-        val id: Int,
-        val created_at: String,
-        val lobby_code: String,
-        val second_player: Boolean,
-        val game_started: Boolean,
-        val settings: Map<String, String>,
-    )
-
-    // Taken from https://stackoverflow.com/questions/46943860/idiomatic-way-to-generate-a-random-alphanumeric-string-in-kotlin
 
     /**
      * Generates a random string containing capital letters and numbers.
@@ -64,7 +48,7 @@ object SupabaseLobbyHandler {
      * @return string containing the lobby-code of the lobby created.
      * @throws PostgrestRestException if creating a lobby fails three times.
      */
-    suspend fun createLobby(onEventListener: KFunction1<Lobby, Unit>): String {
+    suspend fun createLobby(onEventListener: (updatedLobby: LobbyDto) -> Unit): String {
         var lobbyCode = getRandomString(LOBBY_CODE_LENGTH)
 
         for (attempts in 1..3) {
@@ -91,7 +75,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun joinLobby(
         lobbyCode: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         val response =
             supabase
@@ -100,12 +84,12 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
         }
-        if (response[0].second_player) {
+        if (response[0].secondPlayer) {
             throw Exception("Lobby is full!")
         }
         addLobbyListener(lobbyCode, onEventListener) // Throws illegalStateException upon already joined lobby
@@ -135,7 +119,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun joinLobbyNoUpdateSecondPlayer(
         lobbyCode: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         val response =
             supabase
@@ -144,12 +128,12 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
         }
-        if (response[0].second_player) {
+        if (response[0].secondPlayer) {
             throw Exception("Lobby is full!")
         }
         addLobbyListener(lobbyCode, onEventListener) // Throws illegalStateException upon already joined lobby
@@ -171,13 +155,13 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
         }
 
-        if (!response[0].second_player) {
+        if (!response[0].secondPlayer) {
             try {
                 supabase.from(SUPABASE_LOBBY_TABLE_NAME).delete {
                     filter {
@@ -228,7 +212,7 @@ object SupabaseLobbyHandler {
      */
     private suspend fun addLobbyListener(
         lobbyCode: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         val channel = SupabaseChannelManager.getOrCreateChannel("lobby_$lobbyCode")
         try {
@@ -243,7 +227,7 @@ object SupabaseLobbyHandler {
             changeFlow
                 .onEach {
                     val updatedRecord = it.record
-                    val lobby = Json.decodeFromString<Lobby>(updatedRecord.toString())
+                    val lobby = Json.decodeFromString<LobbyDto>(updatedRecord.toString())
 
                     onEventListener(lobby)
                 }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
@@ -293,7 +277,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun updateLobbySettings(
         lobbyCode: String,
-        gameSettings: SettingsDTO,
+        gameSettings: SettingsDto,
     ) {
         try {
             val settingsMap =
@@ -324,7 +308,7 @@ object SupabaseLobbyHandler {
      * @return Lobby-object representing the data.
      * @throws IllegalArgumentException if the lobby does not exist.
      */
-    suspend fun getLobbyRow(lobbyCode: String): Lobby {
+    suspend fun getLobbyRow(lobbyCode: String): LobbyDto {
         val response =
             supabase
                 .from(SUPABASE_LOBBY_TABLE_NAME)
@@ -332,7 +316,7 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw IllegalArgumentException("Lobby does not exist.")

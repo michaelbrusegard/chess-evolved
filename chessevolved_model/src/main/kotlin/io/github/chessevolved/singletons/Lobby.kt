@@ -1,12 +1,13 @@
 package io.github.chessevolved.singletons
 
+import com.badlogic.gdx.Gdx
+import io.github.chessevolved.dtos.LobbyDto
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
-import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.Lobby
-import kotlin.reflect.KFunction1
 
 object Lobby {
     private var lobbyId: String? = null
-    private var subscribers = mutableMapOf<String, KFunction1<Lobby, Unit>>()
+    private var subscribers =
+        mutableMapOf<String, (updatedLobby: LobbyDto) -> Unit>()
 
     /**
      * Method to join a lobby.
@@ -14,7 +15,7 @@ object Lobby {
      * @throws Exception if something goes wrong.
      */
     suspend fun joinLobby(lobbyId: String) {
-        println("Lobby: Joining lobby with ID: $lobbyId...")
+        Gdx.app.log("Lobby", "Joining lobby with ID: $lobbyId...")
         try {
             SupabaseLobbyHandler.joinLobby(lobbyId, ::onLobbyRowUpdate)
             this.lobbyId = lobbyId
@@ -32,9 +33,7 @@ object Lobby {
             SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
             SupabaseLobbyHandler.joinLobbyNoUpdateSecondPlayer(lobbyId!!, ::onLobbyRowUpdate)
         } catch (e: Exception) {
-            println(e.message)
-            error(e)
-            // throw e
+            Gdx.app.error("Lobby", "Error when joining rematch lobby: " + e.message)
         }
     }
 
@@ -54,7 +53,7 @@ object Lobby {
         try {
             val lobbyId = SupabaseLobbyHandler.createLobby(::onLobbyRowUpdate)
             this.lobbyId = lobbyId
-            println("Lobby: Creating lobby with ID: $lobbyId...")
+            Gdx.app.log("Lobby", "Creating lobby with ID: $lobbyId...")
         } catch (e: Exception) {
             throw Exception("Problem when creating lobby! " + e.message)
         }
@@ -95,17 +94,7 @@ object Lobby {
         }
     }
 
-    // suspend fun getLobbySettings(): Map<String, String> {
-    //     if (!isInLobby()) {
-    //         throw IllegalStateException("Can't get game settings when not in a lobby!")
-    //     }
-    //     val settingsArray = SupabaseLobbyHandler.getLobbyRow(lobbyId!!).settings
-    //     val settingsMap = mapOf(
-    //         settingsArray
-    //     )
-    // }
-
-    suspend fun getLobby(): Lobby {
+    suspend fun getLobby(): LobbyDto {
         if (!isInLobby()) {
             throw IllegalStateException("Can't retrieve lobby if not in a lobby yet.")
         }
@@ -113,6 +102,7 @@ object Lobby {
             val lobby = SupabaseLobbyHandler.getLobbyRow(lobbyId!!)
             return lobby
         } catch (e: Exception) {
+            Gdx.app.error("Lobby", "Error when trying to fetch lobby: " + e.message)
             throw Exception("Something went wrong trying to fetch lobby: " + e.message)
         }
     }
@@ -132,7 +122,7 @@ object Lobby {
 
     fun getLobbyId(): String? = lobbyId
 
-    private fun onLobbyRowUpdate(lobby: SupabaseLobbyHandler.Lobby) {
+    private fun onLobbyRowUpdate(lobby: LobbyDto) {
         subscribers.forEach {
             it.value.invoke(lobby)
         }
@@ -140,7 +130,7 @@ object Lobby {
 
     fun subscribeToLobbyUpdates(
         subscriberName: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         subscribers.put(subscriberName, onEventListener)
     }
