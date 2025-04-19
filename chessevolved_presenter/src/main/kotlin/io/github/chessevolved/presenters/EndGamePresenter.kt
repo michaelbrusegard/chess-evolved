@@ -28,7 +28,7 @@ class EndGamePresenter(
 
     private fun requestRematch() {
         endGameView.disableRematchButton()
-        endGameView.updateRematchText("Rematch request sent...")
+        endGameView.updateRematchText("Rematch request\nsent...")
         runBlocking {
             launch {
                 Game.askForRematch()
@@ -91,7 +91,7 @@ class EndGamePresenter(
         if (updatedGame.wantRematch) {
             if (!Game.getWantsRematch()) {
                 otherPlayerHasAskedForRematch = true
-                endGameView.updateRematchText("Other player wants a rematch.")
+                endGameView.updateRematchText("Other player\nwants a rematch.")
             }
         }
 
@@ -121,7 +121,7 @@ class EndGamePresenter(
         if (updatedGame.playerDisconnected) {
             otherPlayerLeft = true
             endGameView.disableRematchButton()
-            endGameView.updateRematchText("Other player has left...")
+            endGameView.updateRematchText("Other player\nhas left...")
         }
     }
 }
