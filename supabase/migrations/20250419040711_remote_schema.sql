@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS "public"."lobbies" (
     "lobby_code" "text" NOT NULL,
     "second_player" boolean DEFAULT false NOT NULL,
     "game_started" boolean DEFAULT false NOT NULL,
-    "settings" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL
+    "settings" "jsonb" NOT NULL
 );
 
 
@@ -71,10 +71,9 @@ CREATE TABLE IF NOT EXISTS "public"."games" (
     "id" bigint NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "lobby_code" "text" NOT NULL,
-    "last_move" "text",
     "turn" "public"."color" DEFAULT 'WHITE'::"public"."color" NOT NULL,
-    "board_squares" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
-    "pieces" "jsonb" DEFAULT '[]'::"jsonb" NOT NULL,
+    "board_squares" "jsonb" NOT NULL,
+    "pieces" "jsonb" NOT NULL,
     "player_disconnected" boolean DEFAULT false NOT NULL,
     "want_rematch" boolean DEFAULT false NOT NULL
 );
@@ -122,12 +121,6 @@ ALTER TABLE ONLY "public"."games"
 ALTER TABLE ONLY "public"."games"
     ADD CONSTRAINT "games_lobby_code_fkey" FOREIGN KEY ("lobby_code") REFERENCES "public"."lobbies"("lobby_code");
 
-
-
-ALTER TABLE "public"."games" DISABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."lobbies" DISABLE ROW LEVEL SECURITY;
 
 
 
