@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 object SupabaseGameHandler {
@@ -145,17 +145,14 @@ object SupabaseGameHandler {
             throw Error("Game does not exist!")
         }
 
-        val piecesJson = Json.encodeToString(pieces)
-        val boardSquaresJson = Json.encodeToString(boardSquares)
-
         supabase
             .from("games")
             .update(
                 {
-                    set("pieces", value = piecesJson)
-                    set("board_squares", value = boardSquaresJson)
+                    set("pieces", value = pieces)
+                    set("board_squares", value = boardSquares)
                     set("turn", value = turn.name)
-                    set("last_move", value = "useless value")
+                    set("last_move", value = "this should be removed ")
                 },
             ) {
                 filter {
