@@ -50,17 +50,19 @@ class JoinGameView : IView {
         val backgroundTexture = SkinSetup.assetManager.get("customUI/backgroundTile.png", Texture::class.java)
         backgroundTexture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat)
 
-        val tiledDrawable = TiledDrawable(
-            TextureRegion(
-            backgroundTexture
-        )
-        )
-        val background = Image(tiledDrawable).apply {
-            setSize(1500f, 1500f)
-            setPosition(-10f, -10f)
-            color = Color(1f, 1f, 1f, 0.25f)
-            zIndex = 0
-        }
+        val tiledDrawable =
+            TiledDrawable(
+                TextureRegion(
+                    backgroundTexture,
+                ),
+            )
+        val background =
+            Image(tiledDrawable).apply {
+                setSize(1500f, 1500f)
+                setPosition(-10f, -10f)
+                color = Color(1f, 1f, 1f, 0.25f)
+                zIndex = 0
+            }
 
         stage.addActor(background)
 

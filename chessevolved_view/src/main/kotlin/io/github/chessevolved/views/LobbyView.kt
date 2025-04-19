@@ -9,14 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import io.github.chessevolved.SkinSetup
 import ktx.actors.onClick
 import ktx.graphics.color
-import ktx.scene2d.container
 import ktx.scene2d.image
 import ktx.scene2d.imageButton
 import ktx.scene2d.label
@@ -59,15 +57,19 @@ class LobbyView(
         val backgroundTexture = SkinSetup.assetManager.get("customUI/backgroundTile.png", Texture::class.java)
         backgroundTexture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat)
 
-        val tiledDrawable = TiledDrawable(TextureRegion(
-            backgroundTexture
-        ))
-        val background = Image(tiledDrawable).apply {
-            setSize(1500f, 1500f)
-            setPosition(-10f, -10f)
-            color = Color(1f, 1f, 1f, 0.25f)
-            zIndex = 0
-        }
+        val tiledDrawable =
+            TiledDrawable(
+                TextureRegion(
+                    backgroundTexture,
+                ),
+            )
+        val background =
+            Image(tiledDrawable).apply {
+                setSize(1500f, 1500f)
+                setPosition(-10f, -10f)
+                color = Color(1f, 1f, 1f, 0.25f)
+                zIndex = 0
+            }
 
         stage.addActor(background)
 

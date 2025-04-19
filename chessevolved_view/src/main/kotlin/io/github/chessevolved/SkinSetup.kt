@@ -25,79 +25,110 @@ object SkinSetup {
 
     fun setupSkins() {
         if (!Scene2DSkin.defaultSkin.has("CEtextButtonStyle", TextButtonStyle::class.java)) {
-            val textButtonStyle = TextButtonStyle().apply {
-                up = TextureRegionDrawable(TextureRegion(
-                        assetManager.get("customUI/buttonNormal.png", Texture::class.java)
-                ))
-                down = TextureRegionDrawable(TextureRegion(
-                        assetManager.get("customUI/buttonPressed.png", Texture::class.java)
-                ))
-                over = TextureRegionDrawable(TextureRegion(
-                        assetManager.get("customUI/buttonNormal.png", Texture::class.java)
-                ))
+            val textButtonStyle =
+                TextButtonStyle().apply {
+                    up =
+                        TextureRegionDrawable(
+                            TextureRegion(
+                                assetManager.get("customUI/buttonNormal.png", Texture::class.java),
+                            ),
+                        )
+                    down =
+                        TextureRegionDrawable(
+                            TextureRegion(
+                                assetManager.get("customUI/buttonPressed.png", Texture::class.java),
+                            ),
+                        )
+                    over =
+                        TextureRegionDrawable(
+                            TextureRegion(
+                                assetManager.get("customUI/buttonNormal.png", Texture::class.java),
+                            ),
+                        )
 
-                font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
+                    font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
 
-
-                font.data.setLineHeight(0.5f * font.data.lineHeight)
-            }
+                    font.data.setLineHeight(0.5f * font.data.lineHeight)
+                }
 
             Scene2DSkin.defaultSkin.add("CEtextButtonStyle", textButtonStyle)
         }
 
         if (!Scene2DSkin.defaultSkin.has("CEcopyButtonStyle", ImageButtonStyle::class.java)) {
-            val imageButtonStyle = ImageButtonStyle().apply {
-                up = TextureRegionDrawable(TextureRegion(
-                    assetManager.get("customUI/copySymbol.png", Texture::class.java)
-                ))
-                down = TextureRegionDrawable(TextureRegion(
-                    assetManager.get("customUI/copySymbolPressed.png", Texture::class.java)
-                ))
-            }
+            val imageButtonStyle =
+                ImageButtonStyle().apply {
+                    up =
+                        TextureRegionDrawable(
+                            TextureRegion(
+                                assetManager.get("customUI/copySymbol.png", Texture::class.java),
+                            ),
+                        )
+                    down =
+                        TextureRegionDrawable(
+                            TextureRegion(
+                                assetManager.get("customUI/copySymbolPressed.png", Texture::class.java),
+                            ),
+                        )
+                }
 
             Scene2DSkin.defaultSkin.add("CEcopyButtonStyle", imageButtonStyle)
         }
 
         if (!Scene2DSkin.defaultSkin.has("CElabelStyle", LabelStyle::class.java)) {
-            val labelStyle = LabelStyle().apply {
-                font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
-            }
+            val labelStyle =
+                LabelStyle().apply {
+                    font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
+                }
 
             Scene2DSkin.defaultSkin.add("CElabelStyle", labelStyle)
         }
 
         if (!Scene2DSkin.defaultSkin.has("CEtextFieldStyle", TextFieldStyle::class.java)) {
-            val textFieldStyle = TextFieldStyle().apply {
-                background = TextureRegionDrawable(TextureRegion(
-                    assetManager.get("customUI/textFieldPanel.png", Texture::class.java)
-                ))
-                font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
-                fontColor = Color.BLACK
-                messageFontColor = Color(0.35f, 0.35f, 0.35f, 1f)
-                cursor = TextureRegionDrawable(TextureRegion(
-                    assetManager.get("customUI/textMarker.png", Texture::class.java)
-                ))
-            }
+            val textFieldStyle =
+                TextFieldStyle().apply {
+                    background =
+                        TextureRegionDrawable(
+                            TextureRegion(
+                                assetManager.get("customUI/textFieldPanel.png", Texture::class.java),
+                            ),
+                        )
+                    font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
+                    fontColor = Color.BLACK
+                    messageFontColor = Color(0.35f, 0.35f, 0.35f, 1f)
+                    cursor =
+                        TextureRegionDrawable(
+                            TextureRegion(
+                                assetManager.get("customUI/textMarker.png", Texture::class.java),
+                            ),
+                        )
+                }
 
             Scene2DSkin.defaultSkin.add("CEtextFieldStyle", textFieldStyle)
         }
 
         if (!Scene2DSkin.defaultSkin.has("CEcheckboxStyle", CheckBoxStyle::class.java)) {
-            val checkBoxStyle = CheckBoxStyle().apply {
-                checkboxOff = TextureRegionDrawable(TextureRegion(
-                    assetManager.get("customUI/checkboxUnchecked.png", Texture::class.java)
-                )).apply {
-                    minWidth = 65f
-                    minHeight = 65f
+            val checkBoxStyle =
+                CheckBoxStyle().apply {
+                    checkboxOff =
+                        TextureRegionDrawable(
+                            TextureRegion(
+                                assetManager.get("customUI/checkboxUnchecked.png", Texture::class.java),
+                            ),
+                        ).apply {
+                            minWidth = 65f
+                            minHeight = 65f
+                        }
+                    checkboxOn =
+                        TextureRegionDrawable(
+                            TextureRegion(
+                                assetManager.get("customUI/checkboxChecked.png", Texture::class.java),
+                            ),
+                        ).apply {
+                            minWidth = 65f
+                            minHeight = 65f
+                        }
+                    font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
                 }
-                checkboxOn = TextureRegionDrawable(TextureRegion(
-                    assetManager.get("customUI/checkboxChecked.png", Texture::class.java)
-                )).apply {
-                    minWidth = 65f
-                    minHeight = 65f
-                }
-                font = assetManager.get("customUI/pixeled.fnt", BitmapFont::class.java)
-            }
 
             Scene2DSkin.defaultSkin.add("CEcheckboxStyle", checkBoxStyle)
         }
