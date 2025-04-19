@@ -1,17 +1,22 @@
 package io.github.chessevolved.dtos
 
 import io.github.chessevolved.enums.PlayerColor
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class GameDto(
     val id: Int,
-    val updated_at: String,
-    val lobby_code: String,
-    val last_move: String?,
+    @SerialName("updated_at")
+    val updatedAt: String,
+    @SerialName("lobby_code")
+    val lobbyCode: String,
     val turn: PlayerColor,
     val pieces: List<PieceDto>,
-    val board_squares: List<BoardSquareDto>,
-    val player_disconnected: Boolean,
-    val want_rematch: Boolean,
+    @SerialName("board_squares")
+    val boardSquares: List<BoardSquareDto>,
+    @SerialName("player_disconnected")
+    val playerDisconnected: Boolean,
+    @SerialName("want_rematch")
+    val wantRematch: Boolean,
 )

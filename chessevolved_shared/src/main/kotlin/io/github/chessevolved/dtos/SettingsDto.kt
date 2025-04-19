@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SettingsDto(
-    val fogOfWar: Boolean = false,
-    val boardSize: Int = 8,
+    val fogOfWar: Boolean,
+    val boardSize: Int,
 )

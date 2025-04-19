@@ -319,8 +319,8 @@ class GamePresenter(
     }
 
     private fun onGameStateUpdate(gameDto: io.github.chessevolved.dtos.GameDto) {
-        val pieces = gameDto.pieces ?: return
-        val boardSquares = gameDto.board_squares ?: return
+        val pieces = gameDto.pieces
+        val boardSquares = gameDto.boardSquares
 
         EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
     }

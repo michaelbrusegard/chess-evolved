@@ -48,8 +48,8 @@ class LobbyPresenter(
     }
 
     private fun lobbyUpdateHandler(newLobby: LobbyDto) {
-        lobbyView.setSecondPlayerConnected(newLobby.second_player)
-        lobbyStartedCheck(newLobby.game_started)
+        lobbyView.setSecondPlayerConnected(newLobby.secondPlayer)
+        lobbyStartedCheck(newLobby.gameStarted)
         GameSettings.setGameSettings(newLobby.settings)
     }
 

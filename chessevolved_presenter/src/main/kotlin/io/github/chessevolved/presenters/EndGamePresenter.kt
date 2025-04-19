@@ -19,7 +19,7 @@ class EndGamePresenter(
     private var otherPlayerLeft = false
 
     init {
-        Game.subscribeToGameUpdates(this.toString(), ::onGameRowUpdate)
+        Game.subscribeToGameUpdates(this.toString(), ::onGameUpdate)
         endGameView.endGameStatus = endGameStatus
         endGameView.init()
         endGameView.onReturnToMenuClicked = { returnToMenu() }
@@ -87,8 +87,8 @@ class EndGamePresenter(
         endGameView.setInputProcessor()
     }
 
-    fun onGameRowUpdate(gameRow: GameDto) {
-        if (gameRow.want_rematch) {
+    fun onGameUpdate(updatedGame: GameDto) {
+        if (updatedGame.wantRematch) {
             if (!Game.getWantsRematch()) {
                 otherPlayerHasAskedForRematch = true
                 endGameView.updateRematchText("Other player wants a rematch.")
@@ -96,7 +96,7 @@ class EndGamePresenter(
         }
 
         // If want_rematch gets set back to false, it's an ACK from the other player, accepting the rematch.
-        if (!gameRow.want_rematch && Game.getWantsRematch()) {
+        if (!updatedGame.wantRematch && Game.getWantsRematch()) {
             Gdx.app.postRunnable {
                 // This ensures that the first one to request a rematch doesn't update the lobby-column "second_player". Needed to avoid a full lobby exception.
                 if (otherPlayerHasAskedForRematch) {
@@ -118,7 +118,7 @@ class EndGamePresenter(
             }
         }
 
-        if (gameRow.player_disconnected) {
+        if (updatedGame.playerDisconnected) {
             otherPlayerLeft = true
             endGameView.disableRematchButton()
             endGameView.updateRematchText("Other player has left...")

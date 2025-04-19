@@ -45,7 +45,7 @@ object SupabaseGameHandler {
             throw IllegalArgumentException("Game does not exist.")
         }
 
-        if (response[0].player_disconnected) {
+        if (response[0].playerDisconnected) {
             try {
                 supabase.from(SUPABASE_GAME_TABLE_NAME).delete {
                     filter {
@@ -93,7 +93,7 @@ object SupabaseGameHandler {
                 .from(SUPABASE_GAME_TABLE_NAME)
                 .update(
                     {
-                        set("want_rematch", value = !response[0].want_rematch)
+                        set("want_rematch", value = !response[0].wantRematch)
                     },
                 ) {
                     filter {
@@ -151,8 +151,7 @@ object SupabaseGameHandler {
                 {
                     set("pieces", value = pieces)
                     set("board_squares", value = boardSquares)
-                    set("turn", value = turn.name)
-                    set("last_move", value = "this should be removed ")
+                    set("turn", value = turn)
                 },
             ) {
                 filter {

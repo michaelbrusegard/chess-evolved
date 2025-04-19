@@ -89,7 +89,7 @@ object SupabaseLobbyHandler {
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
         }
-        if (response[0].second_player) {
+        if (response[0].secondPlayer) {
             throw Exception("Lobby is full!")
         }
         addLobbyListener(lobbyCode, onEventListener) // Throws illegalStateException upon already joined lobby
@@ -133,7 +133,7 @@ object SupabaseLobbyHandler {
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
         }
-        if (response[0].second_player) {
+        if (response[0].secondPlayer) {
             throw Exception("Lobby is full!")
         }
         addLobbyListener(lobbyCode, onEventListener) // Throws illegalStateException upon already joined lobby
@@ -161,7 +161,7 @@ object SupabaseLobbyHandler {
             throw Exception("Lobby does not exist.")
         }
 
-        if (!response[0].second_player) {
+        if (!response[0].secondPlayer) {
             try {
                 supabase.from(SUPABASE_LOBBY_TABLE_NAME).delete {
                     filter {
