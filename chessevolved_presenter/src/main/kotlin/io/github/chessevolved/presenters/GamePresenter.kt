@@ -96,9 +96,7 @@ class GamePresenter(
         loadRequiredAssets()
         assetManager.finishLoading()
 
-        val fowTexture = assetManager.get("board/fow.png", Texture::class.java)
-
-        fowRenderingSystem = FowRenderingSystem(gameBatch, fowTexture, isFowEnabled)
+        fowRenderingSystem = FowRenderingSystem(gameBatch, assetManager)
         engine.addSystem(fowRenderingSystem)
 
         visualEffectSystem.initializeAnimations()
@@ -153,7 +151,6 @@ class GamePresenter(
                     WeatherEvent.NONE,
                     tileColor,
                     gameStage,
-                    isFowEnabled,
                 )
             }
         }

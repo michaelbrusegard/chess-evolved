@@ -18,6 +18,7 @@ import io.github.chessevolved.components.WeatherEventComponent
 import io.github.chessevolved.data.Position
 import io.github.chessevolved.enums.PlayerColor
 import io.github.chessevolved.enums.WeatherEvent
+import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.systems.InputService
 import ktx.actors.onClick
 
@@ -26,6 +27,7 @@ class BoardSquareFactory(
     private val assetManager: AssetManager,
 ) {
     private val inputService: InputService = InputService()
+    private val isFowEnabled = GameSettings.isFOWEnabled()
 
     private fun getBoardSquareTextureRegion(playerColor: PlayerColor): TextureRegion {
         val colorStr = playerColor.name.lowercase()
@@ -59,7 +61,6 @@ class BoardSquareFactory(
         weatherEvent: WeatherEvent,
         playerColor: PlayerColor,
         stage: Stage,
-        isFowEnabled: Boolean,
     ): Entity =
         Entity().apply {
             add(PositionComponent(position))

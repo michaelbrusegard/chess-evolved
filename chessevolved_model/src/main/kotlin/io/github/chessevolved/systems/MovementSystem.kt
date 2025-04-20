@@ -11,7 +11,6 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.data.Position
-import io.github.chessevolved.singletons.EcsEngine
 
 class MovementSystem(
     private val onTurnComplete: () -> Unit,
@@ -23,7 +22,7 @@ class MovementSystem(
                 MovementIntentComponent::class.java,
             ).get(),
     ) {
-    private val engine = EcsEngine
+    private val boardFamily = Family.all(PositionComponent::class.java, FowComponent::class.java).get()
 
     override fun processEntity(
         entity: Entity?,

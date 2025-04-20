@@ -3,6 +3,7 @@ package io.github.chessevolved.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.components.FowComponent
@@ -11,11 +12,13 @@ import io.github.chessevolved.singletons.GameSettings
 
 class FowRenderingSystem(
     private val batch: SpriteBatch,
-    private val texture: Texture,
-    private val isFowEnabled: Boolean,
+    private val assetManager: AssetManager,
 ) : IteratingSystem(
         Family.all(PositionComponent::class.java, FowComponent::class.java).get(),
     ) {
+    private val isFowEnabled = GameSettings.isFOWEnabled()
+    private val fowTexture = assetManager.get("board/fow.png", Texture::class.java)
+
     override fun processEntity(
         entity: Entity,
         deltaTime: Float,
@@ -28,7 +31,7 @@ class FowRenderingSystem(
         if (position != null && fow != null) {
             if (fow.showFog && (position.position.y >= (GameSettings.getBoardSize() + 1) / 2)) {
                 batch.draw(
-                    texture,
+                    fowTexture,
                     position.position.x.toFloat(),
                     position.position.y.toFloat(),
                     1f,
