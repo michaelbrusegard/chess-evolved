@@ -11,10 +11,15 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.components.AbilityCardComponent
+import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.SelectionComponent
+import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.data.Position
+import io.github.chessevolved.entities.AbilityItemFactory
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
+import io.github.chessevolved.enums.AbilityType
 import io.github.chessevolved.enums.PieceType
 import io.github.chessevolved.enums.PlayerColor
 import io.github.chessevolved.enums.WeatherEvent
@@ -23,11 +28,11 @@ import io.github.chessevolved.singletons.EcsEntityMapper
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Game.subscribeToGameUpdates
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
-import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.systems.AbilitySystem
 import io.github.chessevolved.systems.CaptureSystem
 import io.github.chessevolved.systems.FowRenderingSystem
+import io.github.chessevolved.systems.InputService
 import io.github.chessevolved.systems.InputSystem
 import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
@@ -46,12 +51,16 @@ class GamePresenter(
 
     private val pieceFactory = PieceFactory(engine, assetManager)
     private val boardSquareFactory = BoardSquareFactory(engine, assetManager)
+    private val abilityItemFactory = AbilityItemFactory(engine, assetManager)
 
     private val gameCamera = OrthographicCamera()
+    private val gameUICamera = OrthographicCamera()
     private val boardWorldSize = 8
 
     private val gameViewport: Viewport =
         FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
+    private val gameUIViewport: Viewport =
+        FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), gameUICamera)
     private lateinit var gameUIView: GameUIView
     private lateinit var gameBoardView: GameView
     private val gameBatch: SpriteBatch = SpriteBatch()
@@ -63,11 +72,11 @@ class GamePresenter(
     private val selectionListener: SelectionEntityListener
     private val captureSystem: CaptureSystem
     private val inputSystem: InputSystem
+    private val inputService = InputService()
     private val abilitySystem: AbilitySystem
     private val visualEffectSystem: VisualEffectSystem
 
     private var navigatingToEndGame = false
-    private val isFowEnabled = GameSettings.isFOWEnabled()
 
     init {
         setupGameView()
@@ -104,6 +113,10 @@ class GamePresenter(
         setupBoard()
 
         resize(Gdx.graphics.width, Gdx.graphics.height)
+
+        val testAbilityCard = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
+        AbilityCardComponent.mapper.get(testAbilityCard).isInInventory = true
+
         subscribeToGameUpdates(this.toString(), this::onGameStateUpdate)
     }
 
@@ -120,6 +133,11 @@ class GamePresenter(
                 assetManager.load(filename, Texture::class.java)
             }
         }
+
+        AbilityType.entries.forEach { ability ->
+            val abilityName = ability.name.lowercase()
+            assetManager.load("abilities/$abilityName-card.png", Texture::class.java)
+        }
     }
 
     private fun setupGameView() {
@@ -129,7 +147,8 @@ class GamePresenter(
             }
         }
 
-        gameUIView = GameUIView(gameViewport, gameCamera)
+        // TODO: Pass in if the player is the white player or not.
+        gameUIView = GameUIView(gameUIViewport, true, ::onSelectAbilityCardButtonClicked)
         gameUIView.init()
 
         gameBoardView = GameView(gameUIView.getStage(), gameViewport)
@@ -137,8 +156,10 @@ class GamePresenter(
 
         gameStage = gameBoardView.getStage()
 
-        gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
+        gameCamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 1f)
+        gameUICamera.position.set(boardWorldSize / 2f, boardWorldSize / 2f, 0f)
         gameCamera.update()
+        gameUICamera.update()
     }
 
     private fun setupBoard() {
@@ -263,13 +284,17 @@ class GamePresenter(
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         gameViewport.apply()
+        gameCamera.update()
         gameBatch.projectionMatrix = gameCamera.combined
 
         gameBatch.begin()
         engine.update(Gdx.graphics.deltaTime)
         gameBatch.end()
 
-        gameBoardView.render()
+        // gameBoardView.render()
+
+        updateAbilityCardInventoryView()
+        gameUIViewport.apply()
         gameUIView.render()
     }
 
@@ -277,8 +302,10 @@ class GamePresenter(
         width: Int,
         height: Int,
     ) {
-        gameViewport.update(width, height, false)
+        gameViewport.update(width, height, true)
+        gameUIViewport.update(width, height, false)
         gameBoardView.resize(width, height)
+        gameUIView.resize(width, height)
     }
 
     override fun dispose() {
@@ -320,6 +347,80 @@ class GamePresenter(
                 }
             }
         }
+        AbilityType.entries.forEach { ability ->
+            val abilityName = ability.name.lowercase()
+            val filename = "abilities/$abilityName-card.png"
+            if (assetManager.isLoaded(filename)) {
+                assetManager.unload(filename)
+            }
+        }
+    }
+
+    private fun updateAbilityCardInventoryView() {
+        // Update if abilityPickPrompt should be showing or not.
+        val allAbilityCards = EcsEngine.getEntitiesFor(Family.all(AbilityCardComponent::class.java).get())
+        val abilityCardsNotInInventory =
+            allAbilityCards.filter {
+                !AbilityCardComponent.mapper.get(it).isInInventory
+            }
+
+        if (abilityCardsNotInInventory.isNotEmpty()) {
+            val abilityCards =
+                abilityCardsNotInInventory.associateBy {
+                    GameUIView.AbilityCardInformation(
+                        TextureRegionComponent.mapper
+                            .get(it)
+                            .region
+                            ?.texture,
+                        AbilityCardComponent.mapper.get(it).id,
+                    )
+                }
+            gameUIView.promptPickAbility(abilityCards.keys, ::onAbilityCardClicked)
+        } else {
+            gameUIView.hidePromptPickAbility()
+        }
+
+        // Update if any new cards have appeared/disappeared from inventory.
+        val abilityCardsInInventory =
+            allAbilityCards.filter {
+                AbilityCardComponent.mapper.get(it).isInInventory
+            }
+
+        val abilityCards =
+            abilityCardsInInventory.associateBy {
+                GameUIView.AbilityCardInformation(
+                    TextureRegionComponent.mapper
+                        .get(it)
+                        .region
+                        ?.texture,
+                    AbilityCardComponent.mapper.get(it).id,
+                )
+            }
+
+        gameUIView.updateCardsInInventory(abilityCards.keys, ::onAbilityCardClicked)
+
+        // Update if a card has been selected or deselected.
+        val selectedAbilityCardEntity =
+            EcsEngine.getEntitiesFor(Family.all(AbilityCardComponent::class.java, SelectionComponent::class.java).get()).firstOrNull()
+        if (selectedAbilityCardEntity != null) {
+            gameUIView.selectCardFromInventory(
+                AbilityComponent.mapper
+                    .get(selectedAbilityCardEntity)
+                    .ability
+                    .abilityDescription,
+                AbilityCardComponent.mapper.get(selectedAbilityCardEntity).id,
+            )
+        } else {
+            gameUIView.selectCardFromInventory("", -1)
+        }
+    }
+
+    fun onAbilityCardClicked(idOfAbilityClicked: Int) {
+        inputService.clickAbilityCardWithId(idOfAbilityClicked)
+    }
+
+    fun onSelectAbilityCardButtonClicked() {
+        inputService.confirmAbilityChoice()
     }
 
     override fun setInputProcessor() {
