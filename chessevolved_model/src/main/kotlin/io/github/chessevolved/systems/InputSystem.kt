@@ -36,16 +36,25 @@ class InputSystem :
 
     private fun handlePieceClicked(piece: Entity) {
         val selectionComponent = piece.getComponent(SelectionComponent::class.java)
-        val selectedPiece = engine.getEntitiesFor(Family.all(SelectionComponent::class.java).get()).firstOrNull()
+        val selectedEntity = engine.getEntitiesFor(Family.all(SelectionComponent::class.java).get()).firstOrNull()
         val canBeCapturedComponent = piece.getComponent(CanBeCapturedComponent::class.java)
 
         if (selectionComponent != null) {
             piece.remove(SelectionComponent::class.java)
-        } else if (selectedPiece != null && canBeCapturedComponent != null) {
+        } else if (selectedEntity != null && canBeCapturedComponent != null) {
             piece.add(CapturedComponent())
         } else {
-            selectedPiece?.remove(SelectionComponent::class.java)
-            piece.add(SelectionComponent())
+            if (selectedEntity != null &&
+                AbilityCardComponent.mapper.get(selectedEntity) != null &&
+                AbilityCardComponent.mapper.get(selectedEntity).isInInventory
+            ) {
+                // TODO: Add logic for applying ability to piece
+                println("Ability got applied to piece!")
+                selectedEntity.removeAll() // Remove abilityCard-entity from the game.
+            } else {
+                selectedEntity?.remove(SelectionComponent::class.java)
+                piece.add(SelectionComponent())
+            }
         }
     }
 
@@ -59,8 +68,16 @@ class InputSystem :
     }
 
     private fun handleAbilityCardClicked(abilityCard: Entity) {
-        println("Ability card clicked")
-        // TODO: Give selected component, de-select all other ability-cards, set highlightComponent to white (selected color)
+        val selectionComponent = SelectionComponent.mapper.get(abilityCard)
+        val alreadySelectedEntity = engine.getEntitiesFor(Family.all(SelectionComponent::class.java).get()).firstOrNull()
+        // val abilityCardComponent = AbilityCardComponent.mapper.get(abilityCard)
+
+        if (selectionComponent != null) {
+            abilityCard.remove(SelectionComponent::class.java)
+        } else {
+            alreadySelectedEntity?.remove(SelectionComponent::class.java)
+            abilityCard.add(SelectionComponent())
+        }
     }
 }
 
@@ -90,5 +107,24 @@ class InputService {
                 .find { AbilityCardComponent.mapper.get(it).id == abilityCardId }
 
         entity?.add(ClickEventComponent())
+    }
+
+    fun confirmAbilityChoice() {
+        val entityWithSelectionComponent =
+            ECSEngine.getEntitiesFor(Family.all(SelectionComponent::class.java).get()).firstOrNull() ?: return
+        val abilityCardComponent = AbilityCardComponent.mapper.get(entityWithSelectionComponent) ?: return
+        if (abilityCardComponent.isInInventory) return
+
+        abilityCardComponent.isInInventory = true
+        entityWithSelectionComponent.remove(SelectionComponent::class.java)
+
+        // Remove all other not-in-inventory cards
+        ECSEngine
+            .getEntitiesFor(Family.all(AbilityCardComponent::class.java).get())
+            .filter {
+                !AbilityCardComponent.mapper.get(it).isInInventory
+            }.forEach {
+                it.removeAll()
+            }
     }
 }

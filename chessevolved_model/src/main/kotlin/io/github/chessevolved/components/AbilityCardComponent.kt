@@ -13,5 +13,5 @@ class AbilityCardComponent : Component {
     }
 
     val id = CurrentCardIdCounter.count++
-    var selected = false
+    var isInInventory = false
 }

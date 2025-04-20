@@ -2,20 +2,23 @@ package io.github.chessevolved.views
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.Viewport
 import ktx.actors.onClick
-import ktx.scene2d.image
 import ktx.scene2d.imageButton
 import ktx.scene2d.label
 import ktx.scene2d.scene2d
 import ktx.scene2d.table
+import ktx.scene2d.textButton
 import ktx.scene2d.textField
 import kotlin.math.min
 
@@ -25,17 +28,26 @@ class GameUIView(
      */
     private val gameViewport: Viewport,
     private val isWhitePlayer: Boolean,
+    private val onPickAbilityCardButtonClicked: () -> Unit,
 ) : IView {
     private lateinit var stage: Stage
     private val blackColor = Color(0.37f, 0.5f, 0.6f, 0.8f)
     private val whiteColor = Color(1f, 1f, 1f, 0.8f)
-    private var amountOfAbilityCards = 0
-    private var sizeOfAbilityCards = min(100, (Gdx.graphics.width - 10) / (amountOfAbilityCards + 1))
     private val abilityCards = HashMap<Int, ImageButton>()
+    private var sizeOfAbilityCards = min(100, (Gdx.graphics.width - 10) / (abilityCards.size + 1))
+    private var promptedAmountOfPickableAbilities = 0
     private lateinit var abilityCardInventory: Table
     private lateinit var abilityPickerWindow: Table
     private lateinit var blackTimer: TextField
     private lateinit var whiteTimer: TextField
+    private lateinit var abilityDescriptionLabel: Label
+    private lateinit var abilityInfoTable: Table
+    private lateinit var pickAbilityButton: TextButton
+
+    data class AbilityCardInformation(
+        val texture: Texture? = Texture(Gdx.files.internal("pieces/pawn-white.png")),
+        val id: Int,
+    )
 
     override fun init() {
         stage = Stage(gameViewport)
@@ -52,14 +64,35 @@ class GameUIView(
                         color = blackColor
                         isDisabled = true
                     }
+                row()
             }
+
+        val bgPixmap = Pixmap(1, 1, Pixmap.Format.RGB565)
+        bgPixmap.setColor(Color.WHITE)
+        bgPixmap.fill()
+        val textureRegionDrawableBg = TextureRegionDrawable(TextureRegion(Texture(bgPixmap)))
+
+        abilityInfoTable =
+            scene2d.table {
+                color = blackColor
+                label("Ability Information:") {
+                    setAlignment(1)
+                }.cell(growX = true, colspan = 2)
+                row()
+                abilityDescriptionLabel =
+                    label("") {
+                        wrap = true
+                        setAlignment(1)
+                    }.cell(growX = true, colspan = 2)
+                setBackground(textureRegionDrawableBg)
+            }
+
+        bgPixmap.dispose()
 
         abilityPickerWindow =
             scene2d.table {
                 defaults().width(100f).height(100f).pad(4f)
-                imageButton()
-                imageButton()
-                imageButton()
+                isVisible = false
             }
 
         abilityCardInventory =
@@ -87,15 +120,30 @@ class GameUIView(
             scene2d.table {
                 // setDebug(true, true)
                 setFillParent(true)
-                add(blackInfoBox).growX().expandY().top()
+                add(blackInfoBox)
+                    .growX()
+                    .top()
+                    .padBottom(10f)
                 row()
-                add(abilityPickerWindow.bottom().padBottom(150f)).expandY().height(500f)
+                add(abilityInfoTable.top())
+                    .growX()
+                    .expandY()
+                    .top()
+                    .height(100f)
+                row()
+                add(abilityPickerWindow).height(200f)
+                row()
+                pickAbilityButton =
+                    textButton("Select") {
+                        onClick { onPickAbilityCardButtonClicked() }
+                    }.cell(padTop = -10f)
                 row()
                 add(abilityCardInventory)
                     .growX()
                     .growY()
                     .expandY()
                     .bottom()
+                    .height(120f)
                 row()
                 add(whiteInfoBox).growX()
             }
@@ -103,57 +151,67 @@ class GameUIView(
         stage.addActor(root)
     }
 
-    data class ThreeAbilities(
-        val ability1Texture: Texture,
-        val ability2Texture: Texture,
-        val ability3Texture: Texture,
-        val onAbilityPickedListener: (abilityPicked: Int) -> Unit,
-    )
-
-    fun promptPickAbility(abilities: ThreeAbilities) {
+    fun promptPickAbility(
+        abilityCards: Set<AbilityCardInformation>,
+        onAbilityPickedListener: (idOfAbilityClicked: Int) -> Unit,
+    ) {
+        if (promptedAmountOfPickableAbilities == abilityCards.size) return
+        promptedAmountOfPickableAbilities = abilityCards.size
         abilityPickerWindow.reset()
         abilityPickerWindow.isVisible = true
-        abilityPickerWindow.add(
-            scene2d.imageButton { onClick { onAbilityPicked(abilities.onAbilityPickedListener, 1) } },
-        )
-        abilityPickerWindow.add(
-            scene2d.imageButton { onClick { onAbilityPicked(abilities.onAbilityPickedListener, 2) } },
-        )
-        abilityPickerWindow.add(
-            scene2d.imageButton { onClick { onAbilityPicked(abilities.onAbilityPickedListener, 3) } },
-        )
+        pickAbilityButton.isVisible = true
+        abilityCards.forEach {
+            val id = it.id
+            val texture = it.texture
+            abilityPickerWindow.add(
+                scene2d.imageButton {
+                    onClick { onAbilityPickedListener(id) }
+                    style.imageUp = TextureRegionDrawable(TextureRegion(texture))
+                    style.imageDown = TextureRegionDrawable(TextureRegion(texture))
+                },
+            )
+        }
     }
 
-    private fun onAbilityPicked(
-        onAbilityPickedListener: (abilityPicked: Int) -> Unit,
-        abilityPicked: Int,
-    ) {
+    fun hidePromptPickAbility() {
+        if (!abilityPickerWindow.isVisible) return
+        promptedAmountOfPickableAbilities = 0
         abilityPickerWindow.isVisible = false
-        onAbilityPickedListener.invoke(abilityPicked)
+        pickAbilityButton.isVisible = false
     }
 
-    /**
-     * @param abilityId corresponds to the id of the ability, not the ability-type. abilityId will be used
-     * to remove the ability from the inventory as well.
-     */
-    fun addAbilityCardToInventory(
-        abilityTexture: Texture,
+    fun updateCardsInInventory(
+        abilityCards: Set<AbilityCardInformation>,
         onAbilityUsed: (abilityId: Int) -> Unit,
-        abilityId: Int,
     ) {
-        amountOfAbilityCards++
-        sizeOfAbilityCards = min(100, (Gdx.graphics.width - 10) / amountOfAbilityCards + 1)
+        // Avoid updating inventory if inventory haven't lost/gained cards.
+        if (abilityCards.size == this.abilityCards.size) return
 
-        var abilityCard =
+        abilityCardInventory.clear()
+        this.abilityCards.clear()
+        abilityCards.forEach {
+            addAbilityCardToInventory(it, onAbilityUsed)
+        }
+    }
+
+    private fun addAbilityCardToInventory(
+        abilityCardInformation: AbilityCardInformation,
+        onAbilityUsed: (idOfAbilityClicked: Int) -> Unit,
+    ) {
+        sizeOfAbilityCards = min(100, (Gdx.graphics.width - 10) / (abilityCards.size + 1))
+
+        val abilityCard =
             scene2d.imageButton {
-                image(TextureRegionDrawable(TextureRegion(abilityTexture)))
+                // TODO: Make image fill imageButton
+                style.imageUp = TextureRegionDrawable(TextureRegion(abilityCardInformation.texture))
+                style.imageDown = TextureRegionDrawable(TextureRegion(abilityCardInformation.texture))
                 onClick {
-                    onAbilityUsed(abilityId)
+                    onAbilityUsed(abilityCardInformation.id)
                 }
             }
         abilityCardInventory.add(abilityCard)
 
-        abilityCards[abilityId] = abilityCard
+        abilityCards[abilityCardInformation.id] = abilityCard
 
         abilityCardInventory.cells.forEach {
             if (it.expandY != 1) {
@@ -163,8 +221,20 @@ class GameUIView(
         // abilityCardInventory.defaults().width(sizeOfAbilityCards.toFloat()).height(sizeOfAbilityCards.toFloat())
     }
 
-    fun removeAbilityCardFromInventory(abilityId: Int) {
-        abilityCards[abilityId]?.remove()
+    fun selectCardFromInventory(
+        abilityInformation: String,
+        abilityCardId: Int,
+    ) {
+        abilityDescriptionLabel.setText(abilityInformation)
+        abilityInfoTable.isVisible = abilityInformation != ""
+
+        abilityCards.forEach {
+            it.value.width = sizeOfAbilityCards.toFloat()
+            it.value.height = sizeOfAbilityCards.toFloat()
+        }
+
+        abilityCards[abilityCardId]?.width = sizeOfAbilityCards.toFloat() + 20f
+        abilityCards[abilityCardId]?.height = sizeOfAbilityCards.toFloat() + 20f
     }
 
     fun updateWhiteTimer(time: Int) {

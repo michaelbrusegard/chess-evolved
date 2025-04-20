@@ -11,11 +11,16 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
+import io.github.chessevolved.components.AbilityCardComponent
+import io.github.chessevolved.components.AbilityComponent
+import io.github.chessevolved.components.AbilityType
 import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.SelectionComponent
+import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.components.WeatherEvent
+import io.github.chessevolved.entities.AbilityItemFactory
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
 import io.github.chessevolved.singletons.ECSEngine
@@ -36,6 +41,7 @@ class GamePresenter(
 
     private val pieceFactory = PieceFactory(engine, assetManager)
     private val boardSquareFactory = BoardSquareFactory(engine, assetManager)
+    private val abilityItemFactory = AbilityItemFactory(engine, assetManager)
 
     private val gameCamera = OrthographicCamera()
     private val gameUICamera = OrthographicCamera()
@@ -84,8 +90,11 @@ class GamePresenter(
         resize(Gdx.graphics.width, Gdx.graphics.height)
 
         // TODO: Remove after testing ability card UI
-        val copyIconTexture = Texture(Gdx.files.internal("icons/copy-icon.png"))
-        gameUIView.addAbilityCardToInventory(copyIconTexture, ::onAbilityCardUsed, 1)
+        val testAbilityCard = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
+        AbilityCardComponent.mapper.get(testAbilityCard).isInInventory = true
+        val testAbilityCard2 = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
+        val testAbilityCard3 = abilityItemFactory.createAbilityItem(AbilityType.SWAP)
+        val testAbilityCard4 = abilityItemFactory.createAbilityItem(AbilityType.NEW_MOVEMENT)
     }
 
     private fun loadRequiredAssets() {
@@ -100,11 +109,16 @@ class GamePresenter(
                 assetManager.load(filename, Texture::class.java)
             }
         }
+
+        AbilityType.entries.forEach { ability ->
+            val abilityName = ability.name.lowercase()
+            assetManager.load("abilities/$abilityName-card.png", Texture::class.java)
+        }
     }
 
     private fun setupGameView() {
         // TODO: Pass in if the player is the white player or not.
-        gameUIView = GameUIView(gameUIViewport, true)
+        gameUIView = GameUIView(gameUIViewport, true, ::onSelectAbilityCardButtonClicked)
         gameUIView.init()
 
         gameBoardView = GameView(gameUIView.getStage(), gameViewport)
@@ -239,6 +253,7 @@ class GamePresenter(
 
         // gameBoardView.render()
 
+        updateAbilityCardInventoryView()
         gameUIViewport.apply()
         gameUIView.render()
     }
@@ -279,11 +294,80 @@ class GamePresenter(
                 }
             }
         }
+        AbilityType.entries.forEach { ability ->
+            val abilityName = ability.name.lowercase()
+            val filename = "abilities/$abilityName-card.png"
+            if (assetManager.isLoaded(filename)) {
+                assetManager.unload(filename)
+            }
+        }
     }
 
-    fun onAbilityCardUsed(abilityId: Int) {
-        // TODO: Fetch which ability to use.
-        println("Abilitycard used!")
+    private fun updateAbilityCardInventoryView() {
+        // Update if abilityPickPrompt should be showing or not.
+        val allAbilityCards = ECSEngine.getEntitiesFor(Family.all(AbilityCardComponent::class.java).get())
+        val abilityCardsNotInInventory =
+            allAbilityCards.filter {
+                !AbilityCardComponent.mapper.get(it).isInInventory
+            }
+
+        if (abilityCardsNotInInventory.isNotEmpty()) {
+            val abilityCards =
+                abilityCardsNotInInventory.associateBy {
+                    GameUIView.AbilityCardInformation(
+                        TextureRegionComponent.mapper
+                            .get(it)
+                            .region
+                            ?.texture,
+                        AbilityCardComponent.mapper.get(it).id,
+                    )
+                }
+            gameUIView.promptPickAbility(abilityCards.keys, ::onAbilityCardClicked)
+        } else {
+            gameUIView.hidePromptPickAbility()
+        }
+
+        // Update if any new cards have appeared/disappeared from inventory.
+        val abilityCardsInInventory =
+            allAbilityCards.filter {
+                AbilityCardComponent.mapper.get(it).isInInventory
+            }
+
+        val abilityCards =
+            abilityCardsInInventory.associateBy {
+                GameUIView.AbilityCardInformation(
+                    TextureRegionComponent.mapper
+                        .get(it)
+                        .region
+                        ?.texture,
+                    AbilityCardComponent.mapper.get(it).id,
+                )
+            }
+
+        gameUIView.updateCardsInInventory(abilityCards.keys, ::onAbilityCardClicked)
+
+        // Update if a card has been selected or deselected.
+        val selectedAbilityCardEntity =
+            ECSEngine.getEntitiesFor(Family.all(AbilityCardComponent::class.java, SelectionComponent::class.java).get()).firstOrNull()
+        if (selectedAbilityCardEntity != null) {
+            gameUIView.selectCardFromInventory(
+                AbilityComponent.mapper
+                    .get(selectedAbilityCardEntity)
+                    .abilities[0]
+                    .abilityDescription,
+                AbilityCardComponent.mapper.get(selectedAbilityCardEntity).id,
+            )
+        } else {
+            gameUIView.selectCardFromInventory("", -1)
+        }
+    }
+
+    fun onAbilityCardClicked(idOfAbilityClicked: Int) {
+        inputService.clickAbilityCardWithId(idOfAbilityClicked)
+    }
+
+    fun onSelectAbilityCardButtonClicked() {
+        inputService.confirmAbilityChoice()
     }
 
     override fun setInputProcessor() {

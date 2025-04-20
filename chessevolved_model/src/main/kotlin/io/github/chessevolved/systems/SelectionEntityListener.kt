@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.graphics.Color
+import io.github.chessevolved.components.AbilityCardComponent
 import io.github.chessevolved.components.CanBeCapturedComponent
 import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.MovementRuleComponent
@@ -14,7 +15,9 @@ import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.components.WeatherEventComponent
 import io.github.chessevolved.singletons.ECSEngine
 
-class SelectionEntityListener(private val boardSize: Int) : EntityListener {
+class SelectionEntityListener(
+    private val boardSize: Int,
+) : EntityListener {
     private val moveValidator = MoveValidator()
 
     private val capturableFamily = Family.all(CanBeCapturedComponent::class.java).get()
@@ -27,6 +30,7 @@ class SelectionEntityListener(private val boardSize: Int) : EntityListener {
             .get()
 
     override fun entityAdded(entity: Entity?) {
+        if (AbilityCardComponent.mapper.get(entity) != null) return
         for (piece in ECSEngine.getEntitiesFor(capturableFamily)) {
             piece.remove(CanBeCapturedComponent::class.java)
         }
@@ -51,6 +55,7 @@ class SelectionEntityListener(private val boardSize: Int) : EntityListener {
     }
 
     override fun entityRemoved(entity: Entity?) {
+        if (AbilityCardComponent.mapper.get(entity) != null) return
         entity?.remove(ValidMovesComponent::class.java)
 
         for (piece in ECSEngine.getEntitiesFor(capturableFamily)) {
