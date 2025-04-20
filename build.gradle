@@ -20,6 +20,7 @@ plugins {
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'
+  apply plugin: 'jacoco'
 
   // This allows you to "Build and run using IntelliJ IDEA", an option in IDEA's Settings.
   idea {
