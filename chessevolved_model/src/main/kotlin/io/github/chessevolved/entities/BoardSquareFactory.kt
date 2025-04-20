@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import io.github.chessevolved.components.ActorComponent
+import io.github.chessevolved.components.FowComponent
 import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.PositionComponent
@@ -58,6 +59,7 @@ class BoardSquareFactory(
         weatherEvent: WeatherEvent,
         playerColor: PlayerColor,
         stage: Stage,
+        isFowEnabled: Boolean,
     ): Entity =
         Entity().apply {
             add(PositionComponent(position))
@@ -65,6 +67,7 @@ class BoardSquareFactory(
             add(PlayerColorComponent(playerColor))
             add(TextureRegionComponent(getBoardSquareTextureRegion(playerColor)))
             add(HighlightComponent(Color.WHITE))
+            add(FowComponent(isFowEnabled))
             add(
                 ActorComponent(
                     getBoardActor(position, stage) { clickedPosition -> inputService.clickBoardSquareAtPosition(clickedPosition) },
