@@ -9,7 +9,10 @@ class MockView(
     override fun render() {
     }
 
-    override fun resize(width: Int, height: Int) {
+    override fun resize(
+        width: Int,
+        height: Int,
+    ) {
     }
 
     override fun dispose() {
