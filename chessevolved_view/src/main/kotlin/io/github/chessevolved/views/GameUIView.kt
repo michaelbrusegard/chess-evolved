@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
@@ -97,8 +98,6 @@ class GameUIView(
 
         abilityCardInventory =
             scene2d.table {
-                // This label is here to always keep the height of the abilityCardInventory the same.
-                label("").cell(expandY = true, height = 100f, width = 0f)
                 defaults().width(sizeOfAbilityCards.toFloat()).height(sizeOfAbilityCards.toFloat())
             }
 
@@ -134,7 +133,7 @@ class GameUIView(
                 add(abilityPickerWindow).height(200f)
                 row()
                 pickAbilityButton =
-                    textButton("Select") {
+                    textButton("Select Ability") {
                         onClick { onPickAbilityCardButtonClicked() }
                     }.cell(padTop = -10f)
                 row()
@@ -160,16 +159,22 @@ class GameUIView(
         abilityPickerWindow.reset()
         abilityPickerWindow.isVisible = true
         pickAbilityButton.isVisible = true
+
         abilityCards.forEach {
+            val imgButtonStyle = ImageButtonStyle()
             val id = it.id
             val texture = it.texture
-            abilityPickerWindow.add(
-                scene2d.imageButton {
-                    onClick { onAbilityPickedListener(id) }
-                    style.imageUp = TextureRegionDrawable(TextureRegion(texture))
-                    style.imageDown = TextureRegionDrawable(TextureRegion(texture))
-                },
-            )
+            abilityPickerWindow
+                .add(
+                    scene2d.imageButton {
+                        style = imgButtonStyle
+                        onClick { onAbilityPickedListener(id) }
+                        style.up = TextureRegionDrawable(TextureRegion(texture))
+                        style.down = TextureRegionDrawable(TextureRegion(texture))
+                        style.over = TextureRegionDrawable(TextureRegion(texture)).tint(Color(0.5f, 0.5f, 0.5f, 1f))
+                    },
+                ).width(100f)
+                .height(100f)
         }
     }
 
@@ -200,11 +205,13 @@ class GameUIView(
     ) {
         sizeOfAbilityCards = min(100, (Gdx.graphics.width - 10) / (abilityCards.size + 1))
 
+        val imgButtonStyle = ImageButtonStyle()
         val abilityCard =
             scene2d.imageButton {
-                // TODO: Make image fill imageButton
-                style.imageUp = TextureRegionDrawable(TextureRegion(abilityCardInformation.texture))
-                style.imageDown = TextureRegionDrawable(TextureRegion(abilityCardInformation.texture))
+                style = imgButtonStyle
+                style.up = TextureRegionDrawable(TextureRegion(abilityCardInformation.texture))
+                style.down = TextureRegionDrawable(TextureRegion(abilityCardInformation.texture))
+                style.over = TextureRegionDrawable(TextureRegion(abilityCardInformation.texture)).tint(Color(0.5f, 0.5f, 0.5f, 1f))
                 onClick {
                     onAbilityUsed(abilityCardInformation.id)
                 }
@@ -214,9 +221,7 @@ class GameUIView(
         abilityCards[abilityCardInformation.id] = abilityCard
 
         abilityCardInventory.cells.forEach {
-            if (it.expandY != 1) {
-                it.width(sizeOfAbilityCards.toFloat()).height(sizeOfAbilityCards.toFloat())
-            }
+            it.width(sizeOfAbilityCards.toFloat()).height(sizeOfAbilityCards.toFloat())
         }
         // abilityCardInventory.defaults().width(sizeOfAbilityCards.toFloat()).height(sizeOfAbilityCards.toFloat())
     }

@@ -108,7 +108,8 @@ com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
 		over: round-light-gray
 		checked: round-dark-gray
 		checkedOver: round-light-gray
-	}
+	},
+
 }
 com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
 	default: {
