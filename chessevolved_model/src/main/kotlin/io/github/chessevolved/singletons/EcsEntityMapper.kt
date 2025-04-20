@@ -34,8 +34,14 @@ object EcsEntityMapper {
     fun extractStateFromEngine(engine: Engine): Pair<List<PieceDto>, List<BoardSquareDto>> {
         val pieces =
             engine.getEntitiesFor(pieceFamily).map { entity ->
+                val piecePosition = PositionComponent.mapper.get(entity)
+
                 PieceDto(
-                    position = PositionComponent.mapper.get(entity).position,
+                    position =
+                        Position(
+                            piecePosition.position.x,
+                            GameSettings.getBoardSize() - 1 - piecePosition.position.y,
+                        ),
                     type = PieceTypeComponent.mapper.get(entity).type,
                     color = PlayerColorComponent.mapper.get(entity).color,
                 )
@@ -60,6 +66,7 @@ object EcsEntityMapper {
         receivedBoardSquares: List<BoardSquareDto>,
     ) {
         Gdx.app.log("ECSEntityMapper", "Applying received state to engine...")
+
         try {
             val existingPieceEntities = engine.getEntitiesFor(pieceFamily)
             val existingPiecesMap =

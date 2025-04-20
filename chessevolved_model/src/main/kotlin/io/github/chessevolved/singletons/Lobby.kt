@@ -2,6 +2,7 @@ package io.github.chessevolved.singletons
 
 import com.badlogic.gdx.Gdx
 import io.github.chessevolved.dtos.LobbyDto
+import io.github.chessevolved.enums.PlayerColor
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
 
 object Lobby {
@@ -19,6 +20,10 @@ object Lobby {
         try {
             SupabaseLobbyHandler.joinLobby(lobbyId, ::onLobbyRowUpdate)
             this.lobbyId = lobbyId
+            GameSettings.clientPlayerColor = PlayerColor.BLACK
+            GameSettings.opponentPlayerColor = PlayerColor.WHITE
+            GameSettings.isSecondPlayer = true
+            println("Player Color: ${GameSettings.clientPlayerColor}")
         } catch (e: Exception) {
             throw e
         }
@@ -54,6 +59,10 @@ object Lobby {
             val lobbyId = SupabaseLobbyHandler.createLobby(::onLobbyRowUpdate)
             this.lobbyId = lobbyId
             Gdx.app.log("Lobby", "Creating lobby with ID: $lobbyId...")
+            GameSettings.clientPlayerColor = PlayerColor.WHITE
+            GameSettings.opponentPlayerColor = PlayerColor.BLACK
+            GameSettings.isSecondPlayer = true
+            println("Player Color: ${GameSettings.clientPlayerColor}")
         } catch (e: Exception) {
             throw Exception("Problem when creating lobby! " + e.message)
         }

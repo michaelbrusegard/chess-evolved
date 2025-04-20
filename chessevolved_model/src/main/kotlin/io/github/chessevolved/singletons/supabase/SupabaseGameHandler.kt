@@ -20,6 +20,7 @@ import kotlinx.serialization.json.Json
 object SupabaseGameHandler {
     private val supabase = getSupabaseClient()
     private const val SUPABASE_GAME_TABLE_NAME = "games"
+    var sendingGameState = false
 
     suspend fun joinGame(
         lobbyCode: String,

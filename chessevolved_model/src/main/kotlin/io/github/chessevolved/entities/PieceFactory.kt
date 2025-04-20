@@ -21,6 +21,7 @@ import io.github.chessevolved.data.Position
 import io.github.chessevolved.enums.MoveType
 import io.github.chessevolved.enums.PieceType
 import io.github.chessevolved.enums.PlayerColor
+import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.systems.InputService
 import ktx.actors.onClick
 
@@ -107,7 +108,11 @@ class PieceFactory(
                     getPieceActor(
                         positionProvider = { PositionComponent.mapper.get(this).position },
                         stage,
-                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) },
+                    ) { clickedPosition ->
+                        if (playerColor == GameSettings.clientPlayerColor) {
+                            inputService.clickPieceAtPosition(clickedPosition)
+                        }
+                    },
                 ),
             )
             engine.addEntity(this)
