@@ -49,7 +49,6 @@ class InputSystem :
                 AbilityCardComponent.mapper.get(selectedEntity) != null &&
                 AbilityCardComponent.mapper.get(selectedEntity).isInInventory
             ) {
-                // TODO: Add logic for applying ability to piece
                 if (AbilityComponent.mapper.get(piece) != null) {
                     println("Already has ability")
                 } else {
@@ -87,7 +86,6 @@ class InputSystem :
     private fun handleAbilityCardClicked(abilityCard: Entity) {
         val selectionComponent = SelectionComponent.mapper.get(abilityCard)
         val alreadySelectedEntity = engine.getEntitiesFor(Family.all(SelectionComponent::class.java).get()).firstOrNull()
-        // val abilityCardComponent = AbilityCardComponent.mapper.get(abilityCard)
 
         if (selectionComponent != null) {
             abilityCard.remove(SelectionComponent::class.java)
