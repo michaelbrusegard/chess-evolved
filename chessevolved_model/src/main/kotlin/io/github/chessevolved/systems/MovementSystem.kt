@@ -11,6 +11,7 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.data.Position
+import io.github.chessevolved.singletons.EcsEngine
 
 class MovementSystem(
     private val onTurnComplete: () -> Unit,
@@ -68,9 +69,7 @@ class MovementSystem(
                 val currentPosition = Position(center.x + x, center.y + y)
 
                 val boardSquare =
-                    engine.getEntitiesFor(
-                        Family.all(PositionComponent::class.java, FowComponent::class.java).get(),
-                    ).firstOrNull {
+                    EcsEngine.getEntitiesFor(boardFamily).firstOrNull {
                         PositionComponent.mapper.get(it).position == currentPosition
                     }
 
