@@ -1,0 +1,10 @@
+plugins {
+  id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion"
+}
+
+dependencies {
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  api "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+}

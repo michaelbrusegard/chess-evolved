@@ -2,11 +2,7 @@ package io.github.chessevolved.components
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
-
-enum class PlayerColor {
-    BLACK,
-    WHITE,
-}
+import io.github.chessevolved.enums.PlayerColor
 
 class PlayerColorComponent(
     var color: PlayerColor = PlayerColor.BLACK,

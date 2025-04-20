@@ -13,7 +13,7 @@ import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.components.WeatherEventComponent
-import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.singletons.EcsEngine
 
 class SelectionEntityListener(
     private val boardSize: Int,
@@ -31,7 +31,7 @@ class SelectionEntityListener(
 
     override fun entityAdded(entity: Entity?) {
         if (AbilityCardComponent.mapper.get(entity) != null) return
-        for (piece in ECSEngine.getEntitiesFor(capturableFamily)) {
+        for (piece in EcsEngine.getEntitiesFor(capturableFamily)) {
             piece.remove(CanBeCapturedComponent::class.java)
         }
 
@@ -45,7 +45,7 @@ class SelectionEntityListener(
 
         val availablePositionsSet = availablePositions.toSet()
 
-        for (boardSquare in ECSEngine.getEntitiesFor(boardSquareFamily)) {
+        for (boardSquare in EcsEngine.getEntitiesFor(boardSquareFamily)) {
             if (availablePositionsSet.contains(PositionComponent.mapper.get(boardSquare).position)) {
                 HighlightComponent.mapper.get(boardSquare).color = Color(0.5f, 0.5f, 0.5f, 1f)
             }
@@ -58,11 +58,11 @@ class SelectionEntityListener(
         if (AbilityCardComponent.mapper.get(entity) != null) return
         entity?.remove(ValidMovesComponent::class.java)
 
-        for (piece in ECSEngine.getEntitiesFor(capturableFamily)) {
+        for (piece in EcsEngine.getEntitiesFor(capturableFamily)) {
             piece.remove(CanBeCapturedComponent::class.java)
         }
 
-        for (boardSquare in ECSEngine.getEntitiesFor(boardSquareFamily)) {
+        for (boardSquare in EcsEngine.getEntitiesFor(boardSquareFamily)) {
             HighlightComponent.mapper.get(boardSquare).color = Color.WHITE
         }
     }

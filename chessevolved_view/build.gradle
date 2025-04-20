@@ -37,4 +37,6 @@ dependencies {
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
+
+  implementation project(":chessevolved_shared")
 }

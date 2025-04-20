@@ -3,13 +3,17 @@ package io.github.chessevolved.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import io.github.chessevolved.components.AbilityTriggerComponent
+import io.github.chessevolved.components.ActorComponent
+import io.github.chessevolved.components.BlockedComponent
 import io.github.chessevolved.components.CanBeCapturedComponent
 import io.github.chessevolved.components.CapturedComponent
 import io.github.chessevolved.components.MovementIntentComponent
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
-import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.components.ValidMovesComponent
+import io.github.chessevolved.singletons.EcsEngine
 
 class CaptureSystem : IteratingSystem(
     Family.all(CapturedComponent::class.java).get(),
@@ -19,17 +23,39 @@ class CaptureSystem : IteratingSystem(
         deltaTime: Float,
     ) {
         val capturedPosition = PositionComponent.mapper.get(entity).position
+        val capturedByAbility = CapturedComponent.mapper.get(entity).capturedByAbility
+
+        val capturedBlockedComponent = BlockedComponent.mapper.get(entity)
 
         // Trigger the movementSystem to move the entity that captured.
-        // TODO: do ability logic here for when a piece is captured.
-        ECSEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { piece ->
-            piece.getComponent(SelectionComponent::class.java) != null
-        }?.add(MovementIntentComponent(capturedPosition))
+        val capturingPiece =
+            EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).find { piece ->
+                piece.getComponent(SelectionComponent::class.java) != null
+            }
 
-        ECSEngine.getEntitiesFor(Family.all(CanBeCapturedComponent::class.java).get()).map { piece ->
+        EcsEngine.getEntitiesFor(Family.all(CanBeCapturedComponent::class.java).get()).map { piece ->
             piece.remove(CanBeCapturedComponent::class.java)
         }
 
-        ECSEngine.removeEntity(entity)
+        if (capturedBlockedComponent != null) {
+            // Trigger the ability.
+            entity?.add(AbilityTriggerComponent(capturedPosition, capturedPosition))
+            // entity?.remove(CapturedComponent::class.java)
+            capturingPiece?.remove(SelectionComponent::class.java)
+            capturingPiece?.remove(ValidMovesComponent::class.java)
+            return
+        }
+
+        if (!capturedByAbility) {
+            capturingPiece?.add(MovementIntentComponent(capturedPosition))
+        } else {
+            capturingPiece?.remove(SelectionComponent::class.java)
+            capturingPiece?.remove(ValidMovesComponent::class.java)
+        }
+
+        val actor = ActorComponent.mapper.get(entity).actor
+        actor.remove()
+
+        EcsEngine.removeEntity(entity)
     }
 }

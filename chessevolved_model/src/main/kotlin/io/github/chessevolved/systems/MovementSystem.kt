@@ -4,26 +4,37 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import io.github.chessevolved.components.ActorComponent
+import io.github.chessevolved.components.FowComponent
 import io.github.chessevolved.components.MovementIntentComponent
 import io.github.chessevolved.components.MovementRuleComponent
-import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.ValidMovesComponent
-import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.data.Position
+import io.github.chessevolved.singletons.EcsEngine
 
-class MovementSystem : IteratingSystem(
-    Family.all(
-        SelectionComponent::class.java,
-        ValidMovesComponent::class.java,
-        MovementIntentComponent::class.java,
-    ).get(),
-) {
+class MovementSystem(
+    private val onTurnComplete: () -> Unit,
+) : IteratingSystem(
+        Family
+            .all(
+                SelectionComponent::class.java,
+                ValidMovesComponent::class.java,
+                MovementIntentComponent::class.java,
+            ).get(),
+    ) {
+    private val boardFamily = Family.all(PositionComponent::class.java, FowComponent::class.java).get()
+
     override fun processEntity(
         entity: Entity?,
         deltaTime: Float,
     ) {
-        val availableMoveSet = ValidMovesComponent.mapper.get(entity).validMoves.toSet()
+        val availableMoveSet =
+            ValidMovesComponent
+                .mapper
+                .get(entity)
+                .validMoves
+                .toSet()
         val targetPosition = MovementIntentComponent.mapper.get(entity).targetPosition
 
         if (!availableMoveSet.contains(targetPosition)) {
@@ -43,8 +54,30 @@ class MovementSystem : IteratingSystem(
             }
         }
 
+        clearFow(targetPosition)
+
         entity?.remove(SelectionComponent::class.java)
         entity?.remove(ValidMovesComponent::class.java)
         entity?.remove(MovementIntentComponent::class.java)
+
+        onTurnComplete()
+    }
+
+    private fun clearFow(center: Position) {
+        for (x in -1..1) {
+            for (y in -1..1) {
+                val currentPosition = Position(center.x + x, center.y + y)
+
+                val boardSquare =
+                    EcsEngine.getEntitiesFor(boardFamily).firstOrNull {
+                        PositionComponent.mapper.get(it).position == currentPosition
+                    }
+
+                boardSquare?.let {
+                    val fow = FowComponent.mapper.get(it)
+                    if (fow.showFog) fow.showFog = false
+                }
+            }
+        }
     }
 }

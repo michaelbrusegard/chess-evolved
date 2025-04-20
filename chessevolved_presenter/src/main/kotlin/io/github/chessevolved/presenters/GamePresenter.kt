@@ -21,23 +21,37 @@ import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.AbilityItemFactory
+import io.github.chessevolved.data.Position
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
-import io.github.chessevolved.singletons.ECSEngine
+import io.github.chessevolved.enums.PieceType
+import io.github.chessevolved.enums.PlayerColor
+import io.github.chessevolved.enums.WeatherEvent
+import io.github.chessevolved.singletons.EcsEngine
+import io.github.chessevolved.singletons.EcsEntityMapper
+import io.github.chessevolved.singletons.Game
+import io.github.chessevolved.singletons.Game.subscribeToGameUpdates
+import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
+import io.github.chessevolved.singletons.GameSettings
+import io.github.chessevolved.singletons.Lobby
+import io.github.chessevolved.systems.AbilitySystem
 import io.github.chessevolved.systems.CaptureSystem
-import io.github.chessevolved.systems.InputService
+import io.github.chessevolved.systems.FowRenderingSystem
 import io.github.chessevolved.systems.InputSystem
 import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
 import io.github.chessevolved.systems.SelectionEntityListener
+import io.github.chessevolved.systems.VisualEffectSystem
 import io.github.chessevolved.views.GameUIView
 import io.github.chessevolved.views.GameView
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class GamePresenter(
     private val navigator: Navigator,
     private val assetManager: AssetManager,
 ) : IPresenter {
-    private val engine = ECSEngine
+    private val engine = EcsEngine
 
     private val pieceFactory = PieceFactory(engine, assetManager)
     private val boardSquareFactory = BoardSquareFactory(engine, assetManager)
@@ -58,10 +72,15 @@ class GamePresenter(
 
     private val movementSystem: MovementSystem
     private val renderingSystem: RenderingSystem
+    private val fowRenderingSystem: FowRenderingSystem
     private val selectionListener: SelectionEntityListener
     private val captureSystem: CaptureSystem
     private val inputSystem: InputSystem
-    private val inputService: InputService = InputService()
+    private val abilitySystem: AbilitySystem
+    private val visualEffectSystem: VisualEffectSystem
+
+    private var navigatingToEndGame = false
+    private val isFowEnabled = GameSettings.isFOWEnabled()
 
     init {
         setupGameView()
@@ -69,7 +88,7 @@ class GamePresenter(
         renderingSystem = RenderingSystem(gameBatch)
         engine.addSystem(renderingSystem)
 
-        movementSystem = MovementSystem()
+        movementSystem = MovementSystem(this::onTurnComplete)
         engine.addSystem(movementSystem)
 
         selectionListener = SelectionEntityListener(boardWorldSize)
@@ -81,12 +100,22 @@ class GamePresenter(
         inputSystem = InputSystem()
         engine.addSystem(inputSystem)
 
+        abilitySystem = AbilitySystem()
+        engine.addSystem(abilitySystem)
+
+        visualEffectSystem = VisualEffectSystem(gameBatch, assetManager)
+        engine.addSystem(visualEffectSystem)
+
         loadRequiredAssets()
         assetManager.finishLoading()
 
+        fowRenderingSystem = FowRenderingSystem(gameBatch, assetManager)
+        engine.addSystem(fowRenderingSystem)
+
+        visualEffectSystem.initializeAnimations()
+
         setupBoard()
 
-        // If we do not call this the board will not be displayed
         resize(Gdx.graphics.width, Gdx.graphics.height)
 
         // TODO: Remove after testing ability card UI
@@ -95,11 +124,14 @@ class GamePresenter(
         val testAbilityCard2 = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
         val testAbilityCard3 = abilityItemFactory.createAbilityItem(AbilityType.SWAP)
         val testAbilityCard4 = abilityItemFactory.createAbilityItem(AbilityType.NEW_MOVEMENT)
+        
+        subscribeToGameUpdates(this.toString(), this::onGameStateUpdate)
     }
 
     private fun loadRequiredAssets() {
         assetManager.load("board/black-tile.png", Texture::class.java)
         assetManager.load("board/white-tile.png", Texture::class.java)
+        assetManager.load("board/fow.png", Texture::class.java)
 
         PlayerColor.entries.forEach { color ->
             PieceType.entries.forEach { type ->
@@ -119,6 +151,13 @@ class GamePresenter(
     private fun setupGameView() {
         // TODO: Pass in if the player is the white player or not.
         gameUIView = GameUIView(gameUIViewport, true, ::onSelectAbilityCardButtonClicked)
+        runBlocking {
+            launch {
+                Game.joinGame(Lobby.getLobbyId() ?: throw IllegalStateException("Can't join a game if not in a lobby first!"))
+            }
+        }
+
+        gameUIView = GameUIView(gameViewport, gameCamera)
         gameUIView.init()
 
         gameBoardView = GameView(gameUIView.getStage(), gameViewport)
@@ -142,101 +181,111 @@ class GamePresenter(
                     WeatherEvent.NONE,
                     tileColor,
                     gameStage,
-                ) { clickedPosition -> inputService.clickBoardSquareAtPosition(clickedPosition) }
+                )
             }
         }
 
         val startX: Int = (boardWorldSize / 2) - 4
         for (startPos in startX until startX + 8) {
-            pieceFactory.createPawn(
-                true,
-                Position(startPos, 1),
-                PlayerColor.WHITE,
-                gameStage,
-            ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+            pieceFactory
+                .createPawn(
+                    true,
+                    Position(startPos, 1),
+                    PlayerColor.WHITE,
+                    gameStage,
+                )
 
-            pieceFactory.createPawn(
-                false,
-                Position(startPos, boardWorldSize - 2),
-                PlayerColor.BLACK,
-                gameStage,
-            ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+            pieceFactory
+                .createPawn(
+                    false,
+                    Position(startPos, boardWorldSize - 2),
+                    PlayerColor.BLACK,
+                    gameStage,
+                )
+        }
 
+        val startXLocal: Int = (boardWorldSize / 2) - 4
+        for (startPos in startXLocal until startXLocal + 8) {
             when (startPos) {
-                startX -> {
+                startXLocal -> {
                     for (j in listOf(0, 7)) {
                         pieceFactory.createRook(
-                            Position(startX + j, 0),
+                            Position(startXLocal + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
 
                         pieceFactory.createRook(
-                            Position(startX + j, boardWorldSize - 1),
+                            Position(startXLocal + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
                     }
                 }
-                startX + 1 -> {
+                startXLocal + 1 -> {
                     for (j in listOf(1, 6)) {
                         pieceFactory.createKnight(
-                            Position(startX + j, 0),
+                            Position(startXLocal + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
 
                         pieceFactory.createKnight(
-                            Position(startX + j, boardWorldSize - 1),
+                            Position(startXLocal + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
                     }
                 }
-                startX + 2 -> {
+                startXLocal + 2 -> {
                     for (j in listOf(2, 5)) {
                         pieceFactory.createBishop(
-                            Position(startX + j, 0),
+                            Position(startXLocal + j, 0),
                             PlayerColor.WHITE,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
 
                         pieceFactory.createBishop(
-                            Position(startX + j, boardWorldSize - 1),
+                            Position(startXLocal + j, boardWorldSize - 1),
                             PlayerColor.BLACK,
                             gameStage,
-                        ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                        )
                     }
                 }
-                startX + 3 -> {
+                startXLocal + 3 -> {
                     pieceFactory.createQueen(
                         Position(startPos, 0),
                         PlayerColor.WHITE,
                         gameStage,
-                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                    )
 
                     pieceFactory.createQueen(
                         Position(startPos, boardWorldSize - 1),
                         PlayerColor.BLACK,
                         gameStage,
-                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                    )
                 }
-                startX + 4 -> {
+                startXLocal + 4 -> {
                     pieceFactory.createKing(
                         Position(startPos, 0),
                         PlayerColor.WHITE,
                         gameStage,
-                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                    )
 
                     pieceFactory.createKing(
                         Position(startPos, boardWorldSize - 1),
                         PlayerColor.BLACK,
                         gameStage,
-                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) }
+                    )
                 }
                 else -> {}
             }
         }
+    }
+
+    private fun goToGameOverScreen(didWin: Boolean) {
+        navigatingToEndGame = true
+        navigator.navigateToEndGame(didWin)
     }
 
     override fun render(sb: SpriteBatch) {
@@ -274,6 +323,19 @@ class GamePresenter(
         gameBatch.dispose()
         engine.removeAllEntities()
         unloadAssets()
+        unsubscribeFromGameUpdates(this.toString())
+        if (Game.isInGame() && !navigatingToEndGame) {
+            runBlocking {
+                launch {
+                    try {
+                        Game.leaveGame()
+                        Lobby.leaveLobby()
+                    } catch (e: Exception) {
+                        error("Non fatal error: Problem with calling leaveGame(). Error: " + e.message)
+                    }
+                }
+            }
+        }
     }
 
     private fun unloadAssets() {
@@ -372,5 +434,26 @@ class GamePresenter(
 
     override fun setInputProcessor() {
         gameBoardView.setInputProcessor()
+    }
+
+    private fun onGameStateUpdate(gameDto: io.github.chessevolved.dtos.GameDto) {
+        val pieces = gameDto.pieces
+        val boardSquares = gameDto.boardSquares
+
+        EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
+    }
+
+    private fun onTurnComplete() {
+        runBlocking {
+            launch {
+                val (pieces, boardSquares) = EcsEntityMapper.extractStateFromEngine(engine)
+
+                Game.updateGameState(
+                    Lobby.getLobbyId()!!,
+                    pieces,
+                    boardSquares,
+                )
+            }
+        }
     }
 }

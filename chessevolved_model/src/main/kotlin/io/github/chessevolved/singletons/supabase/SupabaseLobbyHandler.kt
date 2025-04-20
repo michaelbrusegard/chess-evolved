@@ -1,5 +1,7 @@
 package io.github.chessevolved.singletons.supabase
 
+import io.github.chessevolved.dtos.LobbyDto
+import io.github.chessevolved.dtos.SettingsDto
 import io.github.chessevolved.singletons.supabase.SupabaseClient.getSupabaseClient
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
@@ -10,9 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlin.reflect.KFunction1
 
 object SupabaseLobbyHandler {
     /**
@@ -29,22 +29,6 @@ object SupabaseLobbyHandler {
      * Supabase lobby-table name
      */
     private val SUPABASE_LOBBY_TABLE_NAME = "lobbies"
-
-    /**
-     * Type used for lobbies saved in database.
-     */
-    @Serializable
-    data class Lobby(
-        val id: Int,
-        val created_at: String,
-        val lobby_code: String,
-        val second_player: Boolean,
-        val game_started: Boolean,
-        // TODO: Turn this into a settings-type array when implemented
-        val settings: Array<String>,
-    )
-
-    // Taken from https://stackoverflow.com/questions/46943860/idiomatic-way-to-generate-a-random-alphanumeric-string-in-kotlin
 
     /**
      * Generates a random string containing capital letters and numbers.
@@ -64,12 +48,13 @@ object SupabaseLobbyHandler {
      * @return string containing the lobby-code of the lobby created.
      * @throws PostgrestRestException if creating a lobby fails three times.
      */
-    suspend fun createLobby(onEventListener: KFunction1<Lobby, Unit>): String {
+    suspend fun createLobby(onEventListener: (updatedLobby: LobbyDto) -> Unit): String {
         var lobbyCode = getRandomString(LOBBY_CODE_LENGTH)
 
         for (attempts in 1..3) {
             try {
                 supabase.from(SUPABASE_LOBBY_TABLE_NAME).insert(mapOf("lobby_code" to lobbyCode))
+
                 addLobbyListener(lobbyCode, onEventListener)
                 return lobbyCode
             } catch (e: PostgrestRestException) {
@@ -90,7 +75,7 @@ object SupabaseLobbyHandler {
      */
     suspend fun joinLobby(
         lobbyCode: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         val response =
             supabase
@@ -99,12 +84,12 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
         }
-        if (response[0].second_player) {
+        if (response[0].secondPlayer) {
             throw Exception("Lobby is full!")
         }
         addLobbyListener(lobbyCode, onEventListener) // Throws illegalStateException upon already joined lobby
@@ -127,6 +112,34 @@ object SupabaseLobbyHandler {
     }
 
     /**
+     * Method that joins and subscribes to row-level lobby updates without
+     * updating second_player column to true.
+     * @param lobbyCode identifying the lobby
+     * @param onEventListener as the method to be called upon row-updates
+     */
+    suspend fun joinLobbyNoUpdateSecondPlayer(
+        lobbyCode: String,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
+    ) {
+        val response =
+            supabase
+                .from(SUPABASE_LOBBY_TABLE_NAME)
+                .select {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
+                }.decodeList<LobbyDto>()
+
+        if (response.isEmpty()) {
+            throw Exception("Lobby does not exist.")
+        }
+        if (response[0].secondPlayer) {
+            throw Exception("Lobby is full!")
+        }
+        addLobbyListener(lobbyCode, onEventListener) // Throws illegalStateException upon already joined lobby
+    }
+
+    /**
      * Method to leave a lobby, marking the row in supabase as not having a second player anymore,
      * or straight up deleting the row if the second player column is already false.
      * Also unsubscribes from the channel that listens to row-level-changes.
@@ -142,13 +155,13 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw Exception("Lobby does not exist.")
         }
 
-        if (!response[0].second_player) {
+        if (!response[0].secondPlayer) {
             try {
                 supabase.from(SUPABASE_LOBBY_TABLE_NAME).delete {
                     filter {
@@ -182,6 +195,16 @@ object SupabaseLobbyHandler {
     }
 
     /**
+     * Method to leave a lobby without updating the row. Useful for when you want to unsubscribe from row updates.
+     * Typically used in rematches where a lobby will be reused.
+     * @param lobbyCode identifying the lobby
+     * @throws Exception if trying to leave nonexistent channel
+     */
+    suspend fun leaveLobbyNoUpdateSecondPlayer(lobbyCode: String) {
+        SupabaseChannelManager.unsubscribeFromChannel("lobby_$lobbyCode")
+    }
+
+    /**
      * Method that subscribes to row-level-updates on the lobby created/joined
      * @param lobbyCode corresponding to the lobby to subscribe to
      * @param onEventListener corresponding to the method to be called upon row changes
@@ -189,7 +212,7 @@ object SupabaseLobbyHandler {
      */
     private suspend fun addLobbyListener(
         lobbyCode: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         val channel = SupabaseChannelManager.getOrCreateChannel("lobby_$lobbyCode")
         try {
@@ -204,7 +227,7 @@ object SupabaseLobbyHandler {
             changeFlow
                 .onEach {
                     val updatedRecord = it.record
-                    val lobby = Json.decodeFromString<Lobby>(updatedRecord.toString())
+                    val lobby = Json.decodeFromString<LobbyDto>(updatedRecord.toString())
 
                     onEventListener(lobby)
                 }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
@@ -217,29 +240,16 @@ object SupabaseLobbyHandler {
     }
 
     /**
-     * Class used to create a new row in game table.
-     */
-    @Serializable
-    private class InsertGame(
-        val lobby_code: String,
-        val settings: Map<String, String>,
-    )
-
-    /**
      * Method to set the "game_started"-column for the lobby table to true in supabase.
      * Also creates a row in the game table on supabase.
      * @param lobbyCode which is the code of the lobby to start the game for.
-     * @param gameSettings which are the game-settings to use for this game.
      */
-    suspend fun startGame(
-        lobbyCode: String,
-        gameSettings: Map<String, String>,
-    ) {
+    suspend fun startGame(lobbyCode: String) {
         try {
             supabase
                 .from("games")
                 .insert(
-                    InsertGame(lobby_code = lobbyCode, settings = gameSettings),
+                    mapOf("lobby_code" to lobbyCode),
                 )
 
             supabase
@@ -267,14 +277,20 @@ object SupabaseLobbyHandler {
      */
     suspend fun updateLobbySettings(
         lobbyCode: String,
-        gameSettings: Map<String, String>,
+        gameSettings: SettingsDto,
     ) {
         try {
+            val settingsMap =
+                mapOf(
+                    "boardSize" to gameSettings.boardSize.toString(),
+                    "fogOfWar" to gameSettings.fogOfWar.toString(),
+                )
+
             supabase
                 .from(SUPABASE_LOBBY_TABLE_NAME)
                 .update(
                     {
-                        set("settings", value = Json.encodeToString(gameSettings))
+                        set("settings", value = settingsMap)
                     },
                 ) {
                     filter {
@@ -292,7 +308,7 @@ object SupabaseLobbyHandler {
      * @return Lobby-object representing the data.
      * @throws IllegalArgumentException if the lobby does not exist.
      */
-    suspend fun getLobbyRow(lobbyCode: String): Lobby {
+    suspend fun getLobbyRow(lobbyCode: String): LobbyDto {
         val response =
             supabase
                 .from(SUPABASE_LOBBY_TABLE_NAME)
@@ -300,11 +316,30 @@ object SupabaseLobbyHandler {
                     filter {
                         eq("lobby_code", lobbyCode)
                     }
-                }.decodeList<Lobby>()
+                }.decodeList<LobbyDto>()
 
         if (response.isEmpty()) {
             throw IllegalArgumentException("Lobby does not exist.")
         }
         return response[0]
+    }
+
+    suspend fun setupRematchLobby(lobbyCode: String) {
+        try {
+            supabase
+                .from("lobbies")
+                .update(
+                    {
+                        set("game_started", value = false)
+                        set("second_player", value = false)
+                    },
+                ) {
+                    filter {
+                        eq("lobby_code", lobbyCode)
+                    }
+                }
+        } catch (e: Exception) {
+            throw e
+        }
     }
 }

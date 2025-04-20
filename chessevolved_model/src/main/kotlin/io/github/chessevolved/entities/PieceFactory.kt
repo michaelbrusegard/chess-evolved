@@ -9,23 +9,27 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
-import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.HighlightComponent
 import io.github.chessevolved.components.MovementRuleComponent
-import io.github.chessevolved.components.PieceType
 import io.github.chessevolved.components.PieceTypeComponent
-import io.github.chessevolved.components.PlayerColor
 import io.github.chessevolved.components.PlayerColorComponent
-import io.github.chessevolved.components.Position
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.TextureRegionComponent
+import io.github.chessevolved.data.MovementPattern
+import io.github.chessevolved.data.Position
+import io.github.chessevolved.enums.MoveType
+import io.github.chessevolved.enums.PieceType
+import io.github.chessevolved.enums.PlayerColor
+import io.github.chessevolved.systems.InputService
 import ktx.actors.onClick
 
 class PieceFactory(
     private val engine: Engine,
     private val assetManager: AssetManager,
 ) {
+    private val inputService: InputService = InputService()
+
     private val diagonalDirections =
         listOf(
             Vector2(1f, 1f),
@@ -90,14 +94,12 @@ class PieceFactory(
         pieceType: PieceType,
         playerColor: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
         Entity().apply {
             add(PositionComponent(position))
             add(PieceTypeComponent(pieceType))
             add(PlayerColorComponent(playerColor))
             add(MovementRuleComponent())
-            add(AbilityComponent(emptyList()))
             add(TextureRegionComponent(getPieceTextureRegion(pieceType, playerColor)))
             add(HighlightComponent(Color.WHITE))
             add(
@@ -105,8 +107,7 @@ class PieceFactory(
                     getPieceActor(
                         positionProvider = { PositionComponent.mapper.get(this).position },
                         stage,
-                        onClick,
-                    ),
+                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) },
                 ),
             )
             engine.addEntity(this)
@@ -117,8 +118,7 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
-    ) = createPiece(position, PieceType.PAWN, color, stage, onClick).apply {
+    ) = createPiece(position, PieceType.PAWN, color, stage).apply {
         getComponent(MovementRuleComponent::class.java).apply {
             val pawnDirections: List<Vector2>
             val pawnCaptureDirections: List<Vector2>
@@ -134,31 +134,31 @@ class PieceFactory(
             }
 
             addPattern(
-                MovementRuleComponent.MovementPattern(
+                MovementPattern(
                     moveName = "pawnMove",
                     directions = pawnDirections,
                     maxSteps = 1,
-                    moveType = MovementRuleComponent.MoveType.MOVE_ONLY,
+                    moveType = MoveType.MOVE_ONLY,
                 ),
             )
 
             addPattern(
-                MovementRuleComponent.MovementPattern(
+                MovementPattern(
                     moveName = "pawnCapture",
                     directions = pawnCaptureDirections,
                     maxSteps = 1,
-                    moveType = MovementRuleComponent.MoveType.CAPTURE_ONLY,
+                    moveType = MoveType.CAPTURE_ONLY,
                 ),
             )
 
             addPattern(
-                MovementRuleComponent.MovementPattern(
+                MovementPattern(
                     moveName = "pawnStart",
                     directions = pawnStartDirections,
                     maxSteps = 1,
                     isFirstMove = true,
-                    moveType = MovementRuleComponent.MoveType.MOVE_ONLY
-                )
+                    moveType = MoveType.MOVE_ONLY,
+                ),
             )
         }
     }
@@ -167,12 +167,11 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
-        createPiece(position, PieceType.KNIGHT, color, stage, onClick).apply {
+        createPiece(position, PieceType.KNIGHT, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
-                    MovementRuleComponent.MovementPattern(
+                    MovementPattern(
                         moveName = "knightNormal",
                         directions = knightDirections,
                         maxSteps = 1,
@@ -186,12 +185,11 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
-        createPiece(position, PieceType.BISHOP, color, stage, onClick).apply {
+        createPiece(position, PieceType.BISHOP, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
-                    MovementRuleComponent.MovementPattern(
+                    MovementPattern(
                         moveName = "bishopNormal",
                         directions = diagonalDirections,
                     ),
@@ -203,12 +201,11 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
-        createPiece(position, PieceType.ROOK, color, stage, onClick).apply {
+        createPiece(position, PieceType.ROOK, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
-                    MovementRuleComponent.MovementPattern(
+                    MovementPattern(
                         moveName = "rookNormal",
                         directions = straightDirections,
                     ),
@@ -220,12 +217,11 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
-        createPiece(position, PieceType.QUEEN, color, stage, onClick).apply {
+        createPiece(position, PieceType.QUEEN, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
-                    MovementRuleComponent.MovementPattern(
+                    MovementPattern(
                         moveName = "queenNormal",
                         directions = straightDirections + diagonalDirections,
                     ),
@@ -237,12 +233,11 @@ class PieceFactory(
         position: Position,
         color: PlayerColor,
         stage: Stage,
-        onClick: (Position) -> Unit,
     ): Entity =
-        createPiece(position, PieceType.KING, color, stage, onClick).apply {
+        createPiece(position, PieceType.KING, color, stage).apply {
             getComponent(MovementRuleComponent::class.java).apply {
                 addPattern(
-                    MovementRuleComponent.MovementPattern(
+                    MovementPattern(
                         moveName = "kingNormal",
                         directions = straightDirections + diagonalDirections,
                         maxSteps = 1,

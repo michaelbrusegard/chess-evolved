@@ -1,12 +1,13 @@
 package io.github.chessevolved.singletons
 
+import com.badlogic.gdx.Gdx
+import io.github.chessevolved.dtos.LobbyDto
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
-import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler.Lobby
-import kotlin.reflect.KFunction1
 
 object Lobby {
     private var lobbyId: String? = null
-    private var subscribers = mutableMapOf<String, KFunction1<Lobby, Unit>>()
+    private var subscribers =
+        mutableMapOf<String, (updatedLobby: LobbyDto) -> Unit>()
 
     /**
      * Method to join a lobby.
@@ -14,10 +15,35 @@ object Lobby {
      * @throws Exception if something goes wrong.
      */
     suspend fun joinLobby(lobbyId: String) {
-        println("Lobby: Joining lobby with ID: $lobbyId...")
+        Gdx.app.log("Lobby", "Joining lobby with ID: $lobbyId...")
         try {
             SupabaseLobbyHandler.joinLobby(lobbyId, ::onLobbyRowUpdate)
             this.lobbyId = lobbyId
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    suspend fun joinRematchLobbyAsHost() {
+        println("Lobby: Joining rematch-lobby with ID: $lobbyId...")
+        if (!isInLobby()) {
+            throw Exception("Can't rematch when not in a lobby!")
+        }
+        try {
+            SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
+            SupabaseLobbyHandler.joinLobbyNoUpdateSecondPlayer(lobbyId!!, ::onLobbyRowUpdate)
+        } catch (e: Exception) {
+            Gdx.app.error("Lobby", "Error when joining rematch lobby: " + e.message)
+        }
+    }
+
+    suspend fun joinRematchLobbyNonHost() {
+        if (!isInLobby()) {
+            throw Exception("Can't rematch when not in a lobby!")
+        }
+        try {
+            SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
+            SupabaseLobbyHandler.joinLobby(lobbyId!!, ::onLobbyRowUpdate)
         } catch (e: Exception) {
             throw e
         }
@@ -27,6 +53,7 @@ object Lobby {
         try {
             val lobbyId = SupabaseLobbyHandler.createLobby(::onLobbyRowUpdate)
             this.lobbyId = lobbyId
+            Gdx.app.log("Lobby", "Creating lobby with ID: $lobbyId...")
         } catch (e: Exception) {
             throw Exception("Problem when creating lobby! " + e.message)
         }
@@ -38,6 +65,19 @@ object Lobby {
         }
         try {
             SupabaseLobbyHandler.leaveLobby(lobbyId!!)
+            this.lobbyId = null
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    suspend fun leaveLobbyWithoutUpdating() {
+        if (!isInLobby()) {
+            throw Exception("Can't leave lobby when not in a lobby!")
+        }
+        try {
+            SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
+            lobbyId = null
         } catch (e: Exception) {
             throw e
         }
@@ -47,10 +87,14 @@ object Lobby {
         if (!isInLobby()) {
             throw IllegalStateException("Can't update game settings when not in a lobby!")
         }
-        SupabaseLobbyHandler.updateLobbySettings(lobbyId!!, GameSettings.getGameSettings())
+        try {
+            SupabaseLobbyHandler.updateLobbySettings(lobbyId!!, GameSettings.getGameSettings())
+        } catch (e: Exception) {
+            throw Exception("Problem updating lobby settings! " + e.message)
+        }
     }
 
-    suspend fun getLobby(): Lobby {
+    suspend fun getLobby(): LobbyDto {
         if (!isInLobby()) {
             throw IllegalStateException("Can't retrieve lobby if not in a lobby yet.")
         }
@@ -58,6 +102,7 @@ object Lobby {
             val lobby = SupabaseLobbyHandler.getLobbyRow(lobbyId!!)
             return lobby
         } catch (e: Exception) {
+            Gdx.app.error("Lobby", "Error when trying to fetch lobby: " + e.message)
             throw Exception("Something went wrong trying to fetch lobby: " + e.message)
         }
     }
@@ -67,9 +112,9 @@ object Lobby {
             throw IllegalStateException("Can't start game when not in a lobby!")
         }
         try {
-            SupabaseLobbyHandler.startGame(lobbyId!!, GameSettings.getGameSettings())
+            SupabaseLobbyHandler.startGame(lobbyId!!)
         } catch (e: Exception) {
-            // TODO: Elevate exception with appropriate message
+            throw e
         }
     }
 
@@ -77,7 +122,7 @@ object Lobby {
 
     fun getLobbyId(): String? = lobbyId
 
-    private fun onLobbyRowUpdate(lobby: SupabaseLobbyHandler.Lobby) {
+    private fun onLobbyRowUpdate(lobby: LobbyDto) {
         subscribers.forEach {
             it.value.invoke(lobby)
         }
@@ -85,7 +130,7 @@ object Lobby {
 
     fun subscribeToLobbyUpdates(
         subscriberName: String,
-        onEventListener: KFunction1<Lobby, Unit>,
+        onEventListener: (updatedLobby: LobbyDto) -> Unit,
     ) {
         subscribers.put(subscriberName, onEventListener)
     }
