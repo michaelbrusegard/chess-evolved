@@ -2,10 +2,10 @@ package io.github.chessevolved.presenters
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.chessevolved.Navigator
-import io.github.chessevolved.views.LobbyView
+import io.github.chessevolved.views.IView
 
 class MockPresenter(
-    private val lobbyView: LobbyView,
+    private val view: IView,
     private val navigator: Navigator,
 ) : IPresenter {
     override fun render(sb: SpriteBatch) {
