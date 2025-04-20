@@ -23,9 +23,11 @@ import io.github.chessevolved.singletons.EcsEntityMapper
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Game.subscribeToGameUpdates
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
+import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.systems.AbilitySystem
 import io.github.chessevolved.systems.CaptureSystem
+import io.github.chessevolved.systems.FowRenderingSystem
 import io.github.chessevolved.systems.InputSystem
 import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
@@ -57,6 +59,7 @@ class GamePresenter(
 
     private val movementSystem: MovementSystem
     private val renderingSystem: RenderingSystem
+    private val fowRenderingSystem: FowRenderingSystem
     private val selectionListener: SelectionEntityListener
     private val captureSystem: CaptureSystem
     private val inputSystem: InputSystem
@@ -64,6 +67,7 @@ class GamePresenter(
     private val visualEffectSystem: VisualEffectSystem
 
     private var navigatingToEndGame = false
+    private val isFowEnabled = GameSettings.isFOWEnabled()
 
     init {
         setupGameView()
@@ -92,6 +96,9 @@ class GamePresenter(
         loadRequiredAssets()
         assetManager.finishLoading()
 
+        fowRenderingSystem = FowRenderingSystem(gameBatch, assetManager)
+        engine.addSystem(fowRenderingSystem)
+
         visualEffectSystem.initializeAnimations()
 
         setupBoard()
@@ -103,6 +110,7 @@ class GamePresenter(
     private fun loadRequiredAssets() {
         assetManager.load("board/black-tile.png", Texture::class.java)
         assetManager.load("board/white-tile.png", Texture::class.java)
+        assetManager.load("board/fow.png", Texture::class.java)
 
         PlayerColor.entries.forEach { color ->
             PieceType.entries.forEach { type ->
