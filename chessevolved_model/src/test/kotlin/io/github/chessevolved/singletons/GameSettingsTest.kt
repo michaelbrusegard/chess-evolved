@@ -1,6 +1,6 @@
 package io.github.chessevolved.singletons
 
-import io.github.chessevolved.shared.SettingsDTO
+import io.github.chessevolved.dtos.SettingsDto
 import org.junit.jupiter.api.Assertions.assertEquals
 import kotlin.test.Test
 
@@ -17,13 +17,13 @@ class GameSettingsTest {
 
     @Test
     fun getGameSettings() {
-        val settingsDTO: SettingsDTO = SettingsDTO(false, 8)
+        val settingsDTO: SettingsDto = SettingsDto(false, 8)
         assertEquals(settingsDTO, GameSettings.getGameSettings())
     }
 
     @Test
     fun setGameSettings() {
-        val settingsDTO: SettingsDTO = SettingsDTO(true, 16)
+        val settingsDTO: SettingsDto = SettingsDto(true, 16)
         GameSettings.setGameSettings(settingsDTO)
         assertEquals(settingsDTO, GameSettings.getGameSettings())
         assertEquals(true, GameSettings.isFOWEnabled())
