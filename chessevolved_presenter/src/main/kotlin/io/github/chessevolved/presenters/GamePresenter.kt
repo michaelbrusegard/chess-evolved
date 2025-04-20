@@ -13,13 +13,9 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.AbilityCardComponent
 import io.github.chessevolved.components.AbilityComponent
-import io.github.chessevolved.components.AbilityType
-import io.github.chessevolved.components.PieceType
-import io.github.chessevolved.components.PlayerColor
-import io.github.chessevolved.components.Position
+import io.github.chessevolved.enums.AbilityType
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.TextureRegionComponent
-import io.github.chessevolved.components.WeatherEvent
 import io.github.chessevolved.entities.AbilityItemFactory
 import io.github.chessevolved.data.Position
 import io.github.chessevolved.entities.BoardSquareFactory
@@ -37,6 +33,7 @@ import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.systems.AbilitySystem
 import io.github.chessevolved.systems.CaptureSystem
 import io.github.chessevolved.systems.FowRenderingSystem
+import io.github.chessevolved.systems.InputService
 import io.github.chessevolved.systems.InputSystem
 import io.github.chessevolved.systems.MovementSystem
 import io.github.chessevolved.systems.RenderingSystem
@@ -76,11 +73,11 @@ class GamePresenter(
     private val selectionListener: SelectionEntityListener
     private val captureSystem: CaptureSystem
     private val inputSystem: InputSystem
+    private val inputService = InputService()
     private val abilitySystem: AbilitySystem
     private val visualEffectSystem: VisualEffectSystem
 
     private var navigatingToEndGame = false
-    private val isFowEnabled = GameSettings.isFOWEnabled()
 
     init {
         setupGameView()
@@ -124,7 +121,7 @@ class GamePresenter(
         val testAbilityCard2 = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
         val testAbilityCard3 = abilityItemFactory.createAbilityItem(AbilityType.SWAP)
         val testAbilityCard4 = abilityItemFactory.createAbilityItem(AbilityType.NEW_MOVEMENT)
-        
+
         subscribeToGameUpdates(this.toString(), this::onGameStateUpdate)
     }
 
@@ -149,15 +146,14 @@ class GamePresenter(
     }
 
     private fun setupGameView() {
-        // TODO: Pass in if the player is the white player or not.
-        gameUIView = GameUIView(gameUIViewport, true, ::onSelectAbilityCardButtonClicked)
         runBlocking {
             launch {
                 Game.joinGame(Lobby.getLobbyId() ?: throw IllegalStateException("Can't join a game if not in a lobby first!"))
             }
         }
 
-        gameUIView = GameUIView(gameViewport, gameCamera)
+        // TODO: Pass in if the player is the white player or not.
+        gameUIView = GameUIView(gameUIViewport, true, ::onSelectAbilityCardButtonClicked)
         gameUIView.init()
 
         gameBoardView = GameView(gameUIView.getStage(), gameViewport)
@@ -367,7 +363,7 @@ class GamePresenter(
 
     private fun updateAbilityCardInventoryView() {
         // Update if abilityPickPrompt should be showing or not.
-        val allAbilityCards = ECSEngine.getEntitiesFor(Family.all(AbilityCardComponent::class.java).get())
+        val allAbilityCards = EcsEngine.getEntitiesFor(Family.all(AbilityCardComponent::class.java).get())
         val abilityCardsNotInInventory =
             allAbilityCards.filter {
                 !AbilityCardComponent.mapper.get(it).isInInventory
@@ -410,12 +406,12 @@ class GamePresenter(
 
         // Update if a card has been selected or deselected.
         val selectedAbilityCardEntity =
-            ECSEngine.getEntitiesFor(Family.all(AbilityCardComponent::class.java, SelectionComponent::class.java).get()).firstOrNull()
+            EcsEngine.getEntitiesFor(Family.all(AbilityCardComponent::class.java, SelectionComponent::class.java).get()).firstOrNull()
         if (selectedAbilityCardEntity != null) {
             gameUIView.selectCardFromInventory(
                 AbilityComponent.mapper
                     .get(selectedAbilityCardEntity)
-                    .abilities[0]
+                    .ability
                     .abilityDescription,
                 AbilityCardComponent.mapper.get(selectedAbilityCardEntity).id,
             )

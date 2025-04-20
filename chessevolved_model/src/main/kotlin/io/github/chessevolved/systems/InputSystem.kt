@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import io.github.chessevolved.components.AbilityCardComponent
+import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.CanBeCapturedComponent
 import io.github.chessevolved.components.CapturedComponent
 import io.github.chessevolved.components.ClickEventComponent
@@ -49,8 +50,22 @@ class InputSystem :
                 AbilityCardComponent.mapper.get(selectedEntity).isInInventory
             ) {
                 // TODO: Add logic for applying ability to piece
-                println("Ability got applied to piece!")
-                selectedEntity.removeAll() // Remove abilityCard-entity from the game.
+                if (AbilityComponent.mapper.get(piece) != null) {
+                    println("Already has ability")
+                } else {
+                    val abilityComponent = AbilityComponent.mapper.get(selectedEntity)
+
+                    if (abilityComponent != null) {
+                        piece.add(AbilityComponent(
+                            abilityComponent.ability,
+                            abilityComponent.abilityCooldownTime,
+                            abilityComponent.currentAbilityCDTime
+                        ))
+                    }
+
+                    println("Ability got applied to piece!")
+                    selectedEntity.removeAll() // Remove abilityCard-entity from the game.
+                }
             } else {
                 selectedEntity?.remove(SelectionComponent::class.java)
                 piece.add(SelectionComponent())
@@ -60,8 +75,8 @@ class InputSystem :
 
     private fun handleBoardSquareClicked(boardSquare: Entity) {
         val position = PositionComponent.mapper.get(boardSquare).position
-      
-        ECSEngine
+
+        EcsEngine
             .getEntitiesFor(Family.all(PieceTypeComponent::class.java, SelectionComponent::class.java).get())
             .firstOrNull()
             ?.add(MovementIntentComponent(position))
@@ -84,7 +99,7 @@ class InputSystem :
 class InputService {
     fun clickPieceAtPosition(position: Position) {
         val entity =
-            ECSEngine
+            EcsEngine
                 .getEntitiesFor(Family.all(PieceTypeComponent::class.java).get())
                 .find { PositionComponent.mapper.get(it).position == position }
 
@@ -102,7 +117,7 @@ class InputService {
 
     fun clickAbilityCardWithId(abilityCardId: Int) {
         val entity =
-            ECSEngine
+            EcsEngine
                 .getEntitiesFor(Family.all(AbilityCardComponent::class.java).get())
                 .find { AbilityCardComponent.mapper.get(it).id == abilityCardId }
 
@@ -111,7 +126,7 @@ class InputService {
 
     fun confirmAbilityChoice() {
         val entityWithSelectionComponent =
-            ECSEngine.getEntitiesFor(Family.all(SelectionComponent::class.java).get()).firstOrNull() ?: return
+            EcsEngine.getEntitiesFor(Family.all(SelectionComponent::class.java).get()).firstOrNull() ?: return
         val abilityCardComponent = AbilityCardComponent.mapper.get(entityWithSelectionComponent) ?: return
         if (abilityCardComponent.isInInventory) return
 
@@ -119,7 +134,7 @@ class InputService {
         entityWithSelectionComponent.remove(SelectionComponent::class.java)
 
         // Remove all other not-in-inventory cards
-        ECSEngine
+        EcsEngine
             .getEntitiesFor(Family.all(AbilityCardComponent::class.java).get())
             .filter {
                 !AbilityCardComponent.mapper.get(it).isInInventory
