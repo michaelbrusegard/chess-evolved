@@ -182,7 +182,6 @@ class GamePresenter(
         for (startPos in startX until startX + 8) {
             pieceFactory
                 .createPawn(
-                    true,
                     Position(startPos, 1),
                     GameSettings.clientPlayerColor,
                     gameStage,
@@ -190,7 +189,6 @@ class GamePresenter(
 
             pieceFactory
                 .createPawn(
-                    false,
                     Position(startPos, boardWorldSize - 2),
                     GameSettings.opponentPlayerColor,
                     gameStage,
