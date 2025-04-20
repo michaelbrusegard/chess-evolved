@@ -123,8 +123,6 @@ For VSCode or Neovim users, you know what you are doing.
 
 ### Debug and Testing
 
-This is not setup yet! Remove this when setup is complete and add GitHub action.
-
 Run unit tests:
 
 ```bash
@@ -135,6 +133,17 @@ Run unit tests with coverage:
 
 ```bash
 ./gradlew test jacocoTestReport
+```
+
+The test coverage reports for each subproject can be found at:
+- [Chessevolved model](chessevolved_model/build/reports/jacoco/test/html/index.html)
+- [Chessevolved presenter](chessevolved_presenter/build/reports/jacoco/test/html/index.html)
+- [Lwjgl3 (Desktop launcher)](lwjgl3/build/reports/jacoco/test/html/index.html)
+
+If Jacoco does not generate coverage reports when running the previous command, run the following:
+
+```bash
+./gradlew test --rerun jacocoTestReport
 ```
 
 ### Dependencies

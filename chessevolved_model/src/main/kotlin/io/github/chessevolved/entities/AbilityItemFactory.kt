@@ -16,10 +16,11 @@ class AbilityItemFactory(
 ) {
     private fun getAbilityItemTexture(abilityType: AbilityType): TextureRegion =
         when (abilityType) {
-            AbilityType.SHIELD -> TextureRegion(assetManager.get("abilities/shield-card.png", Texture::class.java))
-            AbilityType.EXPLOSION -> TextureRegion(assetManager.get("abilities/explosion-card.png", Texture::class.java))
+            AbilityType.SHIELD -> TextureRegion(assetManager.get("abilities/cards/shieldCard.png", Texture::class.java))
+            AbilityType.EXPLOSION -> TextureRegion(assetManager.get("abilities/cards/explosionCard.png", Texture::class.java))
+            // TODO: update all cards
             AbilityType.SWAP -> TextureRegion(assetManager.get("abilities/swap-card.png", Texture::class.java))
-            AbilityType.MIRROR -> TextureRegion(assetManager.get("abilities/mirror-card.png", Texture::class.java))
+            AbilityType.MIRROR -> TextureRegion(assetManager.get("abilities/cards/mirrorCard.png", Texture::class.java))
             AbilityType.NEW_MOVEMENT -> TextureRegion(assetManager.get("abilities/new_movement-card.png", Texture::class.java))
         }
 
