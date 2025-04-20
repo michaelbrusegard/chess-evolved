@@ -114,12 +114,8 @@ class GamePresenter(
 
         resize(Gdx.graphics.width, Gdx.graphics.height)
 
-        // TODO: Remove after testing ability card UI
         val testAbilityCard = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
         AbilityCardComponent.mapper.get(testAbilityCard).isInInventory = true
-        val testAbilityCard2 = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
-        val testAbilityCard3 = abilityItemFactory.createAbilityItem(AbilityType.SWAP)
-        val testAbilityCard4 = abilityItemFactory.createAbilityItem(AbilityType.NEW_MOVEMENT)
 
         subscribeToGameUpdates(this.toString(), this::onGameStateUpdate)
     }

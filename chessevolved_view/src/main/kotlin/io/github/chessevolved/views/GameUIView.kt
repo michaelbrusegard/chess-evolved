@@ -117,7 +117,6 @@ class GameUIView(
 
         val root =
             scene2d.table {
-                // setDebug(true, true)
                 setFillParent(true)
                 add(blackInfoBox)
                     .growX()
@@ -223,7 +222,6 @@ class GameUIView(
         abilityCardInventory.cells.forEach {
             it.width(sizeOfAbilityCards.toFloat()).height(sizeOfAbilityCards.toFloat())
         }
-        // abilityCardInventory.defaults().width(sizeOfAbilityCards.toFloat()).height(sizeOfAbilityCards.toFloat())
     }
 
     fun selectCardFromInventory(
