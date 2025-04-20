@@ -13,13 +13,13 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.AbilityCardComponent
 import io.github.chessevolved.components.AbilityComponent
-import io.github.chessevolved.enums.AbilityType
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.TextureRegionComponent
-import io.github.chessevolved.entities.AbilityItemFactory
 import io.github.chessevolved.data.Position
+import io.github.chessevolved.entities.AbilityItemFactory
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
+import io.github.chessevolved.enums.AbilityType
 import io.github.chessevolved.enums.PieceType
 import io.github.chessevolved.enums.PlayerColor
 import io.github.chessevolved.enums.WeatherEvent
@@ -28,7 +28,6 @@ import io.github.chessevolved.singletons.EcsEntityMapper
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Game.subscribeToGameUpdates
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
-import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.systems.AbilitySystem
 import io.github.chessevolved.systems.CaptureSystem

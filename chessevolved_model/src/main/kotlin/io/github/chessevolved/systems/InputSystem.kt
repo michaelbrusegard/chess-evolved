@@ -56,11 +56,13 @@ class InputSystem :
                     val abilityComponent = AbilityComponent.mapper.get(selectedEntity)
 
                     if (abilityComponent != null) {
-                        piece.add(AbilityComponent(
-                            abilityComponent.ability,
-                            abilityComponent.abilityCooldownTime,
-                            abilityComponent.currentAbilityCDTime
-                        ))
+                        piece.add(
+                            AbilityComponent(
+                                abilityComponent.ability,
+                                abilityComponent.abilityCooldownTime,
+                                abilityComponent.currentAbilityCDTime,
+                            ),
+                        )
                     }
 
                     println("Ability got applied to piece!")

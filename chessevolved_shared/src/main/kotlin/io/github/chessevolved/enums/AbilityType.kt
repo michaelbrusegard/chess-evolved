@@ -1,7 +1,7 @@
 package io.github.chessevolved.enums
 
 enum class AbilityType(
-    val abilityDescription: String
+    val abilityDescription: String,
 ) {
     SHIELD("Blocks attacks from opponent pieces"),
     EXPLOSION("Causes an explosion around the tile that your piece moves to"),
