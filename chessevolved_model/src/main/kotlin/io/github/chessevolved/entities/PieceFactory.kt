@@ -21,7 +21,6 @@ import io.github.chessevolved.data.Position
 import io.github.chessevolved.enums.MoveType
 import io.github.chessevolved.enums.PieceType
 import io.github.chessevolved.enums.PlayerColor
-import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.systems.InputService
 import ktx.actors.onClick
 

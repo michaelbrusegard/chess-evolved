@@ -13,10 +13,10 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.AbilityCardComponent
 import io.github.chessevolved.components.AbilityComponent
-import io.github.chessevolved.components.SelectionComponent
-import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
+import io.github.chessevolved.components.SelectionComponent
+import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.data.Position
 import io.github.chessevolved.entities.AbilityItemFactory
 import io.github.chessevolved.entities.BoardSquareFactory
@@ -28,9 +28,9 @@ import io.github.chessevolved.enums.WeatherEvent
 import io.github.chessevolved.singletons.EcsEngine
 import io.github.chessevolved.singletons.EcsEntityMapper
 import io.github.chessevolved.singletons.Game
-import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Game.subscribeToGameUpdates
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
+import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
 import io.github.chessevolved.systems.AbilitySystem
@@ -317,7 +317,7 @@ class GamePresenter(
         gameBatch.dispose()
         engine.removeAllEntities()
         unloadAssets()
-        println("${this.toString()}")
+        println("$this")
         unsubscribeFromGameUpdates(this.toString())
     }
 
@@ -441,13 +441,14 @@ class GamePresenter(
         Gdx.app.postRunnable {
             EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
 
-            val kings = EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).filter {
-                PieceTypeComponent.mapper.get(it).type == PieceType.KING
-            }
+            val kings =
+                EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).filter {
+                    PieceTypeComponent.mapper.get(it).type == PieceType.KING
+                }
 
-            if(kings.size != 2) {
+            if (kings.size != 2) {
                 val winningColor = kings.get(0).getComponent(PlayerColorComponent::class.java).color
-                    
+
                 goToGameOverScreen(winningColor == GameSettings.clientPlayerColor)
             }
         }

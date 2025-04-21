@@ -101,7 +101,7 @@ class InputSystem :
 class InputService {
     fun clickPieceAtPosition(position: Position) {
         println("piece clicked")
-        if(Game.getCurrentTurn() != GameSettings.clientPlayerColor) return
+        if (Game.getCurrentTurn() != GameSettings.clientPlayerColor) return
 
         val entity =
             EcsEngine
