@@ -36,6 +36,7 @@ object Lobby {
         try {
             SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
             SupabaseLobbyHandler.joinLobbyNoUpdateSecondPlayer(lobbyId!!, ::onLobbyRowUpdate)
+            onLobbyRowUpdate(getLobby())
         } catch (e: Exception) {
             Gdx.app.error("Lobby", "Error when joining rematch lobby: " + e.message)
         }
@@ -48,6 +49,7 @@ object Lobby {
         try {
             SupabaseLobbyHandler.leaveLobbyNoUpdateSecondPlayer(lobbyId!!)
             SupabaseLobbyHandler.joinLobby(lobbyId!!, ::onLobbyRowUpdate)
+            onLobbyRowUpdate(getLobby())
         } catch (e: Exception) {
             throw e
         }

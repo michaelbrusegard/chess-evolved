@@ -75,18 +75,20 @@ class EndGamePresenter(
 
         // Both isInGame and isInLobby must be checked here
         // game and lobby is being left somewhere else leading to a fatal error if not checked
-        runBlocking { 
+        runBlocking {
             launch {
                 val wantsRematch = Game.getWantsRematch()
                 if (Game.isInGame()) {
                     Game.leaveGame()
                 }
 
+                // TODO: This logic doesn't work as of yet. In further iterations, this would be priority.
                 if (wantsRematch && !otherPlayerLeft) {
-                    Lobby.leaveLobbyWithoutUpdating()
+                    // TODO: Need to discern between a player that leaves the rematch-screen, and a player that goes from rematch-screen to a lobby.
+                    // Lobby.leaveLobbyWithoutUpdating()
                 } else {
-                    if(Lobby.isInLobby()) {
-                        Lobby.leaveLobby()
+                    if (Lobby.isInLobby()) {
+                        // Lobby.leaveLobby()
                     }
                 }
             }
@@ -120,7 +122,7 @@ class EndGamePresenter(
                 } else {
                     runBlocking {
                         launch {
-                            Game.leaveGame()
+                            Game.deleteGame()
                             Lobby.joinRematchLobbyAsHost()
                         }
                     }

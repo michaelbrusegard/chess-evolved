@@ -36,6 +36,11 @@ object Game {
         }
     }
 
+    suspend fun deleteGame() {
+        leaveGame()
+        SupabaseGameHandler.deleteGameRow(Lobby.getLobbyId()!!)
+    }
+
     suspend fun askForRematch() {
         if (!isInGame() && !hasAskedForRematch) {
             throw IllegalStateException("Can't ask for rematch if not in a game or have already asked for rematch!")
