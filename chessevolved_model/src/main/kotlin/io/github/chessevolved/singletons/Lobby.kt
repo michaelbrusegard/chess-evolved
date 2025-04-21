@@ -23,7 +23,6 @@ object Lobby {
             GameSettings.clientPlayerColor = PlayerColor.BLACK
             GameSettings.opponentPlayerColor = PlayerColor.WHITE
             GameSettings.isSecondPlayer = true
-            println("Player Color: ${GameSettings.clientPlayerColor}")
         } catch (e: Exception) {
             throw e
         }

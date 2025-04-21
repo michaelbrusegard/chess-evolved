@@ -19,6 +19,7 @@ class EndGamePresenter(
     private var otherPlayerLeft = false
 
     init {
+        println("${Game.isInGame()} init")
         Game.subscribeToGameUpdates(this.toString(), ::onGameUpdate)
         endGameView.endGameStatus = endGameStatus
         endGameView.init()
@@ -27,6 +28,7 @@ class EndGamePresenter(
     }
 
     private fun requestRematch() {
+        println("${Game.isInGame()} rematch")
         endGameView.disableRematchButton()
         endGameView.updateRematchText("Rematch request\nsent...")
         runBlocking {
@@ -37,6 +39,7 @@ class EndGamePresenter(
     }
 
     private fun returnToMenu() {
+        println("${Game.isInGame()} returntomenu")
         runBlocking {
             launch {
                 val wantsRematch = Game.getWantsRematch()
@@ -66,18 +69,25 @@ class EndGamePresenter(
     }
 
     override fun dispose() {
+        println("${Game.isInGame()} dispose") // Denne e false.... Noe leavea gamen alt for tidlig
         endGameView.dispose()
         Game.unsubscribeFromGameUpdates(this.toString())
 
-        runBlocking {
+        // Both isInGame and isInLobby must be checked here
+        // game and lobby is being left somewhere else leading to a fatal error if not checked
+        runBlocking { 
             launch {
                 val wantsRematch = Game.getWantsRematch()
-                Game.leaveGame()
+                if (Game.isInGame()) {
+                    Game.leaveGame()
+                }
 
                 if (wantsRematch && !otherPlayerLeft) {
                     Lobby.leaveLobbyWithoutUpdating()
                 } else {
-                    Lobby.leaveLobby()
+                    if(Lobby.isInLobby()) {
+                        Lobby.leaveLobby()
+                    }
                 }
             }
         }
@@ -88,6 +98,7 @@ class EndGamePresenter(
     }
 
     fun onGameUpdate(updatedGame: GameDto) {
+        println("${Game.isInGame()} gameupdate")
         if (updatedGame.wantRematch) {
             if (!Game.getWantsRematch()) {
                 otherPlayerHasAskedForRematch = true

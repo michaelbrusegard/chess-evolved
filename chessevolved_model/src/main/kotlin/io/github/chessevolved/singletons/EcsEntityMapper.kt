@@ -137,7 +137,7 @@ object EcsEntityMapper {
         pieceData: PieceDto,
     ) {
         when (pieceData.type) {
-            PieceType.PAWN -> pieceFactory.createPawn(true, pieceData.position, pieceData.color, stage)
+            PieceType.PAWN -> pieceFactory.createPawn(pieceData.position, pieceData.color, stage)
             PieceType.ROOK -> pieceFactory.createRook(pieceData.position, pieceData.color, stage)
             PieceType.KNIGHT -> pieceFactory.createKnight(pieceData.position, pieceData.color, stage)
             PieceType.BISHOP -> pieceFactory.createBishop(pieceData.position, pieceData.color, stage)

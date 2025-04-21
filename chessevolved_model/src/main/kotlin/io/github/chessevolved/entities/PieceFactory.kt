@@ -108,11 +108,7 @@ class PieceFactory(
                     getPieceActor(
                         positionProvider = { PositionComponent.mapper.get(this).position },
                         stage,
-                    ) { clickedPosition ->
-                        if (playerColor == GameSettings.clientPlayerColor) {
-                            inputService.clickPieceAtPosition(clickedPosition)
-                        }
-                    },
+                    ) { clickedPosition -> inputService.clickPieceAtPosition(clickedPosition) },
                 ),
             )
             engine.addEntity(this)

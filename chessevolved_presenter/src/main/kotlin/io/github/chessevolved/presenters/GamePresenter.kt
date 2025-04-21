@@ -15,6 +15,8 @@ import io.github.chessevolved.components.AbilityCardComponent
 import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.TextureRegionComponent
+import io.github.chessevolved.components.PieceTypeComponent
+import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.data.Position
 import io.github.chessevolved.entities.AbilityItemFactory
 import io.github.chessevolved.entities.BoardSquareFactory
@@ -26,9 +28,9 @@ import io.github.chessevolved.enums.WeatherEvent
 import io.github.chessevolved.singletons.EcsEngine
 import io.github.chessevolved.singletons.EcsEntityMapper
 import io.github.chessevolved.singletons.Game
+import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Game.subscribeToGameUpdates
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
-import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
 import io.github.chessevolved.systems.AbilitySystem
@@ -44,6 +46,7 @@ import io.github.chessevolved.views.GameUIView
 import io.github.chessevolved.views.GameView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import ktx.graphics.color
 
 class GamePresenter(
     private val navigator: Navigator,
@@ -314,19 +317,8 @@ class GamePresenter(
         gameBatch.dispose()
         engine.removeAllEntities()
         unloadAssets()
+        println("${this.toString()}")
         unsubscribeFromGameUpdates(this.toString())
-        if (Game.isInGame() && !navigatingToEndGame) {
-            runBlocking {
-                launch {
-                    try {
-                        Game.leaveGame()
-                        Lobby.leaveLobby()
-                    } catch (e: Exception) {
-                        error("Non fatal error: Problem with calling leaveGame(). Error: " + e.message)
-                    }
-                }
-            }
-        }
     }
 
     private fun unloadAssets() {
@@ -433,10 +425,32 @@ class GamePresenter(
 
         if (SupabaseGameHandler.sendingGameState) {
             SupabaseGameHandler.sendingGameState = false
+
+            val kings = pieces.filter { it.type == PieceType.KING }
+
+            if (kings.size != 2) {
+                val winningColor = kings[0].color
+                Gdx.app.postRunnable {
+                    goToGameOverScreen(winningColor == GameSettings.clientPlayerColor)
+                }
+            }
+
             return
         }
 
-        EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
+        Gdx.app.postRunnable {
+            EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
+
+            val kings = EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).filter {
+                PieceTypeComponent.mapper.get(it).type == PieceType.KING
+            }
+
+            if(kings.size != 2) {
+                val winningColor = kings.get(0).getComponent(PlayerColorComponent::class.java).color
+                    
+                goToGameOverScreen(winningColor == GameSettings.clientPlayerColor)
+            }
+        }
     }
 
     private fun onTurnComplete() {
