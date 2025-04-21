@@ -69,11 +69,13 @@ class Navigator(
     }
 
     fun goBack() {
+        print("${PresenterManager.getCurrent()} before")
         if (!PresenterManager.isEmpty()) {
             PresenterManager.pop()
         }
         if (PresenterManager.isEmpty()) {
             PresenterManager.push(createMenuPresenter())
         }
+        print("${PresenterManager.getCurrent()} after")
     }
 }

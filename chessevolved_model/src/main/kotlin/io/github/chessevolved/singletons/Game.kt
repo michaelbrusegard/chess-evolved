@@ -17,6 +17,7 @@ object Game {
         try {
             SupabaseGameHandler.joinGame(gameId, ::onGameRowUpdate)
             this.inGame = true
+            this.currentTurn = PlayerColor.WHITE
         } catch (e: Exception) {
             throw Exception("Problem with joining game: " + e.message)
         }
@@ -34,6 +35,11 @@ object Game {
         } catch (e: Exception) {
             throw Exception("Problem with leaving game: " + e.message)
         }
+    }
+
+    suspend fun deleteGame() {
+        leaveGame()
+        SupabaseGameHandler.deleteGameRow(Lobby.getLobbyId()!!)
     }
 
     suspend fun askForRematch() {

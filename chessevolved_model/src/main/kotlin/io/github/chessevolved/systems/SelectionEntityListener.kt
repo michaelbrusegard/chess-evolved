@@ -14,6 +14,7 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.components.WeatherEventComponent
 import io.github.chessevolved.singletons.EcsEngine
+import io.github.chessevolved.singletons.GameSettings
 
 class SelectionEntityListener(
     private val boardSize: Int,
@@ -33,6 +34,10 @@ class SelectionEntityListener(
         if (AbilityCardComponent.mapper.get(entity) != null) return
         for (piece in EcsEngine.getEntitiesFor(capturableFamily)) {
             piece.remove(CanBeCapturedComponent::class.java)
+        }
+
+        if (PlayerColorComponent.mapper.get(entity).color != GameSettings.clientPlayerColor) {
+            return
         }
 
         val availablePositions =

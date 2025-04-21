@@ -1,10 +1,14 @@
 package io.github.chessevolved.singletons
 
 import io.github.chessevolved.dtos.SettingsDto
+import io.github.chessevolved.enums.PlayerColor
 
 object GameSettings {
     private var fogOfWar: Boolean = false
     private var boardSize: Int = 8
+    var clientPlayerColor: PlayerColor = PlayerColor.WHITE
+    var opponentPlayerColor: PlayerColor = PlayerColor.BLACK
+    var isSecondPlayer: Boolean = false
 
     /**
      * The current setting of FOW

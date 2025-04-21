@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
+import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.PositionComponent
@@ -34,8 +35,14 @@ object EcsEntityMapper {
     fun extractStateFromEngine(engine: Engine): Pair<List<PieceDto>, List<BoardSquareDto>> {
         val pieces =
             engine.getEntitiesFor(pieceFamily).map { entity ->
+                val piecePosition = PositionComponent.mapper.get(entity)
+
                 PieceDto(
-                    position = PositionComponent.mapper.get(entity).position,
+                    position =
+                        Position(
+                            piecePosition.position.x,
+                            GameSettings.getBoardSize() - 1 - piecePosition.position.y,
+                        ),
                     type = PieceTypeComponent.mapper.get(entity).type,
                     color = PlayerColorComponent.mapper.get(entity).color,
                 )
@@ -60,6 +67,7 @@ object EcsEntityMapper {
         receivedBoardSquares: List<BoardSquareDto>,
     ) {
         Gdx.app.log("ECSEntityMapper", "Applying received state to engine...")
+
         try {
             val existingPieceEntities = engine.getEntitiesFor(pieceFamily)
             val existingPiecesMap =
@@ -91,7 +99,10 @@ object EcsEntityMapper {
                 val pos = PositionComponent.mapper.get(existingEntity).position
                 if (pos !in currentPositions) {
                     Gdx.app.debug("ECSEntityMapper", "Removing piece no longer in state at $pos")
+                    val actorComponent = ActorComponent.mapper.get(existingEntity)
+                    actorComponent.actor.remove()
                     engine.removeEntity(existingEntity)
+                    println("ActorComp: $actorComponent")
                 }
             }
 
@@ -130,7 +141,7 @@ object EcsEntityMapper {
         pieceData: PieceDto,
     ) {
         when (pieceData.type) {
-            PieceType.PAWN -> pieceFactory.createPawn(true, pieceData.position, pieceData.color, stage)
+            PieceType.PAWN -> pieceFactory.createPawn(pieceData.position, pieceData.color, stage)
             PieceType.ROOK -> pieceFactory.createRook(pieceData.position, pieceData.color, stage)
             PieceType.KNIGHT -> pieceFactory.createKnight(pieceData.position, pieceData.color, stage)
             PieceType.BISHOP -> pieceFactory.createBishop(pieceData.position, pieceData.color, stage)

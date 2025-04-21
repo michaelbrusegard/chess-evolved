@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.AbilityCardComponent
 import io.github.chessevolved.components.AbilityComponent
+import io.github.chessevolved.components.PieceTypeComponent
+import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.data.Position
@@ -28,7 +30,9 @@ import io.github.chessevolved.singletons.EcsEntityMapper
 import io.github.chessevolved.singletons.Game
 import io.github.chessevolved.singletons.Game.subscribeToGameUpdates
 import io.github.chessevolved.singletons.Game.unsubscribeFromGameUpdates
+import io.github.chessevolved.singletons.GameSettings
 import io.github.chessevolved.singletons.Lobby
+import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
 import io.github.chessevolved.systems.AbilitySystem
 import io.github.chessevolved.systems.CaptureSystem
 import io.github.chessevolved.systems.FowRenderingSystem
@@ -42,6 +46,7 @@ import io.github.chessevolved.views.GameUIView
 import io.github.chessevolved.views.GameView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import ktx.graphics.color
 
 class GamePresenter(
     private val navigator: Navigator,
@@ -136,7 +141,8 @@ class GamePresenter(
 
         AbilityType.entries.forEach { ability ->
             val abilityName = ability.name.lowercase()
-            assetManager.load("abilities/$abilityName-card.png", Texture::class.java)
+            println("abilities/cards/${abilityName}Card.png")
+            assetManager.load("abilities/cards/${abilityName}Card.png", Texture::class.java)
         }
     }
 
@@ -147,8 +153,7 @@ class GamePresenter(
             }
         }
 
-        // TODO: Pass in if the player is the white player or not.
-        gameUIView = GameUIView(gameUIViewport, true, ::onSelectAbilityCardButtonClicked)
+        gameUIView = GameUIView(gameUIViewport, GameSettings.clientPlayerColor == PlayerColor.WHITE, ::onSelectAbilityCardButtonClicked)
         gameUIView.init()
 
         gameBoardView = GameView(gameUIView.getStage(), gameViewport)
@@ -180,17 +185,15 @@ class GamePresenter(
         for (startPos in startX until startX + 8) {
             pieceFactory
                 .createPawn(
-                    true,
                     Position(startPos, 1),
-                    PlayerColor.WHITE,
+                    GameSettings.clientPlayerColor,
                     gameStage,
                 )
 
             pieceFactory
                 .createPawn(
-                    false,
                     Position(startPos, boardWorldSize - 2),
-                    PlayerColor.BLACK,
+                    GameSettings.opponentPlayerColor,
                     gameStage,
                 )
         }
@@ -202,13 +205,13 @@ class GamePresenter(
                     for (j in listOf(0, 7)) {
                         pieceFactory.createRook(
                             Position(startXLocal + j, 0),
-                            PlayerColor.WHITE,
+                            GameSettings.clientPlayerColor,
                             gameStage,
                         )
 
                         pieceFactory.createRook(
                             Position(startXLocal + j, boardWorldSize - 1),
-                            PlayerColor.BLACK,
+                            GameSettings.opponentPlayerColor,
                             gameStage,
                         )
                     }
@@ -217,13 +220,13 @@ class GamePresenter(
                     for (j in listOf(1, 6)) {
                         pieceFactory.createKnight(
                             Position(startXLocal + j, 0),
-                            PlayerColor.WHITE,
+                            GameSettings.clientPlayerColor,
                             gameStage,
                         )
 
                         pieceFactory.createKnight(
                             Position(startXLocal + j, boardWorldSize - 1),
-                            PlayerColor.BLACK,
+                            GameSettings.opponentPlayerColor,
                             gameStage,
                         )
                     }
@@ -232,13 +235,13 @@ class GamePresenter(
                     for (j in listOf(2, 5)) {
                         pieceFactory.createBishop(
                             Position(startXLocal + j, 0),
-                            PlayerColor.WHITE,
+                            GameSettings.clientPlayerColor,
                             gameStage,
                         )
 
                         pieceFactory.createBishop(
                             Position(startXLocal + j, boardWorldSize - 1),
-                            PlayerColor.BLACK,
+                            GameSettings.opponentPlayerColor,
                             gameStage,
                         )
                     }
@@ -246,26 +249,26 @@ class GamePresenter(
                 startXLocal + 3 -> {
                     pieceFactory.createQueen(
                         Position(startPos, 0),
-                        PlayerColor.WHITE,
+                        GameSettings.clientPlayerColor,
                         gameStage,
                     )
 
                     pieceFactory.createQueen(
                         Position(startPos, boardWorldSize - 1),
-                        PlayerColor.BLACK,
+                        GameSettings.opponentPlayerColor,
                         gameStage,
                     )
                 }
                 startXLocal + 4 -> {
                     pieceFactory.createKing(
                         Position(startPos, 0),
-                        PlayerColor.WHITE,
+                        GameSettings.clientPlayerColor,
                         gameStage,
                     )
 
                     pieceFactory.createKing(
                         Position(startPos, boardWorldSize - 1),
-                        PlayerColor.BLACK,
+                        GameSettings.opponentPlayerColor,
                         gameStage,
                     )
                 }
@@ -314,19 +317,8 @@ class GamePresenter(
         gameBatch.dispose()
         engine.removeAllEntities()
         unloadAssets()
+        println("$this")
         unsubscribeFromGameUpdates(this.toString())
-        if (Game.isInGame() && !navigatingToEndGame) {
-            runBlocking {
-                launch {
-                    try {
-                        Game.leaveGame()
-                        Lobby.leaveLobby()
-                    } catch (e: Exception) {
-                        error("Non fatal error: Problem with calling leaveGame(). Error: " + e.message)
-                    }
-                }
-            }
-        }
     }
 
     private fun unloadAssets() {
@@ -349,7 +341,7 @@ class GamePresenter(
         }
         AbilityType.entries.forEach { ability ->
             val abilityName = ability.name.lowercase()
-            val filename = "abilities/$abilityName-card.png"
+            val filename = "abilities/cards/${abilityName}Card.png"
             if (assetManager.isLoaded(filename)) {
                 assetManager.unload(filename)
             }
@@ -431,13 +423,43 @@ class GamePresenter(
         val pieces = gameDto.pieces
         val boardSquares = gameDto.boardSquares
 
-        EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
+        if (SupabaseGameHandler.sendingGameState) {
+            SupabaseGameHandler.sendingGameState = false
+
+            val kings = pieces.filter { it.type == PieceType.KING }
+
+            if (kings.size != 2) {
+                val winningColor = kings[0].color
+                Gdx.app.postRunnable {
+                    goToGameOverScreen(winningColor == GameSettings.clientPlayerColor)
+                }
+            }
+
+            return
+        }
+
+        Gdx.app.postRunnable {
+            EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
+
+            val kings =
+                EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).filter {
+                    PieceTypeComponent.mapper.get(it).type == PieceType.KING
+                }
+
+            if (kings.size != 2) {
+                val winningColor = kings.get(0).getComponent(PlayerColorComponent::class.java).color
+
+                goToGameOverScreen(winningColor == GameSettings.clientPlayerColor)
+            }
+        }
     }
 
     private fun onTurnComplete() {
         runBlocking {
             launch {
                 val (pieces, boardSquares) = EcsEntityMapper.extractStateFromEngine(engine)
+
+                SupabaseGameHandler.sendingGameState = true
 
                 Game.updateGameState(
                     Lobby.getLobbyId()!!,

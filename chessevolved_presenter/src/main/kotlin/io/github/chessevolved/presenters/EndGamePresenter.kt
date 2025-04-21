@@ -19,6 +19,7 @@ class EndGamePresenter(
     private var otherPlayerLeft = false
 
     init {
+        println("${Game.isInGame()} init")
         Game.subscribeToGameUpdates(this.toString(), ::onGameUpdate)
         endGameView.endGameStatus = endGameStatus
         endGameView.init()
@@ -27,6 +28,7 @@ class EndGamePresenter(
     }
 
     private fun requestRematch() {
+        println("${Game.isInGame()} rematch")
         endGameView.disableRematchButton()
         endGameView.updateRematchText("Rematch request\nsent...")
         runBlocking {
@@ -37,6 +39,7 @@ class EndGamePresenter(
     }
 
     private fun returnToMenu() {
+        println("${Game.isInGame()} returntomenu")
         runBlocking {
             launch {
                 val wantsRematch = Game.getWantsRematch()
@@ -66,18 +69,27 @@ class EndGamePresenter(
     }
 
     override fun dispose() {
+        println("${Game.isInGame()} dispose") // Denne e false.... Noe leavea gamen alt for tidlig
         endGameView.dispose()
         Game.unsubscribeFromGameUpdates(this.toString())
 
+        // Both isInGame and isInLobby must be checked here
+        // game and lobby is being left somewhere else leading to a fatal error if not checked
         runBlocking {
             launch {
                 val wantsRematch = Game.getWantsRematch()
-                Game.leaveGame()
+                if (Game.isInGame()) {
+                    Game.leaveGame()
+                }
 
+                // TODO: This logic doesn't work as of yet. In further iterations, this would be priority.
                 if (wantsRematch && !otherPlayerLeft) {
-                    Lobby.leaveLobbyWithoutUpdating()
+                    // TODO: Need to discern between a player that leaves the rematch-screen, and a player that goes from rematch-screen to a lobby.
+                    // Lobby.leaveLobbyWithoutUpdating()
                 } else {
-                    Lobby.leaveLobby()
+                    if (Lobby.isInLobby()) {
+                        // Lobby.leaveLobby()
+                    }
                 }
             }
         }
@@ -88,6 +100,7 @@ class EndGamePresenter(
     }
 
     fun onGameUpdate(updatedGame: GameDto) {
+        println("${Game.isInGame()} gameupdate")
         if (updatedGame.wantRematch) {
             if (!Game.getWantsRematch()) {
                 otherPlayerHasAskedForRematch = true
@@ -109,7 +122,7 @@ class EndGamePresenter(
                 } else {
                     runBlocking {
                         launch {
-                            Game.leaveGame()
+                            Game.deleteGame()
                             Lobby.joinRematchLobbyAsHost()
                         }
                     }

@@ -114,24 +114,14 @@ class PieceFactory(
         }
 
     fun createPawn(
-        isPlayerOne: Boolean,
         position: Position,
         color: PlayerColor,
         stage: Stage,
     ) = createPiece(position, PieceType.PAWN, color, stage).apply {
         getComponent(MovementRuleComponent::class.java).apply {
-            val pawnDirections: List<Vector2>
-            val pawnCaptureDirections: List<Vector2>
-            val pawnStartDirections: List<Vector2>
-            if (isPlayerOne) {
-                pawnDirections = listOf(Vector2(0f, 1f))
-                pawnCaptureDirections = listOf(Vector2(1f, 1f), Vector2(-1f, 1f))
-                pawnStartDirections = listOf(Vector2(0f, 2f))
-            } else {
-                pawnDirections = listOf(Vector2(0f, -1f))
-                pawnCaptureDirections = listOf(Vector2(1f, -1f), Vector2(-1f, -1f))
-                pawnStartDirections = listOf(Vector2(0f, -2f))
-            }
+            val pawnDirections: List<Vector2> = listOf(Vector2(0f, 1f))
+            val pawnCaptureDirections: List<Vector2> = listOf(Vector2(1f, 1f), Vector2(-1f, 1f))
+            val pawnStartDirections: List<Vector2> = listOf(Vector2(0f, 2f))
 
             addPattern(
                 MovementPattern(
