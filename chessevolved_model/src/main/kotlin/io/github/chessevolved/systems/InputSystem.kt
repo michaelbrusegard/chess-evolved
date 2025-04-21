@@ -15,6 +15,8 @@ import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.WeatherEventComponent
 import io.github.chessevolved.data.Position
 import io.github.chessevolved.singletons.EcsEngine
+import io.github.chessevolved.singletons.Game
+import io.github.chessevolved.singletons.GameSettings
 
 class InputSystem :
     IteratingSystem(
@@ -98,6 +100,9 @@ class InputSystem :
 
 class InputService {
     fun clickPieceAtPosition(position: Position) {
+        println("piece clicked")
+        if(Game.getCurrentTurn() != GameSettings.clientPlayerColor) return
+
         val entity =
             EcsEngine
                 .getEntitiesFor(Family.all(PieceTypeComponent::class.java).get())
@@ -107,6 +112,7 @@ class InputService {
     }
 
     fun clickBoardSquareAtPosition(position: Position) {
+        println("boardsquare clicked")
         val entity =
             EcsEngine
                 .getEntitiesFor(Family.all(WeatherEventComponent::class.java).get())

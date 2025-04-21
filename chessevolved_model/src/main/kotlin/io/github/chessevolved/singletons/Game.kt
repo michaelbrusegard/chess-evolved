@@ -17,6 +17,7 @@ object Game {
         try {
             SupabaseGameHandler.joinGame(gameId, ::onGameRowUpdate)
             this.inGame = true
+            this.currentTurn = PlayerColor.WHITE
         } catch (e: Exception) {
             throw Exception("Problem with joining game: " + e.message)
         }

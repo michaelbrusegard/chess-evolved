@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
+import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.PositionComponent
@@ -98,7 +99,10 @@ object EcsEntityMapper {
                 val pos = PositionComponent.mapper.get(existingEntity).position
                 if (pos !in currentPositions) {
                     Gdx.app.debug("ECSEntityMapper", "Removing piece no longer in state at $pos")
+                    val actorComponent = ActorComponent.mapper.get(existingEntity)
+                    actorComponent.actor.remove()
                     engine.removeEntity(existingEntity)
+                    println("ActorComp: $actorComponent")
                 }
             }
 
