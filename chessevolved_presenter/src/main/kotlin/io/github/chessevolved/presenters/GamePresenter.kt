@@ -20,6 +20,7 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.data.Position
+import io.github.chessevolved.dtos.GameDto
 import io.github.chessevolved.entities.AbilityItemFactory
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
@@ -455,6 +456,8 @@ class GamePresenter(
     private fun onGameStateUpdate(gameDto: io.github.chessevolved.dtos.GameDto) {
         val pieces = gameDto.pieces
         val boardSquares = gameDto.boardSquares
+
+        gameUIView.changeTurnText(gameDto.turn)
 
         if (SupabaseGameHandler.sendingGameState) {
             SupabaseGameHandler.sendingGameState = false
