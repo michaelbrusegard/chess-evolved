@@ -1,16 +1,23 @@
 # Chess Evolved
 
+See below for instructions for compiling and running the project.
+
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
 
 This project was generated with a Kotlin project template that includes Kotlin application launchers and [KTX](https://libktx.github.io/) utilities.
 
 ## Platforms
 
-- `core`: Main module with the application logic shared by all platforms.
+- `chessevolved_model`: Main module with the application logic shared by all platforms.
+- `chessevolved_presenter`: Module with the application logic shared by all platforms.
+- `chessevolved_shared`: Module containg DTOs and Enums used by all other modules.
+- `chessevolved_view`: Module containing the logic the different views.
 - `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
 - `android`: Android mobile platform. Needs Android SDK.
 
 ## Setting up Supabase for production
+
+This no longer requires to be done, as the env file is now included in the main branch.
 
 Add a env (no dot) file to the `/assets` folder and add `SUPABASE_ANON_KEY={anon_key}` and `SUPABASE_URL={project_url}` to this file.
 > You should replace "{anon_key}" and "{project_url}" with the key and url you find under Project Settings->Data API on supabase.
