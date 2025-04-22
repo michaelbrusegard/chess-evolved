@@ -39,7 +39,6 @@ class CaptureSystem : IteratingSystem(
         }
 
         if (capturedBlockedComponent != null) {
-            // Trigger the ability.
             entity?.add(AbilityTriggerComponent(capturedPosition, capturedPosition, false))
             capturingPiece?.remove(SelectionComponent::class.java)
             capturingPiece?.remove(ValidMovesComponent::class.java)

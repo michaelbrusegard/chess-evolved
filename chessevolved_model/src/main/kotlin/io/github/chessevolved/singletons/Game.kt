@@ -19,6 +19,7 @@ object Game {
     private var subscribers = mutableMapOf<String, (updatedGame: GameDto) -> Unit>()
     private var hasAskedForRematch = false
     private var currentTurn: PlayerColor? = null
+    var turnNumber: Int = 0
 
     private var pieceDTOS: MutableMap<Entity, PieceDto> = mutableMapOf()
 

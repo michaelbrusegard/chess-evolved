@@ -31,6 +31,8 @@ class AbilitySystem :
         val abilityComponent = AbilityComponent.mapper.get(entity)
         val abilityTriggerComponent = AbilityTriggerComponent.mapper.get(entity)
 
+        println(EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java, AbilityComponent::class.java).get()))
+
         println("Triggering ability: ${abilityComponent.ability}")
         println("Ability CurrentCD: ${abilityComponent.currentAbilityCDTime}")
 
@@ -128,10 +130,12 @@ class AbilitySystem :
             EcsEngine.addEntity(effectEntity)
         } else if (shieldEffectEntity != null) {
             abilityComponent.currentAbilityCDTime = 0
+            Game.changePieceDTOAbility(entity!!, abilityComponent.ability, abilityComponent.currentAbilityCDTime)
             PositionComponent.mapper.get(shieldEffectEntity).position = targetPosition
         } else {
             abilityComponent.currentAbilityCDTime = 0
-            entity?.add(BlockedComponent())
+            Game.changePieceDTOAbility(entity!!, abilityComponent.ability, abilityComponent.currentAbilityCDTime)
+            entity.add(BlockedComponent())
 
             val effectEntity = EcsEngine.createEntity()
             effectEntity.add(VisualEffectComponent(VisualEffectType.SHIELD_ACTIVE, 3, duration = 0f, squareSize = VisualEffectSize.NORMAL))

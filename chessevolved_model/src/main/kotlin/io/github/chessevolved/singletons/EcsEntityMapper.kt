@@ -100,6 +100,7 @@ object EcsEntityMapper {
                     if (typeComp.type != receivedPiece.type || colorComp.color != receivedPiece.color) {
                         Gdx.app.debug("ECSEntityMapper", "Replacing piece at ${receivedPiece.position} due to type/color mismatch.")
                         engine.removeEntity(existingEntity)
+                        Game.removeEntityFromPieceDTOS(existingEntity)
                         createPieceFromDto(pieceFactory, stage, receivedPiece)
                     }
 
@@ -181,6 +182,7 @@ object EcsEntityMapper {
         pieceEntity.apply {
             if (pieceData.abilityType != null) {
                 add(AbilityComponent(pieceData.abilityType!!, pieceData.abilityType!!.cooldownTime, pieceData.abilityCurrentCooldown))
+                println("CREATEPIECEFROMDTO: THIS ONE GETS TRIGGERED")
                 add(AbilityTriggerComponent(pieceData.position, pieceData.previousPosition, true))
             }
         }

@@ -3,6 +3,7 @@ package io.github.chessevolved.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.AbilityTriggerComponent
 import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.FowComponent
@@ -48,8 +49,9 @@ class MovementSystem(
         val pieceActorComponent = ActorComponent.mapper.get(entity)
         val pieceMovementRuleComponent = MovementRuleComponent.mapper.get(entity)
 
-        println("This is getting triggered")
-        entity?.add(AbilityTriggerComponent(targetPosition, piecePositionComponent.position, true))
+        if (AbilityComponent.mapper.get(entity) != null) {
+            entity?.add(AbilityTriggerComponent(targetPosition, piecePositionComponent.position, true))
+        }
 
         piecePositionComponent.position = targetPosition
         pieceActorComponent.actor.setPosition(targetPosition.x.toFloat(), targetPosition.y.toFloat())

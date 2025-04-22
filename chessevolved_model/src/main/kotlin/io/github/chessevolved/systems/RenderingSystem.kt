@@ -37,6 +37,8 @@ class RenderingSystem(
                 batch.color = Color.WHITE
             }
         }
+
+        // println("All: " + EcsEngine.getEntitiesFor(Family.all(AbilityTriggerComponent::class.java).get()))
     }
 
 //    fun defaultBoardSquaresState() {

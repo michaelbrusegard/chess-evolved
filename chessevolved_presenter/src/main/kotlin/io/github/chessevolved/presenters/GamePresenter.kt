@@ -48,7 +48,6 @@ import io.github.chessevolved.views.GameUIView
 import io.github.chessevolved.views.GameView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import ktx.graphics.color
 
 class GamePresenter(
     private val navigator: Navigator,
@@ -121,14 +120,14 @@ class GamePresenter(
 
         resize(Gdx.graphics.width, Gdx.graphics.height)
 
-        val testAbilityCard = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
-        AbilityCardComponent.mapper.get(testAbilityCard).isInInventory = true
+//        val testAbilityCard = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
+//        AbilityCardComponent.mapper.get(testAbilityCard).isInInventory = true
 
         subscribeToGameUpdates(this.toString(), this::onGameStateUpdate)
 
-        abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
-        abilityItemFactory.createAbilityItem(AbilityType.SHIELD)
-        abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
+//        abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
+//        abilityItemFactory.createAbilityItem(AbilityType.SHIELD)
+//        abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
     }
 
     private fun loadRequiredAssets() {
@@ -472,6 +471,9 @@ class GamePresenter(
             return
         }
 
+        Game.turnNumber++
+        checkAddAbilitiesUI()
+
         Gdx.app.postRunnable {
             EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
 
@@ -480,20 +482,17 @@ class GamePresenter(
             ).map {
                 val position = PositionComponent.mapper.get(it).position
                 val abilityComponent = AbilityComponent.mapper.get(it)
-                val abilityTriggerComponent = AbilityTriggerComponent.mapper.get(it)
 
                 var cooldown = abilityComponent.currentAbilityCDTime
 
-                if (abilityTriggerComponent == null) {
-                    if (Game.getCurrentTurn() != GameSettings.clientPlayerColor) {
-                        cooldown++
-                    }
+                if (Game.getCurrentTurn() != GameSettings.clientPlayerColor) {
+                    cooldown++
+                }
 
-                    abilityComponent.currentAbilityCDTime = cooldown
+                abilityComponent.currentAbilityCDTime = cooldown
 
-                    if (PlayerColorComponent.mapper.get(it).color == GameSettings.clientPlayerColor) {
-                        it.add(AbilityTriggerComponent(position, position, false))
-                    }
+                if (PlayerColorComponent.mapper.get(it).color == GameSettings.clientPlayerColor) {
+                    it.add(AbilityTriggerComponent(position, position, false))
                 }
             }
 
@@ -511,39 +510,53 @@ class GamePresenter(
     }
 
     private fun onTurnComplete() {
-        EcsEngine.getEntitiesFor(
-            Family.all(PieceTypeComponent::class.java, AbilityComponent::class.java).get(),
-        ).map {
-            val position = PositionComponent.mapper.get(it).position
-            val abilityComponent = AbilityComponent.mapper.get(it)
-            val abilityTriggerComponent = AbilityTriggerComponent.mapper.get(it)
-
-            var cooldown = abilityComponent.currentAbilityCDTime
-
-            if (abilityTriggerComponent == null) {
-                if (Game.getCurrentTurn() == GameSettings.clientPlayerColor) {
-                    cooldown++
-                }
-
-                abilityComponent.currentAbilityCDTime = cooldown
-
-                if (PlayerColorComponent.mapper.get(it).color == GameSettings.clientPlayerColor) {
-                    it.add(AbilityTriggerComponent(position, position, false))
-                }
-            }
-        }
-
         runBlocking {
             launch {
                 val (pieces, boardSquares) = EcsEntityMapper.extractStateFromEngine(engine)
 
                 SupabaseGameHandler.sendingGameState = true
+                Game.turnNumber++
+                checkAddAbilitiesUI()
 
                 Game.updateGameState(
                     Lobby.getLobbyId()!!,
                     pieces,
                     boardSquares,
                 )
+
+                EcsEngine.getEntitiesFor(
+                    Family.all(PieceTypeComponent::class.java, AbilityComponent::class.java).get(),
+                ).map {
+                    val position = PositionComponent.mapper.get(it).position
+                    val abilityComponent = AbilityComponent.mapper.get(it)
+                    val abilityTriggerComponent = AbilityTriggerComponent.mapper.get(it)
+
+                    var cooldown = abilityComponent.currentAbilityCDTime
+
+                    if (abilityTriggerComponent == null) {
+                        if (Game.getCurrentTurn() == GameSettings.clientPlayerColor) {
+                            cooldown++
+                        }
+
+                        abilityComponent.currentAbilityCDTime = cooldown
+
+                        if (PlayerColorComponent.mapper.get(it).color == GameSettings.clientPlayerColor) {
+                            it.add(AbilityTriggerComponent(position, position, false))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkAddAbilitiesUI() {
+        // Must keep this for now since we don't have all definitions for all abilities
+        val validAbilities = mutableListOf(AbilityType.EXPLOSION, AbilityType.SHIELD)
+
+        if (Game.turnNumber % 4 == 0 && Game.turnNumber != 0) {
+            val chosenAbilities = List(3) { validAbilities.random() }
+            for (ability in chosenAbilities) {
+                abilityItemFactory.createAbilityItem(ability)
             }
         }
     }
