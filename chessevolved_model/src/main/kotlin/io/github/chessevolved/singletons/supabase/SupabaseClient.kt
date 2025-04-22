@@ -19,6 +19,7 @@ internal object SupabaseClient {
         }
 
     private val supabase: SupabaseClient =
+        @Suppress("ktlint:standard:max-line-length")
         createSupabaseClient(
             supabaseUrl = "https://tsmubattgglbqaarktnw.supabase.co" ?: "no_url_found",
             supabaseKey =
