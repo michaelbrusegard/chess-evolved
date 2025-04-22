@@ -67,7 +67,7 @@ class GamePresenter(
     private val gameViewport: Viewport =
         FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
     private val gameUIViewport: Viewport =
-        FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), gameUICamera)
+        FitViewport(500f, 500f / (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat()), gameUICamera)
     private lateinit var gameUIView: GameUIView
     private lateinit var gameBoardView: GameView
     private val gameBatch: SpriteBatch = SpriteBatch()
@@ -480,24 +480,25 @@ class GamePresenter(
         Gdx.app.postRunnable {
             EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
 
-            EcsEngine.getEntitiesFor(
-                Family.all(PieceTypeComponent::class.java, AbilityComponent::class.java).get(),
-            ).map {
-                val position = PositionComponent.mapper.get(it).position
-                val abilityComponent = AbilityComponent.mapper.get(it)
+            EcsEngine
+                .getEntitiesFor(
+                    Family.all(PieceTypeComponent::class.java, AbilityComponent::class.java).get(),
+                ).map {
+                    val position = PositionComponent.mapper.get(it).position
+                    val abilityComponent = AbilityComponent.mapper.get(it)
 
-                var cooldown = abilityComponent.currentAbilityCDTime
+                    var cooldown = abilityComponent.currentAbilityCDTime
 
-                if (Game.getCurrentTurn() != GameSettings.clientPlayerColor) {
-                    cooldown++
+                    if (Game.getCurrentTurn() != GameSettings.clientPlayerColor) {
+                        cooldown++
+                    }
+
+                    abilityComponent.currentAbilityCDTime = cooldown
+
+                    if (PlayerColorComponent.mapper.get(it).color == GameSettings.clientPlayerColor) {
+                        it.add(AbilityTriggerComponent(position, position, false))
+                    }
                 }
-
-                abilityComponent.currentAbilityCDTime = cooldown
-
-                if (PlayerColorComponent.mapper.get(it).color == GameSettings.clientPlayerColor) {
-                    it.add(AbilityTriggerComponent(position, position, false))
-                }
-            }
 
             val kings =
                 EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).filter {
@@ -527,27 +528,28 @@ class GamePresenter(
                     boardSquares,
                 )
 
-                EcsEngine.getEntitiesFor(
-                    Family.all(PieceTypeComponent::class.java, AbilityComponent::class.java).get(),
-                ).map {
-                    val position = PositionComponent.mapper.get(it).position
-                    val abilityComponent = AbilityComponent.mapper.get(it)
-                    val abilityTriggerComponent = AbilityTriggerComponent.mapper.get(it)
+                EcsEngine
+                    .getEntitiesFor(
+                        Family.all(PieceTypeComponent::class.java, AbilityComponent::class.java).get(),
+                    ).map {
+                        val position = PositionComponent.mapper.get(it).position
+                        val abilityComponent = AbilityComponent.mapper.get(it)
+                        val abilityTriggerComponent = AbilityTriggerComponent.mapper.get(it)
 
-                    var cooldown = abilityComponent.currentAbilityCDTime
+                        var cooldown = abilityComponent.currentAbilityCDTime
 
-                    if (abilityTriggerComponent == null) {
-                        if (Game.getCurrentTurn() == GameSettings.clientPlayerColor) {
-                            cooldown++
-                        }
+                        if (abilityTriggerComponent == null) {
+                            if (Game.getCurrentTurn() == GameSettings.clientPlayerColor) {
+                                cooldown++
+                            }
 
-                        abilityComponent.currentAbilityCDTime = cooldown
+                            abilityComponent.currentAbilityCDTime = cooldown
 
-                        if (PlayerColorComponent.mapper.get(it).color == GameSettings.clientPlayerColor) {
-                            it.add(AbilityTriggerComponent(position, position, false))
+                            if (PlayerColorComponent.mapper.get(it).color == GameSettings.clientPlayerColor) {
+                                it.add(AbilityTriggerComponent(position, position, false))
+                            }
                         }
                     }
-                }
             }
         }
     }
