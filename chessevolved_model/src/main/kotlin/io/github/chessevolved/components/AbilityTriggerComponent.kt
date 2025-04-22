@@ -8,6 +8,7 @@ class AbilityTriggerComponent(
     // The position of where the trigger happens
     val targetPosition: Position,
     val oldPosition: Position,
+    val isActive: Boolean,
 ) : Component {
     companion object {
         val mapper: ComponentMapper<AbilityTriggerComponent> =

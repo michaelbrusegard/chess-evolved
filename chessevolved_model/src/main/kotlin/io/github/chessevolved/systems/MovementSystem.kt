@@ -13,6 +13,7 @@ import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.data.Position
 import io.github.chessevolved.singletons.EcsEngine
+import io.github.chessevolved.singletons.Game
 
 class MovementSystem(
     private val onTurnComplete: () -> Unit,
@@ -43,10 +44,12 @@ class MovementSystem(
         }
 
         val piecePositionComponent = PositionComponent.mapper.get(entity)
+
         val pieceActorComponent = ActorComponent.mapper.get(entity)
         val pieceMovementRuleComponent = MovementRuleComponent.mapper.get(entity)
 
-        entity?.add(AbilityTriggerComponent(targetPosition, piecePositionComponent.position))
+        println("This is getting triggered")
+        entity?.add(AbilityTriggerComponent(targetPosition, piecePositionComponent.position, true))
 
         piecePositionComponent.position = targetPosition
         pieceActorComponent.actor.setPosition(targetPosition.x.toFloat(), targetPosition.y.toFloat())
@@ -62,6 +65,10 @@ class MovementSystem(
         entity?.remove(SelectionComponent::class.java)
         entity?.remove(ValidMovesComponent::class.java)
         entity?.remove(MovementIntentComponent::class.java)
+
+        if (entity != null) {
+            Game.changePieceDTOPosition(entity, targetPosition)
+        }
 
         onTurnComplete()
     }

@@ -14,6 +14,7 @@ import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.singletons.EcsEngine
+import io.github.chessevolved.singletons.Game
 
 class CaptureSystem : IteratingSystem(
     Family.all(CapturedComponent::class.java).get(),
@@ -39,8 +40,7 @@ class CaptureSystem : IteratingSystem(
 
         if (capturedBlockedComponent != null) {
             // Trigger the ability.
-            entity?.add(AbilityTriggerComponent(capturedPosition, capturedPosition))
-            // entity?.remove(CapturedComponent::class.java)
+            entity?.add(AbilityTriggerComponent(capturedPosition, capturedPosition, false))
             capturingPiece?.remove(SelectionComponent::class.java)
             capturingPiece?.remove(ValidMovesComponent::class.java)
             return
@@ -55,6 +55,8 @@ class CaptureSystem : IteratingSystem(
 
         val actor = ActorComponent.mapper.get(entity).actor
         actor.remove()
+
+        Game.removeEntityFromPieceDTOS(entity!!)
 
         EcsEngine.removeEntity(entity)
     }

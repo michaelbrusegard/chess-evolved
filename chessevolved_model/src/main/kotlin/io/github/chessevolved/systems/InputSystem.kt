@@ -66,7 +66,9 @@ class InputSystem :
                         )
                     }
 
-                    println("Ability got applied to piece!")
+                    Game.changePieceDTOAbility(piece, abilityComponent.ability, abilityComponent.currentAbilityCDTime)
+                    print("Ability got applied to piece!")
+                    print(" For position: ${PositionComponent.mapper.get(piece).position}\n")
                     selectedEntity.removeAll() // Remove abilityCard-entity from the game.
                 }
             } else {

@@ -18,6 +18,7 @@ import io.github.chessevolved.enums.AbilityType
 import io.github.chessevolved.enums.VisualEffectSize
 import io.github.chessevolved.enums.VisualEffectType
 import io.github.chessevolved.singletons.EcsEngine
+import io.github.chessevolved.singletons.Game
 
 class AbilitySystem :
     IteratingSystem(
@@ -30,11 +31,16 @@ class AbilitySystem :
         val abilityComponent = AbilityComponent.mapper.get(entity)
         val abilityTriggerComponent = AbilityTriggerComponent.mapper.get(entity)
 
+        println("Triggering ability: ${abilityComponent.ability}")
+        println("Ability CurrentCD: ${abilityComponent.currentAbilityCDTime}")
+
         if (abilityComponent.currentAbilityCDTime <= 0) {
             abilityComponent.currentAbilityCDTime = abilityComponent.abilityCooldownTime
+            Game.changePieceDTOAbility(entity!!, abilityComponent.ability, abilityComponent.currentAbilityCDTime)
         } else {
             abilityComponent.currentAbilityCDTime--
-            entity?.remove(AbilityTriggerComponent::class.java)
+            Game.changePieceDTOAbility(entity!!, abilityComponent.ability, abilityComponent.currentAbilityCDTime)
+            entity.remove(AbilityTriggerComponent::class.java)
             return
         }
 
@@ -42,7 +48,10 @@ class AbilitySystem :
             AbilityType.EXPLOSION -> {
                 // Since the trigger doesn't know if it was an active call or passive call.
                 // It is the ability's job to determine.
-                if (CapturedComponent.mapper.get(entity) == null) {
+                println("Explosion: isActive? : ${abilityTriggerComponent.isActive}")
+
+                if (abilityTriggerComponent.isActive && CapturedComponent.mapper.get(entity) == null) {
+                    println("Cant enter here?")
                     triggerExplosionEffect(entity, abilityTriggerComponent.targetPosition)
                 }
             }
@@ -54,7 +63,7 @@ class AbilitySystem :
             AbilityType.MIRROR -> {}
         }
 
-        entity?.remove(AbilityTriggerComponent::class.java)
+        entity.remove(AbilityTriggerComponent::class.java)
     }
 
     private fun triggerExplosionEffect(
