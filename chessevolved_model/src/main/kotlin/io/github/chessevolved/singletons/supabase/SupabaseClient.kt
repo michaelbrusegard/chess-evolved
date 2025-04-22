@@ -19,9 +19,12 @@ internal object SupabaseClient {
         }
 
     private val supabase: SupabaseClient =
+        @Suppress("ktlint:standard:max-line-length")
         createSupabaseClient(
-            supabaseUrl = dotenv["SUPABASE_URL"] ?: "no_url_found",
-            supabaseKey = dotenv["SUPABASE_ANON_KEY"] ?: "no_pass_found",
+            supabaseUrl = "https://tsmubattgglbqaarktnw.supabase.co" ?: "no_url_found",
+            supabaseKey =
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzbXViYXR0Z2dsYnFhYXJrdG53Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwNTE5MzksImV4cCI6MjA1NzYyNzkzOX0.O7DqYVCmuvHa3iOvXl53SOaNu-N6Rfb3E3J1Cg5K4Dw"
+                    ?: "no_pass_found",
         ) {
             install(Postgrest)
             install(Realtime) {

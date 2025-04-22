@@ -10,6 +10,7 @@ import io.github.chessevolved.components.CapturedComponent
 import io.github.chessevolved.components.ClickEventComponent
 import io.github.chessevolved.components.MovementIntentComponent
 import io.github.chessevolved.components.PieceTypeComponent
+import io.github.chessevolved.components.PlayerColorComponent
 import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.WeatherEventComponent
@@ -49,7 +50,8 @@ class InputSystem :
         } else {
             if (selectedEntity != null &&
                 AbilityCardComponent.mapper.get(selectedEntity) != null &&
-                AbilityCardComponent.mapper.get(selectedEntity).isInInventory
+                AbilityCardComponent.mapper.get(selectedEntity).isInInventory &&
+                PlayerColorComponent.mapper.get(piece).color == GameSettings.clientPlayerColor
             ) {
                 if (AbilityComponent.mapper.get(piece) != null) {
                     println("Already has ability")
@@ -66,7 +68,9 @@ class InputSystem :
                         )
                     }
 
-                    println("Ability got applied to piece!")
+                    Game.changePieceDTOAbility(piece, abilityComponent.ability, abilityComponent.currentAbilityCDTime)
+                    print("Ability got applied to piece!")
+                    print(" For position: ${PositionComponent.mapper.get(piece).position}\n")
                     selectedEntity.removeAll() // Remove abilityCard-entity from the game.
                 }
             } else {

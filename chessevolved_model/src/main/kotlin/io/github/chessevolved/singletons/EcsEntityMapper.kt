@@ -1,9 +1,12 @@
 package io.github.chessevolved.singletons
 
 import com.badlogic.ashley.core.Engine
+import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
+import io.github.chessevolved.components.AbilityComponent
+import io.github.chessevolved.components.AbilityTriggerComponent
 import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
@@ -33,20 +36,30 @@ object EcsEntityMapper {
             .get()
 
     fun extractStateFromEngine(engine: Engine): Pair<List<PieceDto>, List<BoardSquareDto>> {
-        val pieces =
-            engine.getEntitiesFor(pieceFamily).map { entity ->
-                val piecePosition = PositionComponent.mapper.get(entity)
+        val pieces: ArrayList<PieceDto> = ArrayList()
 
+        for ((_, value) in Game.getPieceDTOS()) {
+            val pieceDto =
                 PieceDto(
                     position =
                         Position(
-                            piecePosition.position.x,
-                            GameSettings.getBoardSize() - 1 - piecePosition.position.y,
+                            value.position.x,
+                            GameSettings.getBoardSize() - 1 - value.position.y,
                         ),
-                    type = PieceTypeComponent.mapper.get(entity).type,
-                    color = PlayerColorComponent.mapper.get(entity).color,
+                    previousPosition =
+                        Position(
+                            value.previousPosition.x,
+                            GameSettings.getBoardSize() - 1 - value.previousPosition.y,
+                        ),
+                    type = value.type,
+                    color = value.color,
+                    abilityType = value.abilityType,
+                    abilityCurrentCooldown = value.abilityCurrentCooldown,
                 )
-            }
+
+            pieces.add(pieceDto)
+        }
+        var amount = 0
 
         val boardSquares =
             engine.getEntitiesFor(boardSquareFamily).map { entity ->
@@ -87,7 +100,19 @@ object EcsEntityMapper {
                     if (typeComp.type != receivedPiece.type || colorComp.color != receivedPiece.color) {
                         Gdx.app.debug("ECSEntityMapper", "Replacing piece at ${receivedPiece.position} due to type/color mismatch.")
                         engine.removeEntity(existingEntity)
+                        Game.removeEntityFromPieceDTOS(existingEntity)
                         createPieceFromDto(pieceFactory, stage, receivedPiece)
+                    }
+
+                    if (receivedPiece.abilityType != null) {
+                        existingEntity.add(
+                            AbilityComponent(
+                                receivedPiece.abilityType!!,
+                                receivedPiece.abilityType!!.cooldownTime,
+                                receivedPiece.abilityCurrentCooldown,
+                            ),
+                        )
+                        existingEntity.add(AbilityTriggerComponent(receivedPiece.position, receivedPiece.position, false))
                     }
                 } else {
                     Gdx.app.debug("ECSEntityMapper", "Creating new piece: ${receivedPiece.type} at ${receivedPiece.position}")
@@ -98,11 +123,14 @@ object EcsEntityMapper {
             for (existingEntity in existingPieceEntities) {
                 val pos = PositionComponent.mapper.get(existingEntity).position
                 if (pos !in currentPositions) {
+                    // Most likely it was this that moved. We can trigger the new entity through movement system.
                     Gdx.app.debug("ECSEntityMapper", "Removing piece no longer in state at $pos")
                     val actorComponent = ActorComponent.mapper.get(existingEntity)
                     actorComponent.actor.remove()
+
+                    Game.removeEntityFromPieceDTOS(existingEntity)
+
                     engine.removeEntity(existingEntity)
-                    println("ActorComp: $actorComponent")
                 }
             }
 
@@ -140,13 +168,28 @@ object EcsEntityMapper {
         stage: Stage,
         pieceData: PieceDto,
     ) {
+        val pieceEntity: Entity
+
         when (pieceData.type) {
-            PieceType.PAWN -> pieceFactory.createPawn(pieceData.position, pieceData.color, stage)
-            PieceType.ROOK -> pieceFactory.createRook(pieceData.position, pieceData.color, stage)
-            PieceType.KNIGHT -> pieceFactory.createKnight(pieceData.position, pieceData.color, stage)
-            PieceType.BISHOP -> pieceFactory.createBishop(pieceData.position, pieceData.color, stage)
-            PieceType.QUEEN -> pieceFactory.createQueen(pieceData.position, pieceData.color, stage)
-            PieceType.KING -> pieceFactory.createKing(pieceData.position, pieceData.color, stage)
+            PieceType.PAWN -> pieceEntity = pieceFactory.createPawn(pieceData.position, pieceData.color, stage)
+            PieceType.ROOK -> pieceEntity = pieceFactory.createRook(pieceData.position, pieceData.color, stage)
+            PieceType.KNIGHT -> pieceEntity = pieceFactory.createKnight(pieceData.position, pieceData.color, stage)
+            PieceType.BISHOP -> pieceEntity = pieceFactory.createBishop(pieceData.position, pieceData.color, stage)
+            PieceType.QUEEN -> pieceEntity = pieceFactory.createQueen(pieceData.position, pieceData.color, stage)
+            PieceType.KING -> pieceEntity = pieceFactory.createKing(pieceData.position, pieceData.color, stage)
         }
+
+        pieceEntity.apply {
+            if (pieceData.abilityType != null) {
+                add(AbilityComponent(pieceData.abilityType!!, pieceData.abilityType!!.cooldownTime, pieceData.abilityCurrentCooldown))
+                println("CREATEPIECEFROMDTO: THIS ONE GETS TRIGGERED")
+                add(AbilityTriggerComponent(pieceData.position, pieceData.previousPosition, true))
+            }
+        }
+
+        println("Ability: ${pieceData.abilityType}")
+        println("AbilityCD: ${pieceData.abilityCurrentCooldown}")
+
+        Game.addPieceDTOS(pieceEntity)
     }
 }

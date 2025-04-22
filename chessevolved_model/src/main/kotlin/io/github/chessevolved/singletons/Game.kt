@@ -1,8 +1,15 @@
 package io.github.chessevolved.singletons
 
+import com.badlogic.ashley.core.Entity
+import io.github.chessevolved.components.AbilityComponent
+import io.github.chessevolved.components.PieceTypeComponent
+import io.github.chessevolved.components.PlayerColorComponent
+import io.github.chessevolved.components.PositionComponent
+import io.github.chessevolved.data.Position
 import io.github.chessevolved.dtos.BoardSquareDto
 import io.github.chessevolved.dtos.GameDto
 import io.github.chessevolved.dtos.PieceDto
+import io.github.chessevolved.enums.AbilityType
 import io.github.chessevolved.enums.PlayerColor
 import io.github.chessevolved.singletons.supabase.SupabaseGameHandler
 import io.github.chessevolved.singletons.supabase.SupabaseLobbyHandler
@@ -12,6 +19,9 @@ object Game {
     private var subscribers = mutableMapOf<String, (updatedGame: GameDto) -> Unit>()
     private var hasAskedForRematch = false
     private var currentTurn: PlayerColor? = null
+    var turnNumber: Int = 0
+
+    private var pieceDTOS: MutableMap<Entity, PieceDto> = mutableMapOf()
 
     suspend fun joinGame(gameId: String) {
         try {
@@ -100,5 +110,55 @@ object Game {
         }
 
         subscribers.remove(subscriberName)
+    }
+
+    fun getPieceDTOS(): MutableMap<Entity, PieceDto> {
+        return pieceDTOS
+    }
+
+    fun addPieceDTOS(entity: Entity) {
+        val pieceDTO =
+            PieceDto(
+                position = PositionComponent.mapper.get(entity).position,
+                previousPosition = PositionComponent.mapper.get(entity).position,
+                type = PieceTypeComponent.mapper.get(entity).type,
+                color = PlayerColorComponent.mapper.get(entity).color,
+                abilityType = AbilityComponent.mapper.get(entity)?.ability,
+                abilityCurrentCooldown =
+                    if (AbilityComponent.mapper.get(entity) != null) {
+                        AbilityComponent.mapper.get(
+                            entity,
+                        ).currentAbilityCDTime
+                    } else {
+                        0
+                    },
+            )
+
+        pieceDTOS[entity] = pieceDTO
+    }
+
+    fun changePieceDTOPosition(
+        entity: Entity,
+        targetPosition: Position,
+    ) {
+        if (pieceDTOS.containsKey(entity)) {
+            pieceDTOS[entity]!!.previousPosition = pieceDTOS[entity]!!.position
+            pieceDTOS[entity]!!.position = targetPosition
+        }
+    }
+
+    fun changePieceDTOAbility(
+        entity: Entity,
+        abilityType: AbilityType?,
+        abilityCurrentCooldown: Int,
+    ) {
+        if (pieceDTOS.containsKey(entity)) {
+            pieceDTOS[entity]!!.abilityType = abilityType
+            pieceDTOS[entity]!!.abilityCurrentCooldown = abilityCurrentCooldown
+        }
+    }
+
+    fun removeEntityFromPieceDTOS(entity: Entity) {
+        pieceDTOS.remove(entity)
     }
 }
