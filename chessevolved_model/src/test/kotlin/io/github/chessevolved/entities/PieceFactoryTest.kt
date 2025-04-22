@@ -21,7 +21,7 @@ class PieceFactoryTest {
     fun createPawn() {
         assertFails({
             pieceFactory.createPawn(
-                false,
+                // false,
                 Position(1000, 1000),
                 PlayerColor.BLACK,
                 Stage(),
