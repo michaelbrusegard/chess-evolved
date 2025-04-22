@@ -134,6 +134,7 @@ class GameUIView(
                 pickAbilityButton =
                     textButton("Select Ability") {
                         onClick { onPickAbilityCardButtonClicked() }
+                        isVisible = false
                     }.cell(padTop = -10f)
                 row()
                 add(abilityCardInventory)

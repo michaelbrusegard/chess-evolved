@@ -123,6 +123,10 @@ class GamePresenter(
         AbilityCardComponent.mapper.get(testAbilityCard).isInInventory = true
 
         subscribeToGameUpdates(this.toString(), this::onGameStateUpdate)
+
+//        abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
+//        abilityItemFactory.createAbilityItem(AbilityType.SHIELD)
+//        abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
     }
 
     private fun loadRequiredAssets() {
