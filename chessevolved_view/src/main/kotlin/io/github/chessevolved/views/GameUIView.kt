@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.enums.PlayerColor
@@ -102,9 +101,10 @@ class GameUIView(
                     isDisabled = true
                     it.left()
                 }.cell()
-                turnText = label("White's Turn") {
-                    style.fontColor = whiteColor
-                }
+                turnText =
+                    label("White's Turn") {
+                        style.fontColor = whiteColor
+                    }
             }
 
         val root =
