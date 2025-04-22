@@ -60,7 +60,7 @@ class GamePresenter(
 
     private val gameCamera = OrthographicCamera()
     private val gameUICamera = OrthographicCamera()
-    private val boardWorldSize = 8
+    private val boardWorldSize = GameSettings.getBoardSize()
 
     private val gameViewport: Viewport =
         FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
