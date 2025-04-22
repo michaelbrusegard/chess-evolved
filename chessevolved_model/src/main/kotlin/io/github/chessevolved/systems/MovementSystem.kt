@@ -3,6 +3,7 @@ package io.github.chessevolved.systems
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import io.github.chessevolved.components.AbilityComponent
 import io.github.chessevolved.components.AbilityTriggerComponent
 import io.github.chessevolved.components.ActorComponent
 import io.github.chessevolved.components.FowComponent
@@ -13,6 +14,7 @@ import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.ValidMovesComponent
 import io.github.chessevolved.data.Position
 import io.github.chessevolved.singletons.EcsEngine
+import io.github.chessevolved.singletons.Game
 
 class MovementSystem(
     private val onTurnComplete: () -> Unit,
@@ -43,10 +45,13 @@ class MovementSystem(
         }
 
         val piecePositionComponent = PositionComponent.mapper.get(entity)
+
         val pieceActorComponent = ActorComponent.mapper.get(entity)
         val pieceMovementRuleComponent = MovementRuleComponent.mapper.get(entity)
 
-        entity?.add(AbilityTriggerComponent(targetPosition, piecePositionComponent.position))
+        if (AbilityComponent.mapper.get(entity) != null) {
+            entity?.add(AbilityTriggerComponent(targetPosition, piecePositionComponent.position, true))
+        }
 
         piecePositionComponent.position = targetPosition
         pieceActorComponent.actor.setPosition(targetPosition.x.toFloat(), targetPosition.y.toFloat())
@@ -62,6 +67,10 @@ class MovementSystem(
         entity?.remove(SelectionComponent::class.java)
         entity?.remove(ValidMovesComponent::class.java)
         entity?.remove(MovementIntentComponent::class.java)
+
+        if (entity != null) {
+            Game.changePieceDTOPosition(entity, targetPosition)
+        }
 
         onTurnComplete()
     }

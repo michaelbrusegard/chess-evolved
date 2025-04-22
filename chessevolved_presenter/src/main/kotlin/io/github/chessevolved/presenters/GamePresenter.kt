@@ -13,11 +13,14 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.chessevolved.Navigator
 import io.github.chessevolved.components.AbilityCardComponent
 import io.github.chessevolved.components.AbilityComponent
+import io.github.chessevolved.components.AbilityTriggerComponent
 import io.github.chessevolved.components.PieceTypeComponent
 import io.github.chessevolved.components.PlayerColorComponent
+import io.github.chessevolved.components.PositionComponent
 import io.github.chessevolved.components.SelectionComponent
 import io.github.chessevolved.components.TextureRegionComponent
 import io.github.chessevolved.data.Position
+import io.github.chessevolved.dtos.GameDto
 import io.github.chessevolved.entities.AbilityItemFactory
 import io.github.chessevolved.entities.BoardSquareFactory
 import io.github.chessevolved.entities.PieceFactory
@@ -46,7 +49,6 @@ import io.github.chessevolved.views.GameUIView
 import io.github.chessevolved.views.GameView
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import ktx.graphics.color
 
 class GamePresenter(
     private val navigator: Navigator,
@@ -60,12 +62,12 @@ class GamePresenter(
 
     private val gameCamera = OrthographicCamera()
     private val gameUICamera = OrthographicCamera()
-    private val boardWorldSize = 8
+    private val boardWorldSize = GameSettings.getBoardSize()
 
     private val gameViewport: Viewport =
         FitViewport(boardWorldSize.toFloat(), boardWorldSize.toFloat(), gameCamera)
     private val gameUIViewport: Viewport =
-        FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), gameUICamera)
+        FitViewport(500f, 500f / (Gdx.graphics.width.toFloat() / Gdx.graphics.height.toFloat()), gameUICamera)
     private lateinit var gameUIView: GameUIView
     private lateinit var gameBoardView: GameView
     private val gameBatch: SpriteBatch = SpriteBatch()
@@ -119,10 +121,14 @@ class GamePresenter(
 
         resize(Gdx.graphics.width, Gdx.graphics.height)
 
-        val testAbilityCard = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
-        AbilityCardComponent.mapper.get(testAbilityCard).isInInventory = true
+//        val testAbilityCard = abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
+//        AbilityCardComponent.mapper.get(testAbilityCard).isInInventory = true
 
         subscribeToGameUpdates(this.toString(), this::onGameStateUpdate)
+
+//        abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
+//        abilityItemFactory.createAbilityItem(AbilityType.SHIELD)
+//        abilityItemFactory.createAbilityItem(AbilityType.EXPLOSION)
     }
 
     private fun loadRequiredAssets() {
@@ -181,96 +187,124 @@ class GamePresenter(
             }
         }
 
-        val startX: Int = (boardWorldSize / 2) - 4
-        for (startPos in startX until startX + 8) {
-            pieceFactory
-                .createPawn(
-                    Position(startPos, 1),
-                    GameSettings.clientPlayerColor,
-                    gameStage,
-                )
+        val startXLocal: Int = (boardWorldSize / 2) - 4
+        for (startPos in startXLocal until startXLocal + 8) {
+            val pawn1 =
+                pieceFactory
+                    .createPawn(
+                        Position(startPos, 1),
+                        GameSettings.clientPlayerColor,
+                        gameStage,
+                    )
 
-            pieceFactory
-                .createPawn(
-                    Position(startPos, boardWorldSize - 2),
-                    GameSettings.opponentPlayerColor,
-                    gameStage,
-                )
+            val pawn2 =
+                pieceFactory
+                    .createPawn(
+                        Position(startPos, boardWorldSize - 2),
+                        GameSettings.opponentPlayerColor,
+                        gameStage,
+                    )
+            Game.addPieceDTOS(pawn1)
+            Game.addPieceDTOS(pawn2)
         }
 
-        val startXLocal: Int = (boardWorldSize / 2) - 4
         for (startPos in startXLocal until startXLocal + 8) {
             when (startPos) {
                 startXLocal -> {
                     for (j in listOf(0, 7)) {
-                        pieceFactory.createRook(
-                            Position(startXLocal + j, 0),
-                            GameSettings.clientPlayerColor,
-                            gameStage,
-                        )
+                        val rook1 =
+                            pieceFactory.createRook(
+                                Position(startXLocal + j, 0),
+                                GameSettings.clientPlayerColor,
+                                gameStage,
+                            )
 
-                        pieceFactory.createRook(
-                            Position(startXLocal + j, boardWorldSize - 1),
-                            GameSettings.opponentPlayerColor,
-                            gameStage,
-                        )
+                        val rook2 =
+                            pieceFactory.createRook(
+                                Position(startXLocal + j, boardWorldSize - 1),
+                                GameSettings.opponentPlayerColor,
+                                gameStage,
+                            )
+
+                        Game.addPieceDTOS(rook1)
+                        Game.addPieceDTOS(rook2)
                     }
                 }
                 startXLocal + 1 -> {
                     for (j in listOf(1, 6)) {
-                        pieceFactory.createKnight(
-                            Position(startXLocal + j, 0),
-                            GameSettings.clientPlayerColor,
-                            gameStage,
-                        )
+                        val knight1 =
+                            pieceFactory.createKnight(
+                                Position(startXLocal + j, 0),
+                                GameSettings.clientPlayerColor,
+                                gameStage,
+                            )
 
-                        pieceFactory.createKnight(
-                            Position(startXLocal + j, boardWorldSize - 1),
-                            GameSettings.opponentPlayerColor,
-                            gameStage,
-                        )
+                        val knight2 =
+                            pieceFactory.createKnight(
+                                Position(startXLocal + j, boardWorldSize - 1),
+                                GameSettings.opponentPlayerColor,
+                                gameStage,
+                            )
+
+                        Game.addPieceDTOS(knight1)
+                        Game.addPieceDTOS(knight2)
                     }
                 }
                 startXLocal + 2 -> {
                     for (j in listOf(2, 5)) {
-                        pieceFactory.createBishop(
-                            Position(startXLocal + j, 0),
+                        val bishop1 =
+                            pieceFactory.createBishop(
+                                Position(startXLocal + j, 0),
+                                GameSettings.clientPlayerColor,
+                                gameStage,
+                            )
+
+                        val bishop2 =
+                            pieceFactory.createBishop(
+                                Position(startXLocal + j, boardWorldSize - 1),
+                                GameSettings.opponentPlayerColor,
+                                gameStage,
+                            )
+
+                        Game.addPieceDTOS(bishop1)
+                        Game.addPieceDTOS(bishop2)
+                    }
+                }
+                startXLocal + 3 -> {
+                    val queen1 =
+                        pieceFactory.createQueen(
+                            Position(startPos, 0),
                             GameSettings.clientPlayerColor,
                             gameStage,
                         )
 
-                        pieceFactory.createBishop(
-                            Position(startXLocal + j, boardWorldSize - 1),
+                    val queen2 =
+                        pieceFactory.createQueen(
+                            Position(startPos, boardWorldSize - 1),
                             GameSettings.opponentPlayerColor,
                             gameStage,
                         )
-                    }
-                }
-                startXLocal + 3 -> {
-                    pieceFactory.createQueen(
-                        Position(startPos, 0),
-                        GameSettings.clientPlayerColor,
-                        gameStage,
-                    )
 
-                    pieceFactory.createQueen(
-                        Position(startPos, boardWorldSize - 1),
-                        GameSettings.opponentPlayerColor,
-                        gameStage,
-                    )
+                    Game.addPieceDTOS(queen1)
+                    Game.addPieceDTOS(queen2)
                 }
                 startXLocal + 4 -> {
-                    pieceFactory.createKing(
-                        Position(startPos, 0),
-                        GameSettings.clientPlayerColor,
-                        gameStage,
-                    )
+                    val king1 =
+                        pieceFactory.createKing(
+                            Position(startPos, 0),
+                            GameSettings.clientPlayerColor,
+                            gameStage,
+                        )
 
-                    pieceFactory.createKing(
-                        Position(startPos, boardWorldSize - 1),
-                        GameSettings.opponentPlayerColor,
-                        gameStage,
-                    )
+                    val king2 =
+                        pieceFactory.createKing(
+                            Position(startPos, boardWorldSize - 1),
+                            GameSettings.opponentPlayerColor,
+                            gameStage,
+                        )
+
+                    Game.addPieceDTOS(king1)
+                    Game.addPieceDTOS(king2)
                 }
                 else -> {}
             }
@@ -423,6 +457,8 @@ class GamePresenter(
         val pieces = gameDto.pieces
         val boardSquares = gameDto.boardSquares
 
+        gameUIView.changeTurnText(gameDto.turn)
+
         if (SupabaseGameHandler.sendingGameState) {
             SupabaseGameHandler.sendingGameState = false
 
@@ -438,8 +474,31 @@ class GamePresenter(
             return
         }
 
+        Game.turnNumber++
+        checkAddAbilitiesUI()
+
         Gdx.app.postRunnable {
             EcsEntityMapper.applyStateToEngine(engine, pieceFactory, gameStage, pieces, boardSquares)
+
+            EcsEngine
+                .getEntitiesFor(
+                    Family.all(PieceTypeComponent::class.java, AbilityComponent::class.java).get(),
+                ).map {
+                    val position = PositionComponent.mapper.get(it).position
+                    val abilityComponent = AbilityComponent.mapper.get(it)
+
+                    var cooldown = abilityComponent.currentAbilityCDTime
+
+                    if (Game.getCurrentTurn() != GameSettings.clientPlayerColor) {
+                        cooldown++
+                    }
+
+                    abilityComponent.currentAbilityCDTime = cooldown
+
+                    if (PlayerColorComponent.mapper.get(it).color == GameSettings.clientPlayerColor) {
+                        it.add(AbilityTriggerComponent(position, position, false))
+                    }
+                }
 
             val kings =
                 EcsEngine.getEntitiesFor(Family.all(PieceTypeComponent::class.java).get()).filter {
@@ -460,12 +519,49 @@ class GamePresenter(
                 val (pieces, boardSquares) = EcsEntityMapper.extractStateFromEngine(engine)
 
                 SupabaseGameHandler.sendingGameState = true
+                Game.turnNumber++
+                checkAddAbilitiesUI()
 
                 Game.updateGameState(
                     Lobby.getLobbyId()!!,
                     pieces,
                     boardSquares,
                 )
+
+                EcsEngine
+                    .getEntitiesFor(
+                        Family.all(PieceTypeComponent::class.java, AbilityComponent::class.java).get(),
+                    ).map {
+                        val position = PositionComponent.mapper.get(it).position
+                        val abilityComponent = AbilityComponent.mapper.get(it)
+                        val abilityTriggerComponent = AbilityTriggerComponent.mapper.get(it)
+
+                        var cooldown = abilityComponent.currentAbilityCDTime
+
+                        if (abilityTriggerComponent == null) {
+                            if (Game.getCurrentTurn() == GameSettings.clientPlayerColor) {
+                                cooldown++
+                            }
+
+                            abilityComponent.currentAbilityCDTime = cooldown
+
+                            if (PlayerColorComponent.mapper.get(it).color == GameSettings.clientPlayerColor) {
+                                it.add(AbilityTriggerComponent(position, position, false))
+                            }
+                        }
+                    }
+            }
+        }
+    }
+
+    private fun checkAddAbilitiesUI() {
+        // Must keep this for now since we don't have all definitions for all abilities
+        val validAbilities = mutableListOf(AbilityType.EXPLOSION, AbilityType.SHIELD)
+
+        if (Game.turnNumber % 4 == 0 && Game.turnNumber != 0) {
+            val chosenAbilities = List(3) { validAbilities.random() }
+            for (ability in chosenAbilities) {
+                abilityItemFactory.createAbilityItem(ability)
             }
         }
     }

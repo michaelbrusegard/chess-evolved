@@ -24,28 +24,8 @@ class AbilityItemFactory(
         }
 
     fun createAbilityItem(abilityType: AbilityType): Entity {
-        var cooldown: Int = 3
-
-        when (abilityType) {
-            AbilityType.SHIELD -> {
-                cooldown = 3
-            }
-            AbilityType.EXPLOSION -> {
-                cooldown = 2
-            }
-            AbilityType.SWAP -> {
-                cooldown = 2
-            }
-            AbilityType.MIRROR -> {
-                cooldown = 3
-            }
-            AbilityType.NEW_MOVEMENT -> {
-                cooldown = 0
-            }
-        }
-
         return Entity().apply {
-            add(AbilityComponent(abilityType, cooldown, 0))
+            add(AbilityComponent(abilityType, abilityType.cooldownTime, 0))
             add(AbilityCardComponent())
             add(TextureRegionComponent(getAbilityItemTexture(abilityType)))
             engine.addEntity(this)

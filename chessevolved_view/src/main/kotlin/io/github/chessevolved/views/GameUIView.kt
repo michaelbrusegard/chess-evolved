@@ -11,9 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.Viewport
+import io.github.chessevolved.enums.PlayerColor
 import ktx.actors.onClick
 import ktx.scene2d.imageButton
 import ktx.scene2d.label
@@ -39,11 +39,10 @@ class GameUIView(
     private var promptedAmountOfPickableAbilities = 0
     private lateinit var abilityCardInventory: Table
     private lateinit var abilityPickerWindow: Table
-    private lateinit var blackTimer: TextField
-    private lateinit var whiteTimer: TextField
     private lateinit var abilityDescriptionLabel: Label
     private lateinit var abilityInfoTable: Table
     private lateinit var pickAbilityButton: TextButton
+    private lateinit var turnText: Label
 
     data class AbilityCardInformation(
         val texture: Texture? = Texture(Gdx.files.internal("pieces/pawn-white.png")),
@@ -55,16 +54,10 @@ class GameUIView(
 
         val blackInfoBox =
             scene2d.table {
-                textField(if (isWhitePlayer) "Black: Opponent" else "Black: You") {
-                    color = blackColor
+                textField(if (isWhitePlayer) "Black: Opponent" else "White: Opponent") {
+                    color = if (isWhitePlayer) blackColor else whiteColor
                     isDisabled = true
                 }.cell(growX = true)
-
-                blackTimer =
-                    textField("Time: 10:00") {
-                        color = blackColor
-                        isDisabled = true
-                    }
                 row()
             }
 
@@ -103,15 +96,14 @@ class GameUIView(
 
         val whiteInfoBox =
             scene2d.table {
-                textField(if (isWhitePlayer) "White: You" else "White: Opponent") {
-                    color = whiteColor
+                textField(if (isWhitePlayer) "White: You" else "Black: You") {
+                    color = if (isWhitePlayer) whiteColor else blackColor
                     isDisabled = true
-                }.cell(growX = true)
-
-                whiteTimer =
-                    textField("Time: 10:00") {
-                        color = whiteColor
-                        isDisabled = true
+                    it.left()
+                }.cell()
+                turnText =
+                    label("White's Turn") {
+                        style.fontColor = whiteColor
                     }
             }
 
@@ -134,6 +126,7 @@ class GameUIView(
                 pickAbilityButton =
                     textButton("Select Ability") {
                         onClick { onPickAbilityCardButtonClicked() }
+                        isVisible = false
                     }.cell(padTop = -10f)
                 row()
                 add(abilityCardInventory)
@@ -240,14 +233,6 @@ class GameUIView(
         abilityCards[abilityCardId]?.height = sizeOfAbilityCards.toFloat() + 20f
     }
 
-    fun updateWhiteTimer(time: Int) {
-        whiteTimer.text = "Time: $time"
-    }
-
-    fun updateBlackTimer(time: Int) {
-        blackTimer.text = "Time: $time"
-    }
-
     override fun render() {
         stage.act(Gdx.graphics.deltaTime)
         stage.draw()
@@ -267,6 +252,16 @@ class GameUIView(
     override fun setInputProcessor() {
         throw IllegalAccessError("setInputProcessor is not allowed for GameUIView. Call GameView's setInputProcessor instead.")
         // Gdx.input.inputProcessor = stage
+    }
+
+    fun changeTurnText(turn: PlayerColor) {
+        if (turn == PlayerColor.WHITE) {
+            turnText.setText("White's Turn")
+            turnText.color = Color.WHITE
+        } else {
+            turnText.setText("Black's Turn")
+            turnText.color = Color.WHITE
+        }
     }
 
     fun getStage() = stage
