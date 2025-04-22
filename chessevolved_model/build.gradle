@@ -42,6 +42,7 @@ dependencies {
   api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
   api "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion"
 
+
   // BEGIN SUPABASE DEPENDENCIES
   implementation platform("io.github.jan-tennert.supabase:bom:$supabaseVersion")
   implementation 'io.github.jan-tennert.supabase:postgrest-kt' //DB Operations
@@ -61,6 +62,9 @@ dependencies {
   // Testing with kotlin.test and JUnit
   testImplementation 'org.jetbrains.kotlin:kotlin-test'
   testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1"
+
+  testImplementation "org.mockito:mockito-core:5.+"
+  testImplementation "org.mockito.kotlin:mockito-kotlin:5.+"
 }
 
 test {
